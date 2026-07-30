@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ओजस्वी जनकल्याण फाउंडेशन</title>
     
-    <!-- Supabase जोड़ने के लिए (इसे लोड होने में कोई रुकावट न आए) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -29,8 +28,16 @@
         
         .btn-submit { width: 100%; background-color: #198754; color: white; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         .btn-submit:hover { background-color: #146c43; }
+        .btn-secondary { background-color: #0d6efd; margin-top: 20px; }
+        .btn-secondary:hover { background-color: #0b5ed7; }
         
         .msg { text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px; }
+        
+        /* नया सक्सेस स्क्रीन का डिजाइन */
+        #successScreen { display: none; text-align: center; padding: 20px; }
+        #successScreen h2 { color: #198754; font-size: 28px; margin-bottom: 10px; }
+        #successScreen p { font-size: 16px; margin-bottom: 10px; color: #333; }
+        #successScreen .note { font-size: 13px; color: #666; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
     </style>
 </head>
 <body>
@@ -58,71 +65,82 @@
             </div>
         </div>
 
-        <!-- कस्टमर लीड फॉर्म -->
         <div class="form-section">
-            <h2>संस्था से जुड़ें (Apply Now)</h2>
-            <p style="text-align: center; font-size: 13px; color: #666;">यह फॉर्म भरें, हमारे लोकल कार्यकर्ता जल्द ही आपसे संपर्क करेंगे।</p>
             
-            <form id="leadForm" onsubmit="submitLead(event)">
-                <div class="form-group">
-                    <label>पूरा नाम (जरूरी) *</label>
-                    <input type="text" id="name" placeholder="अपना नाम लिखें" required>
-                </div>
+            <!-- 1. असली फॉर्म (शुरुआत में दिखेगा) -->
+            <div id="formContainer">
+                <h2>संस्था से जुड़ें (Apply Now)</h2>
+                <p style="text-align: center; font-size: 13px; color: #666;">यह फॉर्म भरें, हमारे लोकल कार्यकर्ता जल्द ही आपसे संपर्क करेंगे।</p>
                 
-                <div class="form-group">
-                    <label>मोबाइल नंबर (जरूरी) *</label>
-                    <input type="tel" id="mobile" placeholder="10 अंकों का नंबर" pattern="[0-9]{10}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>पिनकोड (जरूरी) *</label>
-                    <input type="text" id="pincode" placeholder="उदा: 344022" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>योजना चुनें (जरूरी) *</label>
-                    <select id="scheme" required>
-                        <option value="">-- योजना चुनें --</option>
-                        <option value="विवाह योजना">पुत्र/पुत्री विवाह योजना</option>
-                        <option value="मायरा योजना">मायरा योगदान योजना</option>
-                        <option value="सहायता योजना">सहायता योगदान योजना</option>
-                        <option value="बुजुर्ग योजना">बुजुर्ग सहायता योजना</option>
-                    </select>
-                </div>
+                <form id="leadForm" onsubmit="submitLead(event)">
+                    <div class="form-group">
+                        <label>पूरा नाम (जरूरी) *</label>
+                        <input type="text" id="name" placeholder="अपना नाम लिखें" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>मोबाइल नंबर (जरूरी) *</label>
+                        <input type="tel" id="mobile" placeholder="10 अंकों का नंबर" pattern="[0-9]{10}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>पिनकोड (जरूरी) *</label>
+                        <input type="text" id="pincode" placeholder="उदा: 344022" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>योजना चुनें (जरूरी) *</label>
+                        <select id="scheme" required>
+                            <option value="">-- योजना चुनें --</option>
+                            <option value="विवाह योजना">पुत्र/पुत्री विवाह योजना</option>
+                            <option value="मायरा योजना">मायरा योगदान योजना</option>
+                            <option value="सहायता योजना">सहायता योगदान योजना</option>
+                            <option value="बुजुर्ग योजना">बुजुर्ग सहायता योजना</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label>पूरा पता (वैकल्पिक/Optional)</label>
-                    <textarea id="address" rows="2" placeholder="अपना घर का पता लिखें"></textarea>
-                </div>
+                    <div class="form-group">
+                        <label>पूरा पता (वैकल्पिक/Optional)</label>
+                        <textarea id="address" rows="2" placeholder="अपना घर का पता लिखें"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ईमेल आईडी (वैकल्पिक/Optional)</label>
+                        <input type="email" id="email" placeholder="अगर है तो डालें">
+                    </div>
+                    
+                    <button type="submit" class="btn-submit" id="submitBtn">सबमिट करें</button>
+                    <div id="statusMessage" class="msg"></div>
+                </form>
+            </div>
+
+            <!-- 2. सक्सेस स्क्रीन (सबमिट होने के बाद ही दिखेगा) -->
+            <div id="successScreen">
+                <h2>🎉 बधाई हो!</h2>
+                <p><strong>आपकी रिक्वेस्ट सफलतापूर्वक दर्ज कर ली गई है।</strong></p>
+                <p>हमारे स्थानीय कार्यकर्ता बहुत जल्द आपसे कॉल पर संपर्क करेंगे और आगे की प्रक्रिया पूरी करेंगे।</p>
                 
-                <div class="form-group">
-                    <label>ईमेल आईडी (वैकल्पिक/Optional)</label>
-                    <input type="email" id="email" placeholder="अगर है तो डालें">
-                </div>
+                <p class="note">अगर आपसे जानकारी भरने में कोई गलती हो गई है, तो आप नीचे दिए गए बटन पर क्लिक करके सही जानकारी के साथ दोबारा फॉर्म भर सकते हैं।</p>
                 
-                <button type="submit" class="btn-submit" id="submitBtn">सबमिट करें</button>
-                <div id="statusMessage" class="msg"></div>
-            </form>
+                <button onclick="resetFormUI()" class="btn-submit btn-secondary">नई रिक्वेस्ट डालें / जानकारी सुधारें</button>
+            </div>
+
         </div>
     </div>
 
-    <!-- पूरा जावास्क्रिप्ट यहीं है (कोई अलग फाइल नहीं चाहिए) -->
     <script>
         async function submitLead(event) {
-            // सबसे जरूरी लाइन: यह फॉर्म को खाली (रिफ्रेश) होने से रोकती है
             event.preventDefault(); 
             
             const btn = document.getElementById('submitBtn');
             const msgBox = document.getElementById('statusMessage');
             
             try {
-                // बटन को ब्लॉक करें ताकि कोई बार-बार न दबाए
                 btn.innerText = "कृपया प्रतीक्षा करें...";
                 btn.disabled = true;
 
-                // अगर Supabase लोड ही नहीं हुआ तो यही रुक जाएगा
                 if (typeof window.supabase === 'undefined') {
-                    throw new Error("इंटरनेट या सर्वर की वजह से डेटाबेस जुड़ नहीं पा रहा है।");
+                    throw new Error("सर्वर से जुड़ नहीं पा रहा है।");
                 }
 
                 const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
@@ -139,28 +157,29 @@
                     email: document.getElementById('email').value
                 };
 
-                // डेटा भेजना
                 const { data, error } = await supabase.from('leads').insert([leadData]);
 
-                if (error) {
-                    throw error; // अगर Supabase से एरर आया
-                }
+                if (error) throw error; 
 
-                // सक्सेस होने पर
-                msgBox.style.color = "green";
-                msgBox.innerText = "✅ आपकी रिक्वेस्ट सफलतापूर्वक भेज दी गई है!";
+                // असली जादू: फॉर्म छुपाओ और सक्सेस स्क्रीन दिखाओ
+                document.getElementById('formContainer').style.display = 'none';
+                document.getElementById('successScreen').style.display = 'block';
                 document.getElementById('leadForm').reset();
                 
             } catch (err) {
-                // अगर कोई भी गड़बड़ हुई तो यहाँ मैसेज आएगा
                 msgBox.style.color = "red";
                 msgBox.innerText = "गड़बड़ हो गई: " + err.message;
-                alert("कुछ समस्या आ रही है: " + err.message); // स्क्रीन पर पॉप-अप भी आएगा
             } finally {
-                // बटन को वापस नार्मल करना
                 btn.innerText = "सबमिट करें";
                 btn.disabled = false;
             }
+        }
+
+        // दोबारा फॉर्म भरने वाला बटन दबाने पर क्या होगा
+        function resetFormUI() {
+            document.getElementById('successScreen').style.display = 'none';
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('statusMessage').innerText = ""; // पुराना एरर/मैसेज हटाना
         }
     </script>
 </body>
