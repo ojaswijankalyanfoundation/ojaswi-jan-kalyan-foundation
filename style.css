@@ -1,0 +1,22 @@
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
+.header { background-color: #f26522; color: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.header h1 { margin: 0; font-size: 24px; }
+.slogan { font-size: 14px; margin-top: 8px; opacity: 0.9; }
+
+.container { padding: 15px; max-width: 800px; margin: auto; }
+
+.plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
+.plan-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid #1c2c52; text-align: center; }
+.plan-card h3 { color: #1c2c52; margin-top: 0; }
+
+.form-section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.form-section h2 { text-align: center; color: #f26522; margin-top: 0; }
+
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+
+.btn-submit { width: 100%; background-color: #198754; color: white; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+.btn-submit:hover { background-color: #146c43; }
+
+.msg { text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px; }
