@@ -19,7 +19,6 @@
     </div>
 
     <div class="container">
-        <!-- योजनाओं की जानकारी -->
         <h2 style="text-align: center; color: #1c2c52;">हमारी मुख्य योजनाएं</h2>
         <div class="plans-grid">
             <div class="plan-card">
@@ -36,12 +35,12 @@
             </div>
         </div>
 
-        <!-- कस्टमर लीड फॉर्म -->
         <div class="form-section">
             <h2>संस्था से जुड़ें (Apply Now)</h2>
             <p style="text-align: center; font-size: 13px; color: #666;">यह फॉर्म भरें, हमारे लोकल कार्यकर्ता जल्द ही आपसे संपर्क करेंगे।</p>
             
-            <form id="leadForm">
+            <!-- ⚠️ यहाँ ध्यान दें: onsubmit लगा दिया है -->
+            <form id="leadForm" onsubmit="submitLead(event)">
                 <div class="form-group">
                     <label>पूरा नाम (जरूरी) *</label>
                     <input type="text" id="name" placeholder="अपना नाम लिखें" required>
@@ -84,7 +83,7 @@
         </div>
     </div>
 
-    <!-- आपकी अलग की हुई JS फाइल सबसे अंत में -->
+    <!-- ⚠️ सुनिश्चित करें कि फाइल का नाम बिल्कुल script.js (छोटे अक्षरों में) हो -->
     <script src="script.js"></script>
 
 </body>
