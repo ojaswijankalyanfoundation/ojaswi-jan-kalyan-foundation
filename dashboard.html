@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Ojasvi Foundation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --saffron: #FF9933;
+            --green: #138808;
+            --navy: #1c2c52;
+            --light-bg: #f4f7f6;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { display: flex; background-color: var(--light-bg); }
+
+        /* Sidebar (Navy Blue) */
+        .sidebar { width: 250px; background-color: var(--navy); color: white; height: 100vh; position: fixed; padding-top: 20px; transition: 0.3s; }
+        .logo-area { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .logo-area h2 { color: var(--saffron); font-size: 22px; }
+        .logo-area p { font-size: 12px; color: #ccc; }
+        
+        .nav-menu { list-style: none; }
+        .nav-menu li { padding: 15px 25px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .nav-menu li:hover { background-color: rgba(255,255,255,0.1); border-left: 4px solid var(--saffron); }
+        .nav-menu li.active { background-color: rgba(255,255,255,0.1); border-left: 4px solid var(--saffron); font-weight: bold; }
+        
+        /* Main Content */
+        .main-content { margin-left: 250px; width: calc(100% - 250px); padding: 20px; }
+        
+        /* Top Header */
+        .top-header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .user-profile img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--green); }
+
+        /* Glassmorphism Cards */
+        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); border: 1px solid rgba(255, 255, 255, 0.18); display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--navy); }
+        .card:nth-child(1) { border-bottom-color: var(--navy); }
+        .card:nth-child(2) { border-bottom-color: var(--saffron); }
+        .card:nth-child(3) { border-bottom-color: var(--green); }
+        
+        .card-info h4 { color: #666; font-size: 14px; margin-bottom: 5px; }
+        .card-info h2 { color: #333; font-size: 28px; }
+        .card-icon { font-size: 35px; color: rgba(28, 44, 82, 0.2); }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); position: absolute; }
+            .main-content { margin-left: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <h2>ओजस्वी</h2>
+            <p>जनकल्याण फाउंडेशन</p>
+        </div>
+        <ul class="nav-menu">
+            <li class="active"><i class="fas fa-home"></i> डैशबोर्ड</li>
+            <li><i class="fas fa-user-plus"></i> मेंबर जोड़ें (KYC)</li>
+            <li><i class="fas fa-users"></i> मेरे मेंबर्स</li>
+            <li><i class="fas fa-file-invoice-dollar"></i> पेमेंट्स & रसीद</li>
+            <li><i class="fas fa-id-card"></i> ID कार्ड & सर्टिफिकेट</li>
+            <li><i class="fas fa-sign-out-alt"></i> लॉगआउट</li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <div class="top-header">
+            <h3><i class="fas fa-bars" style="color:var(--navy); cursor:pointer;"></i> वेलकम, एजेंट पोर्टल</h3>
+            <div class="user-profile">
+                <div style="text-align: right;">
+                    <strong>सुरेश कुमार</strong><br>
+                    <span style="font-size: 12px; color: #666;">Agent ID: OJKF-AG-001</span>
+                </div>
+                <img src="https://via.placeholder.com/40" alt="Profile">
+            </div>
+        </div>
+
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-info">
+                    <h4>कुल मेंबर्स</h4>
+                    <h2>125</h2>
+                </div>
+                <i class="fas fa-users card-icon" style="color: var(--navy);"></i>
+            </div>
+            <div class="card">
+                <div class="card-info">
+                    <h4>पेंडिंग अप्रूवल</h4>
+                    <h2>12</h2>
+                </div>
+                <i class="fas fa-clock card-icon" style="color: var(--saffron);"></i>
+            </div>
+            <div class="card">
+                <div class="card-info">
+                    <h4>अप्रूव्ड मेंबर्स</h4>
+                    <h2>113</h2>
+                </div>
+                <i class="fas fa-check-circle card-icon" style="color: var(--green);"></i>
+            </div>
+            <div class="card">
+                <div class="card-info">
+                    <h4>कुल कलेक्शन</h4>
+                    <h2>₹2,45,000</h2>
+                </div>
+                <i class="fas fa-rupee-sign card-icon" style="color: var(--navy);"></i>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <h3 style="color: var(--navy); margin-bottom: 15px;">क्विक एक्शन (Quick Actions)</h3>
+            <button style="background: var(--navy); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;"><i class="fas fa-plus"></i> नया मेंबर जोड़ें</button>
+            <button style="background: var(--saffron); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;"><i class="fas fa-upload"></i> KYC अपलोड करें</button>
+            <button style="background: var(--green); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;"><i class="fas fa-download"></i> रसीद डाउनलोड</button>
+        </div>
+
+    </div>
+
+</body>
+</html>
