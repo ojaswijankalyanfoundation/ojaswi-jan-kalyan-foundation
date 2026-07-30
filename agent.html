@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>एजेंट पोर्टल - ओजस्वी फाउंडेशन</title>
+    <!-- Supabase जोड़ने के लिए -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
+        .header { background-color: #1c2c52; color: white; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header h2 { margin: 0; font-size: 22px; }
+        
+        .container { padding: 20px; max-width: 1000px; margin: auto; }
+        
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        h3 { color: #f26522; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        /* टेबल का डिजाइन */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f8f9fa; color: #1c2c52; }
+        tr:hover { background-color: #f1f1f1; }
+        
+        .status-badge { background-color: #ffc107; color: #000; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .btn-approve { background: #198754; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-approve:hover { background: #146c43; }
+        
+        /* मोबाइल पर टेबल को स्क्रॉल करने के लिए */
+        .table-responsive { overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>👨‍💼 एजेंट डैशबोर्ड (लीड मैनेजमेंट)</h2>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h3>नई कस्टमर लीड्स</h3>
+            <p style="font-size: 13px; color: #666;">यहाँ वह सभी डेटा आ रहा है जो कस्टमर वेबसाइट से भर रहे हैं। मोबाइल नंबर पर क्लिक करके आप डायरेक्ट कॉल कर सकते हैं।</p>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>नाम</th>
+                            <th>मोबाइल नंबर</th>
+                            <th>योजना</th>
+                            <th>पिनकोड</th>
+                            <th>स्टेटस</th>
+                            <th>एक्शन</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leadsBody">
+                        <tr><td colspan="6" style="text-align: center; padding: 20px;">डेटा लोड हो रहा है... कृपया प्रतीक्षा करें</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase से कनेक्ट करना
+        const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // डेटाबेस से लीड्स मंगाने वाला फंक्शन
+        async function fetchLeads() {
+            // leads टेबल से डेटा लाओ, सबसे नई लीड सबसे ऊपर (order by created_at)
+            const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('leadsBody');
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">डेटा लाने में समस्या: ${error.message}</td></tr>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">अभी तक कोई नई लीड नहीं आई है।</td></tr>`;
+                return;
+            }
+
+            // डेटा को टेबल में डालना
+            tbody.innerHTML = ""; 
+            data.forEach(lead => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${lead.name}</strong></td>
+                    <td><a href="tel:${lead.mobile}" style="color: #0d6efd; text-decoration: none;">📞 ${lead.mobile}</a></td>
+                    <td>${lead.scheme_name}</td>
+                    <td>${lead.pincode}</td>
+                    <td><span class="status-badge">${lead.status || 'Pending'}</span></td>
+                    <td><button class="btn-approve" onclick="alert('हम अगले स्टेप में यहाँ KYC फॉर्म जोड़ेंगे, जहाँ से इस कस्टमर को पक्का मेम्बर बनाया जाएगा!')">KYC करें</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // पेज लोड होते ही यह फंक्शन अपने आप चल जाएगा
+        fetchLeads();
+    </script>
+</body>
+</html>
