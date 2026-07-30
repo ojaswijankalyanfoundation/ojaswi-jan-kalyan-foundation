@@ -5,11 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ओजस्वी जनकल्याण फाउंडेशन</title>
     
-    <!-- Supabase लाइब्रेरी -->
+    <!-- Supabase जोड़ने के लिए (इसे लोड होने में कोई रुकावट न आए) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- आपकी अलग की हुई CSS फाइल -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
+        .header { background-color: #f26522; color: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 24px; }
+        .slogan { font-size: 14px; margin-top: 8px; opacity: 0.9; }
+        
+        .container { padding: 15px; max-width: 800px; margin: auto; }
+        
+        .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .plan-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid #1c2c52; text-align: center; }
+        .plan-card h3 { color: #1c2c52; margin-top: 0; }
+        
+        .form-section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .form-section h2 { text-align: center; color: #f26522; margin-top: 0; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        
+        .btn-submit { width: 100%; background-color: #198754; color: white; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .btn-submit:hover { background-color: #146c43; }
+        
+        .msg { text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px; }
+    </style>
 </head>
 <body>
 
@@ -19,6 +41,7 @@
     </div>
 
     <div class="container">
+        <!-- योजनाओं की जानकारी -->
         <h2 style="text-align: center; color: #1c2c52;">हमारी मुख्य योजनाएं</h2>
         <div class="plans-grid">
             <div class="plan-card">
@@ -35,11 +58,11 @@
             </div>
         </div>
 
+        <!-- कस्टमर लीड फॉर्म -->
         <div class="form-section">
             <h2>संस्था से जुड़ें (Apply Now)</h2>
             <p style="text-align: center; font-size: 13px; color: #666;">यह फॉर्म भरें, हमारे लोकल कार्यकर्ता जल्द ही आपसे संपर्क करेंगे।</p>
             
-            <!-- ⚠️ यहाँ ध्यान दें: onsubmit लगा दिया है -->
             <form id="leadForm" onsubmit="submitLead(event)">
                 <div class="form-group">
                     <label>पूरा नाम (जरूरी) *</label>
@@ -83,8 +106,62 @@
         </div>
     </div>
 
-    <!-- ⚠️ सुनिश्चित करें कि फाइल का नाम बिल्कुल script.js (छोटे अक्षरों में) हो -->
-    <script src="script.js"></script>
+    <!-- पूरा जावास्क्रिप्ट यहीं है (कोई अलग फाइल नहीं चाहिए) -->
+    <script>
+        async function submitLead(event) {
+            // सबसे जरूरी लाइन: यह फॉर्म को खाली (रिफ्रेश) होने से रोकती है
+            event.preventDefault(); 
+            
+            const btn = document.getElementById('submitBtn');
+            const msgBox = document.getElementById('statusMessage');
+            
+            try {
+                // बटन को ब्लॉक करें ताकि कोई बार-बार न दबाए
+                btn.innerText = "कृपया प्रतीक्षा करें...";
+                btn.disabled = true;
 
+                // अगर Supabase लोड ही नहीं हुआ तो यही रुक जाएगा
+                if (typeof window.supabase === 'undefined') {
+                    throw new Error("इंटरनेट या सर्वर की वजह से डेटाबेस जुड़ नहीं पा रहा है।");
+                }
+
+                const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
+                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+                
+                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                
+                const leadData = {
+                    name: document.getElementById('name').value,
+                    mobile: document.getElementById('mobile').value,
+                    pincode: document.getElementById('pincode').value,
+                    scheme_name: document.getElementById('scheme').value,
+                    address: document.getElementById('address').value,
+                    email: document.getElementById('email').value
+                };
+
+                // डेटा भेजना
+                const { data, error } = await supabase.from('leads').insert([leadData]);
+
+                if (error) {
+                    throw error; // अगर Supabase से एरर आया
+                }
+
+                // सक्सेस होने पर
+                msgBox.style.color = "green";
+                msgBox.innerText = "✅ आपकी रिक्वेस्ट सफलतापूर्वक भेज दी गई है!";
+                document.getElementById('leadForm').reset();
+                
+            } catch (err) {
+                // अगर कोई भी गड़बड़ हुई तो यहाँ मैसेज आएगा
+                msgBox.style.color = "red";
+                msgBox.innerText = "गड़बड़ हो गई: " + err.message;
+                alert("कुछ समस्या आ रही है: " + err.message); // स्क्रीन पर पॉप-अप भी आएगा
+            } finally {
+                // बटन को वापस नार्मल करना
+                btn.innerText = "सबमिट करें";
+                btn.disabled = false;
+            }
+        }
+    </script>
 </body>
 </html>
