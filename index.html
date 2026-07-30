@@ -111,7 +111,7 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function submitLead(event) {
-            event.preventDefault();
+            event.preventDefault(); // पेज को रिफ्रेश होने से रोकना
             
             const btn = document.getElementById('submitBtn');
             const msgBox = document.getElementById('statusMessage');
