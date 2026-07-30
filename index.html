@@ -1,64 +1,149 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ओजस्वी जनकल्याण फाउंडेशन</title>
-    <!-- Supabase CDN -->
+    <!-- Supabase जोड़ने के लिए -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background-color: #f8f9fa; text-align: center; }
-        .header { background-color: #f26522; color: white; padding: 20px; }
-        .slogan { font-size: 14px; margin-top: 5px; }
-        .card-container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; gap: 15px; }
-        .card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; width: 90%; max-width: 300px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .card h3 { color: #1c2c52; }
-        .btn { display: inline-block; background-color: #0d6efd; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold; border: none; cursor: pointer;}
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
+        .header { background-color: #f26522; color: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 24px; }
+        .slogan { font-size: 14px; margin-top: 8px; opacity: 0.9; }
+        
+        .container { padding: 15px; max-width: 800px; margin: auto; }
+        
+        .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .plan-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid #1c2c52; text-align: center; }
+        .plan-card h3 { color: #1c2c52; margin-top: 0; }
+        
+        .form-section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .form-section h2 { text-align: center; color: #f26522; margin-top: 0; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        
+        .btn-submit { width: 100%; background-color: #198754; color: white; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .btn-submit:hover { background-color: #146c43; }
+        
+        .msg { text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
+
     <div class="header">
         <h1>ओजस्वी जनकल्याण फाउंडेशन</h1>
         <div class="slogan">जन-जन की शक्ति, समाज का विकास | सेवा • सशक्तिकरण • सम्मान</div>
     </div>
 
-    <!-- यह बटन सिर्फ चेक करने के लिए है कि डेटाबेस कनेक्ट हुआ या नहीं -->
-    <button class="btn" onclick="testConnection()">डेटाबेस कनेक्शन टेस्ट करें</button>
+    <div class="container">
+        <!-- योजनाओं की जानकारी -->
+        <h2 style="text-align: center; color: #1c2c52;">हमारी मुख्य योजनाएं</h2>
+        <div class="plans-grid">
+            <div class="plan-card">
+                <h3>पुत्र/पुत्री विवाह योजना</h3>
+                <p>बेटियों और बेटों की शादी पर संस्था द्वारा बड़ा आर्थिक सहयोग।</p>
+            </div>
+            <div class="plan-card">
+                <h3>मायरा योगदान योजना</h3>
+                <p>मायरे से पहले आर्थिक सहयोग और आसान किश्तें।</p>
+            </div>
+            <div class="plan-card">
+                <h3>सहायता योगदान योजना</h3>
+                <p>सदस्य के निधन पर 12वें दिन परिवार को आर्थिक सहायता।</p>
+            </div>
+        </div>
 
-    <div class="card-container">
-        <div class="card">
-            <h3>पुत्र/पुत्री विवाह योजना</h3>
-            <p>बेटियों और बेटों की शादी पर बड़ा आर्थिक सहयोग।</p>
-        </div>
-        <div class="card">
-            <h3>मायरा योगदान योजना</h3>
-            <p>मायरे से पहले आर्थिक सहयोग।</p>
-        </div>
-        <div class="card">
-            <h3>सहायता योगदान योजना</h3>
-            <p>सदस्य के निधन पर परिवार को आर्थिक सहायता।</p>
-        </div>
-        <div class="card">
-            <h3>बुजुर्ग सहायता योजना</h3>
-            <p>वरिष्ठ नागरिकों के लिए आर्थिक सुरक्षा।</p>
+        <!-- कस्टमर लीड फॉर्म (बिना OTP वाला) -->
+        <div class="form-section">
+            <h2>संस्था से जुड़ें (Apply Now)</h2>
+            <p style="text-align: center; font-size: 13px; color: #666;">यह फॉर्म भरें, हमारे लोकल कार्यकर्ता जल्द ही आपसे संपर्क करेंगे।</p>
+            
+            <form id="leadForm" onsubmit="submitLead(event)">
+                <div class="form-group">
+                    <label>पूरा नाम (जरूरी) *</label>
+                    <input type="text" id="name" placeholder="अपना नाम लिखें" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>मोबाइल नंबर (जरूरी) *</label>
+                    <input type="tel" id="mobile" placeholder="10 अंकों का नंबर" pattern="[0-9]{10}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>पिनकोड (जरूरी) *</label>
+                    <input type="text" id="pincode" placeholder="उदा: 344022" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>योजना चुनें (जरूरी) *</label>
+                    <select id="scheme" required>
+                        <option value="">-- योजना चुनें --</option>
+                        <option value="विवाह योजना">पुत्र/पुत्री विवाह योजना</option>
+                        <option value="मायरा योजना">मायरा योगदान योजना</option>
+                        <option value="सहायता योजना">सहायता योगदान योजना</option>
+                        <option value="बुजुर्ग योजना">बुजुर्ग सहायता योजना</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>पूरा पता (वैकल्पिक/Optional)</label>
+                    <textarea id="address" rows="2" placeholder="अपना घर का पता लिखें"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>ईमेल आईडी (वैकल्पिक/Optional)</label>
+                    <input type="email" id="email" placeholder="अगर है तो डालें">
+                </div>
+                
+                <button type="submit" class="btn-submit" id="submitBtn">सबमिट करें</button>
+                <div id="statusMessage" class="msg"></div>
+            </form>
         </div>
     </div>
 
     <script>
-        // आपकी Supabase डिटेल्स (जो आपने दी हैं)
+        // आपकी Supabase की डिटेल्स सेट कर दी गई हैं
         const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
         
-        // डेटाबेस चालू करना
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // कनेक्शन टेस्ट करने का फंक्शन
-        function testConnection() {
-            if(supabase) {
-                alert("बधाई हो! आपका Supabase डेटाबेस सफलतापूर्वक कनेक्ट हो गया है। 🚀");
+        async function submitLead(event) {
+            event.preventDefault(); // पेज को रिफ्रेश होने से रोकना
+            
+            const btn = document.getElementById('submitBtn');
+            const msgBox = document.getElementById('statusMessage');
+            
+            btn.innerText = "कृपया प्रतीक्षा करें...";
+            btn.disabled = true;
+            
+            // फॉर्म का डेटा इकट्ठा करना
+            const leadData = {
+                name: document.getElementById('name').value,
+                mobile: document.getElementById('mobile').value,
+                pincode: document.getElementById('pincode').value,
+                scheme_name: document.getElementById('scheme').value,
+                address: document.getElementById('address').value,
+                // ईमेल हम बाद में इस्तेमाल करेंगे
+            };
+
+            // डेटाबेस की 'leads' टेबल में डेटा डालना
+            const { data, error } = await supabase.from('leads').insert([leadData]);
+
+            if (error) {
+                msgBox.style.color = "red";
+                msgBox.innerText = "कुछ गड़बड़ हो गई: " + error.message;
+                btn.innerText = "सबमिट करें";
+                btn.disabled = false;
             } else {
-                alert("कनेक्शन फेल हो गया।");
+                msgBox.style.color = "green";
+                msgBox.innerText = "✅ आपकी रिक्वेस्ट सफलतापूर्वक भेज दी गई है! हमारे एजेंट जल्द ही आपसे संपर्क करेंगे।";
+                document.getElementById('leadForm').reset(); // फॉर्म खाली कर देना
+                btn.innerText = "सबमिट करें";
+                btn.disabled = false;
             }
         }
     </script>
