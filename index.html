@@ -1,1 +1,66 @@
 
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ओजस्वी जनकल्याण फाउंडेशन</title>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f8f9fa; text-align: center; }
+        .header { background-color: #f26522; color: white; padding: 20px; }
+        .slogan { font-size: 14px; margin-top: 5px; }
+        .card-container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; gap: 15px; }
+        .card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; width: 90%; max-width: 300px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .card h3 { color: #1c2c52; }
+        .btn { display: inline-block; background-color: #0d6efd; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold; border: none; cursor: pointer;}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ओजस्वी जनकल्याण फाउंडेशन</h1>
+        <div class="slogan">जन-जन की शक्ति, समाज का विकास | सेवा • सशक्तिकरण • सम्मान</div>
+    </div>
+
+    <!-- यह बटन सिर्फ चेक करने के लिए है कि डेटाबेस कनेक्ट हुआ या नहीं -->
+    <button class="btn" onclick="testConnection()">डेटाबेस कनेक्शन टेस्ट करें</button>
+
+    <div class="card-container">
+        <div class="card">
+            <h3>पुत्र/पुत्री विवाह योजना</h3>
+            <p>बेटियों और बेटों की शादी पर बड़ा आर्थिक सहयोग।</p>
+        </div>
+        <div class="card">
+            <h3>मायरा योगदान योजना</h3>
+            <p>मायरे से पहले आर्थिक सहयोग।</p>
+        </div>
+        <div class="card">
+            <h3>सहायता योगदान योजना</h3>
+            <p>सदस्य के निधन पर परिवार को आर्थिक सहायता।</p>
+        </div>
+        <div class="card">
+            <h3>बुजुर्ग सहायता योजना</h3>
+            <p>वरिष्ठ नागरिकों के लिए आर्थिक सुरक्षा।</p>
+        </div>
+    </div>
+
+    <script>
+        // आपकी Supabase डिटेल्स (जो आपने दी हैं)
+        const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+        
+        // डेटाबेस चालू करना
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // कनेक्शन टेस्ट करने का फंक्शन
+        function testConnection() {
+            if(supabase) {
+                alert("बधाई हो! आपका Supabase डेटाबेस सफलतापूर्वक कनेक्ट हो गया है। 🚀");
+            } else {
+                alert("कनेक्शन फेल हो गया।");
+            }
+        }
+    </script>
+</body>
+</html>
