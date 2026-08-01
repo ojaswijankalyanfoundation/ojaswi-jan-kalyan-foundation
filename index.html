@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ओजस्वी जनकल्याण फाउंडेशन | Ojasvi Foundation</title>
+    <title>ओजस्वी जनकल्याण फाउंडेशन | Ojasvi Jan-Kalyan Foundation</title>
     
-    <!-- Supabase & FontAwesome (Icons) -->
+    <!-- Supabase & FontAwesome -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -20,19 +20,22 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--light-bg); color: #333; }
         
         /* Premium Navbar */
-        .navbar { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
-        .logo { display: flex; align-items: center; gap: 15px; }
-        .logo h1 { margin: 0; font-size: 24px; color: var(--navy); }
-        .logo span { color: var(--saffron); }
-        .nav-links { display: flex; gap: 20px; }
+        .navbar { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        
+        /* नया लोगो और नाम का डिज़ाइन */
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-section img { height: 60px; width: auto; }
+        .brand-text { display: flex; flex-direction: column; }
+        .brand-text h1 { margin: 0; font-size: 22px; color: var(--navy); line-height: 1.2; }
+        .brand-text span { color: var(--saffron); font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+        
+        .nav-links { display: flex; gap: 20px; align-items: center; }
         .nav-links a { text-decoration: none; color: var(--navy); font-weight: 600; font-size: 15px; transition: 0.3s; }
         .nav-links a:hover { color: var(--saffron); }
         
-        /* Hero Banner */
-        .hero { background: linear-gradient(135deg, var(--navy) 0%, #2a4178 100%); color: white; padding: 60px 20px; text-align: center; border-bottom: 5px solid var(--saffron); }
-        .hero h2 { font-size: 36px; margin-bottom: 10px; }
-        .hero p { font-size: 18px; opacity: 0.9; margin-bottom: 20px; }
-        .hero-line { height: 4px; width: 100px; background: var(--green); margin: 0 auto; border-radius: 2px; }
+        /* नया हीरो बैनर सेक्शन */
+        .hero-banner { width: 100%; background: var(--navy); border-bottom: 5px solid var(--saffron); }
+        .hero-banner img { width: 100%; height: auto; display: block; object-fit: cover; }
 
         .container { padding: 40px 15px; max-width: 1000px; margin: auto; }
         
@@ -64,32 +67,36 @@
         #successScreen p { font-size: 16px; color: #444; }
         
         @media (max-width: 768px) {
-            .nav-links { display: none; /* मोबाइल में मेनू छुप जाएगा, बाद में टॉगल लगाएंगे */ }
-            .navbar { justify-content: center; }
+            .nav-links { display: none; }
+            .brand-text h1 { font-size: 18px; }
+            .brand-text span { font-size: 9px; }
+            .logo-section img { height: 45px; }
+            .navbar { padding: 10px; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Navigation Bar -->
+    <!-- Navigation Bar (लोगो और पूरा नाम) -->
     <div class="navbar">
-        <div class="logo">
-            <i class="fas fa-hands-holding-child" style="color: var(--saffron); font-size: 28px;"></i>
-            <h1>ओजस्वी <span>फाउंडेशन</span></h1>
+        <div class="logo-section">
+            <img src="90888.png" alt="Ojasvi Logo">
+            <div class="brand-text">
+                <h1>ओजस्वी जनकल्याण फाउंडेशन</h1>
+                <span>OJASVI JAN-KALYAN FOUNDATION</span>
+            </div>
         </div>
         <div class="nav-links">
             <a href="#">होम</a>
             <a href="#">हमारे बारे में</a>
             <a href="#">योजनाएं</a>
-            <a href="#" style="background: var(--saffron); color: white; padding: 5px 15px; border-radius: 20px;">लॉगिन (Login)</a>
+            <a href="#" style="background: var(--saffron); color: white; padding: 6px 18px; border-radius: 20px;">लॉगिन (Login)</a>
         </div>
     </div>
 
-    <!-- Hero Banner -->
-    <div class="hero">
-        <h2>समाज सेवा, जन सेवा, राष्ट्र सेवा</h2>
-        <p>जन-जन की शक्ति, समाज का विकास • सेवा • सशक्तिकरण • सम्मान</p>
-        <div class="hero-line"></div>
+    <!-- Hero Banner (बड़ी इमेज) -->
+    <div class="hero-banner">
+        <img src="90913.png" alt="Ojasvi Jan Kalyan Foundation Banner">
     </div>
 
     <div class="container">
