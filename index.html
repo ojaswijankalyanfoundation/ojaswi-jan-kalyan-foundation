@@ -32,9 +32,10 @@
         .nav-links a { text-decoration: none; color: var(--navy); font-weight: 600; font-size: 15px; transition: 0.3s; }
         .nav-links a:hover { color: var(--saffron); }
         
-        /* Hero Banner */
-        .hero-banner { width: 100%; background: var(--navy); border-bottom: 5px solid var(--saffron); }
-        .hero-banner img { width: 100%; height: auto; display: block; object-fit: cover; }
+        /* Solid Color Hero Banner for Phase 1 */
+        .hero-banner { background: linear-gradient(135deg, var(--navy) 0%, #2a4178 100%); padding: 60px 20px; text-align: center; color: white; border-bottom: 5px solid var(--saffron); }
+        .hero-banner h2 { margin: 0; font-size: 32px; color: var(--saffron); }
+        .hero-banner p { margin-top: 10px; font-size: 18px; opacity: 0.9; }
 
         .container { padding: 40px 15px; max-width: 1000px; margin: auto; }
         
@@ -71,15 +72,18 @@
             .brand-text span { font-size: 9px; }
             .logo-section img { height: 45px; }
             .navbar { padding: 10px; justify-content: center; }
+            .hero-banner h2 { font-size: 24px; }
+            .hero-banner p { font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Navigation Bar (लोगो और पूरा नाम) -->
+    <!-- Navigation Bar -->
     <div class="navbar">
         <div class="logo-section">
-            <img src="90888.png" alt="Ojasvi Logo">
+            <!-- Logo from Assets folder -->
+            <img src="assets/ojasvi-logo.png" alt="Ojasvi Logo">
             <div class="brand-text">
                 <h1>ओजस्वी जनकल्याण फाउंडेशन</h1>
                 <span>OJASVI JAN-KALYAN FOUNDATION</span>
@@ -93,9 +97,10 @@
         </div>
     </div>
 
-    <!-- Hero Banner (बड़ी इमेज) -->
+    <!-- Temporary Solid Color Hero Banner for Phase 1 -->
     <div class="hero-banner">
-        <img src="90913.png" alt="Ojasvi Jan Kalyan Foundation Banner">
+        <h2>ओजस्वी राह, हर घर रोशन, हर जीवन खुशहाल।</h2>
+        <p>समाज सेवा • शिक्षा सहायता • स्वास्थ्य सहायता • बुजुर्ग सहयोग • महिला सशक्तिकरण</p>
     </div>
 
     <div class="container">
@@ -124,7 +129,6 @@
                 <h2><i class="fas fa-user-plus" style="color: var(--saffron);"></i> संस्था से जुड़ें (Apply Now)</h2>
                 <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 25px;">यह फॉर्म भरें, हमारे लोकल कार्यकर्ता जल्द ही आपसे संपर्क करेंगे।</p>
                 
-                <!-- ⚠️ सही फॉर्म टैग यहाँ है (इसमें onsubmit लगा है) -->
                 <form id="leadForm" onsubmit="submitLead(event)">
                     <div class="form-group">
                         <label>पूरा नाम (जरूरी) *</label>
@@ -179,7 +183,7 @@
         </div>
     </div>
 
-    <!-- ⚠️ Backend Script (Supabase) - जो कट गया था, वो वापस डाल दिया गया है -->
+    <!-- Backend Script (Supabase) -->
     <script>
         async function submitLead(event) {
             event.preventDefault(); 
