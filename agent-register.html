@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>एजेंट रजिस्ट्रेशन | ओजस्वी फाउंडेशन</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --saffron: #FF9933; --green: #138808; --navy: #1c2c52; --light-bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--light-bg); color: #333; }
+        
+        .navbar { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-section img { height: 50px; }
+        .brand-text h1 { margin: 0; font-size: 20px; color: var(--navy); }
+        .nav-links a { text-decoration: none; color: var(--navy); font-weight: 600; margin-left: 20px; }
+        
+        .form-container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); border-top: 4px solid var(--saffron); }
+        .form-container h2 { text-align: center; color: var(--navy); margin-top: 0; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        
+        .btn-submit { width: 100%; background: var(--green); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo-section">
+            <img src="assets/ojasvi-logo.png" alt="Logo">
+            <div class="brand-text"><h1>ओजस्वी फाउंडेशन</h1></div>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">होम</a>
+            <a href="login.html" style="background: var(--saffron); color: white; padding: 6px 15px; border-radius: 20px;">लॉगिन (Login)</a>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <h2><i class="fas fa-user-tie"></i> एजेंट रजिस्ट्रेशन फॉर्म</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">संस्था के अधिकृत एजेंट बनने के लिए अपनी जानकारी भरें।</p>
+        
+        <form>
+            <div class="form-grid">
+                <div class="form-group"><label>पूरा नाम *</label><input type="text" required></div>
+                <div class="form-group"><label>पिता का नाम *</label><input type="text" required></div>
+                <div class="form-group"><label>जन्म तिथि *</label><input type="date" required></div>
+                <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" required></div>
+                <div class="form-group"><label>आधार नंबर *</label><input type="text" required></div>
+                <div class="form-group"><label>पैन नंबर *</label><input type="text" required></div>
+                <div class="form-group"><label>बैंक का नाम *</label><input type="text" required></div>
+                <div class="form-group"><label>अकाउंट नंबर *</label><input type="text" required></div>
+            </div>
+            
+            <h4 style="margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">डॉक्यूमेंट अपलोड</h4>
+            <div class="form-grid" style="margin-top: 15px;">
+                <div class="form-group"><label>पासपोर्ट फोटो *</label><input type="file" required></div>
+                <div class="form-group"><label>आधार कार्ड *</label><input type="file" required></div>
+                <div class="form-group"><label>पैन कार्ड *</label><input type="file" required></div>
+                <div class="form-group"><label>बैंक पासबुक *</label><input type="file" required></div>
+            </div>
+
+            <button type="submit" class="btn-submit">सबमिट करें</button>
+        </form>
+    </div>
+
+</body>
+</html>
