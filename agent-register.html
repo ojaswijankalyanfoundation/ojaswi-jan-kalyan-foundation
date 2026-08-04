@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>एजेंट रजिस्ट्रेशन | ओजस्वी फाउंडेशन</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --saffron: #FF9933; --green: #138808; --navy: #1c2c52; --light-bg: #f4f7f6; }
@@ -21,9 +22,19 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        .form-group input[type="file"] { padding: 7px; background: #f9f9f9; }
         
         .btn-submit { width: 100%; background: var(--green); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-submit:disabled { background: #999; cursor: not-allowed; }
+        
+        #successScreen { display: none; text-align: center; padding: 20px; }
+        #successScreen i { font-size: 50px; color: var(--green); margin-bottom: 15px; }
+        
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .brand-text h1 { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -39,33 +50,109 @@
         </div>
     </div>
 
-    <div class="form-container">
+    <div class="form-container" id="mainFormBox">
         <h2><i class="fas fa-user-tie"></i> एजेंट रजिस्ट्रेशन फॉर्म</h2>
         <p style="text-align: center; color: #666; margin-bottom: 20px;">संस्था के अधिकृत एजेंट बनने के लिए अपनी जानकारी भरें।</p>
         
-        <form>
+        <form id="agentForm" onsubmit="submitAgent(event)">
             <div class="form-grid">
-                <div class="form-group"><label>पूरा नाम *</label><input type="text" required></div>
-                <div class="form-group"><label>पिता का नाम *</label><input type="text" required></div>
-                <div class="form-group"><label>जन्म तिथि *</label><input type="date" required></div>
-                <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" required></div>
-                <div class="form-group"><label>आधार नंबर *</label><input type="text" required></div>
-                <div class="form-group"><label>पैन नंबर *</label><input type="text" required></div>
-                <div class="form-group"><label>बैंक का नाम *</label><input type="text" required></div>
-                <div class="form-group"><label>अकाउंट नंबर *</label><input type="text" required></div>
+                <div class="form-group"><label>पूरा नाम *</label><input type="text" id="a_name" required></div>
+                <div class="form-group"><label>पिता का नाम *</label><input type="text" id="a_father" required></div>
+                <div class="form-group"><label>जन्म तिथि *</label><input type="date" id="a_dob" required></div>
+                <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="a_mobile" pattern="[0-9]{10}" required></div>
+                <div class="form-group"><label>आधार नंबर *</label><input type="text" id="a_aadhaar" required></div>
+                <div class="form-group"><label>पैन नंबर *</label><input type="text" id="a_pan" required></div>
+                <div class="form-group"><label>बैंक का नाम *</label><input type="text" id="a_bank" required></div>
+                <div class="form-group"><label>अकाउंट नंबर *</label><input type="text" id="a_account" required></div>
             </div>
             
             <h4 style="margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">डॉक्यूमेंट अपलोड</h4>
             <div class="form-grid" style="margin-top: 15px;">
-                <div class="form-group"><label>पासपोर्ट फोटो *</label><input type="file" required></div>
-                <div class="form-group"><label>आधार कार्ड *</label><input type="file" required></div>
-                <div class="form-group"><label>पैन कार्ड *</label><input type="file" required></div>
-                <div class="form-group"><label>बैंक पासबुक *</label><input type="file" required></div>
+                <div class="form-group"><label>पासपोर्ट फोटो *</label><input type="file" id="f_photo" accept="image/*" required></div>
+                <div class="form-group"><label>आधार कार्ड *</label><input type="file" id="f_aadhaar" accept="image/*,application/pdf" required></div>
+                <div class="form-group"><label>पैन कार्ड *</label><input type="file" id="f_pan" accept="image/*,application/pdf" required></div>
+                <div class="form-group"><label>बैंक पासबुक *</label><input type="file" id="f_passbook" accept="image/*,application/pdf" required></div>
             </div>
 
-            <button type="submit" class="btn-submit">सबमिट करें</button>
+            <button type="submit" class="btn-submit" id="submitBtn">सबमिट करें</button>
+            <div id="statusMsg" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
         </form>
     </div>
 
+    <!-- Success Screen -->
+    <div class="form-container" id="successScreen">
+        <i class="fas fa-check-circle"></i>
+        <h2 style="color: var(--green);">रजिस्ट्रेशन सफल!</h2>
+        <p>आपकी जानकारी और डाक्यूमेंट्स सफलतापूर्वक जमा हो गए हैं।</p>
+        <p style="color: #666; margin-top: 10px;">एडमिन द्वारा अप्रूवल मिलने के बाद आपके मोबाइल पर लॉगिन आईडी (Agent ID) और पासवर्ड भेज दिया जाएगा।</p>
+        <button onclick="window.location.href='index.html'" class="btn-submit" style="width: auto; padding: 10px 30px; margin-top: 20px;">होम पेज पर जाएँ</button>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function uploadFile(file, folderName) {
+            if (!file) return null;
+            const fileExt = file.name.split('.').pop();
+            const fileName = `agent_kyc/${folderName}_${Date.now()}.${fileExt}`; 
+            
+            const { data, error } = await supabase.storage.from('kyc_documents').upload(fileName, file);
+            if (error) throw error;
+            
+            const { data: urlData } = supabase.storage.from('kyc_documents').getPublicUrl(fileName);
+            return urlData.publicUrl;
+        }
+
+        async function submitAgent(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const msg = document.getElementById('statusMsg');
+            
+            try {
+                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> डाटा अपलोड हो रहा है...";
+                btn.disabled = true;
+                msg.innerText = "";
+
+                // Uploading 4 Files
+                const photoUrl = await uploadFile(document.getElementById('f_photo').files[0], 'photo');
+                const aadhaarUrl = await uploadFile(document.getElementById('f_aadhaar').files[0], 'aadhaar');
+                const panUrl = await uploadFile(document.getElementById('f_pan').files[0], 'pan');
+                const passbookUrl = await uploadFile(document.getElementById('f_passbook').files[0], 'passbook');
+
+                // Inserting Database Record
+                const agentData = {
+                    name: document.getElementById('a_name').value,
+                    father_name: document.getElementById('a_father').value,
+                    dob: document.getElementById('a_dob').value,
+                    mobile: document.getElementById('a_mobile').value,
+                    aadhaar: document.getElementById('a_aadhaar').value,
+                    pan: document.getElementById('a_pan').value,
+                    bank_name: document.getElementById('a_bank').value,
+                    account_no: document.getElementById('a_account').value,
+                    status: 'Pending',
+                    photo_url: photoUrl,
+                    aadhaar_url: aadhaarUrl,
+                    pan_url: panUrl,
+                    passbook_url: passbookUrl
+                };
+
+                const { error } = await supabase.from('agents').insert([agentData]);
+                if (error) throw error;
+
+                // Show Success Screen
+                document.getElementById('mainFormBox').style.display = 'none';
+                document.getElementById('successScreen').style.display = 'block';
+
+            } catch (error) {
+                msg.style.color = "red";
+                msg.innerText = "❌ एरर: " + error.message;
+            } finally {
+                btn.innerHTML = "सबमिट करें";
+                btn.disabled = false;
+            }
+        }
+    </script>
 </body>
 </html>
