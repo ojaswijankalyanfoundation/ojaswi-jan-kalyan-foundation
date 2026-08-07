@@ -74,7 +74,7 @@
             <h3 style="color: var(--navy);"><i class="fas fa-bars"></i> ओजस्वी जनकल्याण फाउंडेशन</h3>
             <div class="user-profile">
                 <div style="text-align: right;">
-                    <strong style="color: var(--navy);">एजेंट टेस्ट</strong><br>
+                    <strong style="color: var(--navy);">Surendra Giri</strong><br>
                     <span style="font-size: 12px; color: #666;">ID: OJKF-AG-0001</span>
                 </div>
                 <img src="https://via.placeholder.com/45" alt="Agent">
@@ -84,16 +84,16 @@
         <!-- Dashboard -->
         <div id="dashboard" class="content-section active">
             <div class="dashboard-cards">
-                <div class="card"><div><h4>मेरे कुल मेंबर्स</h4><h2 id="total_members">0</h2></div><i class="fas fa-users"></i></div>
+                <div class="card"><div><h4>कुल लाभार्थी</h4><h2 id="total_members">0</h2></div><i class="fas fa-users"></i></div>
                 <div class="card"><div><h4>पेंडिंग अप्रूवल</h4><h2 id="pending_members">0</h2></div><i class="fas fa-clock"></i></div>
             </div>
-            <h3><i class="fas fa-list"></i> हाल ही में जोड़े गए मेंबर्स</h3>
+            <h3><i class="fas fa-list"></i> हाल ही में जोड़े गए लाभार्थी</h3>
             <p style="color: #666; font-size: 14px;">(डेटा लाने का कोड हम अगले स्टेप में जोड़ेंगे)</p>
         </div>
 
         <!-- Add Member Form -->
         <div id="add-member" class="content-section">
-            <h3><i class="fas fa-user-plus"></i> नया मेंबर रजिस्ट्रेशन & KYC</h3>
+            <h3><i class="fas fa-user-plus"></i> लाभार्थी रजिस्ट्रेशन & KYC</h3>
             
             <form id="memberForm" onsubmit="submitMember(event)">
                 <div class="form-grid">
@@ -118,7 +118,7 @@
                     <div class="form-group"><label>पैन कार्ड</label><input type="file" id="m_pan_file" accept="image/*,application/pdf"></div>
                 </div>
 
-                <button type="submit" class="btn-submit" id="btnSaveMember"><i class="fas fa-save"></i> मेंबर रजिस्टर करें</button>
+                <button type="submit" class="btn-submit" id="btnSaveMember"><i class="fas fa-save"></i> लाभार्थी रजिस्टर करें</button>
                 <div id="formMsg" style="margin-top: 10px; font-weight: bold; text-align: center;"></div>
             </form>
         </div>
@@ -139,12 +139,11 @@
         async function uploadFile(file, folderName) {
             if (!file) return null;
             const fileExt = file.name.split('.').pop();
-            const fileName = `${folderName}/${Date.now()}.${fileExt}`; // Ex: photos/16912345.jpg
+            const fileName = `${folderName}/${Date.now()}.${fileExt}`; 
             
             const { data, error } = await supabase.storage.from('kyc_documents').upload(fileName, file);
             if (error) throw error;
             
-            // Get public URL
             const { data: urlData } = supabase.storage.from('kyc_documents').getPublicUrl(fileName);
             return urlData.publicUrl;
         }
@@ -164,7 +163,7 @@
                 const aadhaarUrl = await uploadFile(document.getElementById('m_aadhaar_file').files[0], 'aadhaar');
                 const panUrl = await uploadFile(document.getElementById('m_pan_file').files[0], 'pan');
 
-                // 2. Insert Database Record
+                // 2. Insert Database Record (अब यह beneficiaries टेबल में जाएगा)
                 const memberData = {
                     name: document.getElementById('m_name').value,
                     dob: document.getElementById('m_dob').value,
@@ -173,26 +172,26 @@
                     aadhaar: document.getElementById('m_aadhaar').value,
                     pan: document.getElementById('m_pan').value,
                     nominee: document.getElementById('m_nominee').value,
-                    agent_id: 'OJKF-AG-0001', // Temporary Hardcoded
+                    agent_id: 'OJKF-AG-0001',
                     status: 'Pending',
                     photo_url: photoUrl,
                     aadhaar_url: aadhaarUrl,
                     pan_url: panUrl
                 };
 
-                const { error } = await supabase.from('members').insert([memberData]);
+                const { error } = await supabase.from('beneficiaries').insert([memberData]);
                 if (error) throw error;
 
                 // Success
                 msg.style.color = "green";
-                msg.innerText = "✅ मेंबर और KYC सफलतापूर्वक सेव हो गए हैं!";
+                msg.innerText = "✅ लाभार्थी और KYC सफलतापूर्वक सेव हो गए हैं!";
                 document.getElementById('memberForm').reset();
 
             } catch (error) {
                 msg.style.color = "red";
                 msg.innerText = "❌ एरर: " + error.message;
             } finally {
-                btn.innerHTML = "<i class='fas fa-save'></i> मेंबर रजिस्टर करें";
+                btn.innerHTML = "<i class='fas fa-save'></i> लाभार्थी रजिस्टर करें";
                 btn.disabled = false;
             }
         }
