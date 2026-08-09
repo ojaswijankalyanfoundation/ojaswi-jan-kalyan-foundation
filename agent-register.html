@@ -3,38 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>एजेंट रजिस्ट्रेशन | ओजस्वी फाउंडेशन</title>
+    <title>एजेंट रजिस्ट्रेशन | ओजस्वी जनकल्याण फाउंडेशन</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --saffron: #FF9933; --green: #138808; --navy: #1c2c52; --light-bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--light-bg); color: #333; }
         
-        .navbar { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .logo-section { display: flex; align-items: center; gap: 12px; }
-        .logo-section img { height: 50px; }
-        .brand-text h1 { margin: 0; font-size: 20px; color: var(--navy); }
-        .nav-links a { text-decoration: none; color: var(--navy); font-weight: 600; margin-left: 20px; }
+        /* Navbar Styling */
+        .navbar { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo-section img { height: 55px; }
+        .brand-text h1 { margin: 0; font-size: 22px; color: var(--navy); letter-spacing: 0.5px; }
+        .brand-text span { font-size: 12px; color: var(--saffron); font-weight: bold; letter-spacing: 1px; }
         
-        .form-container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); border-top: 4px solid var(--saffron); }
-        .form-container h2 { text-align: center; color: var(--navy); margin-top: 0; }
+        .nav-links { display: flex; align-items: center; gap: 15px; }
+        .nav-links a { text-decoration: none; color: var(--navy); font-weight: 600; font-size: 15px; }
+        .btn-login { background: var(--saffron); color: white !important; padding: 8px 20px; border-radius: 25px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); transition: 0.3s; }
+        .btn-login:hover { background: #e68a2e; }
         
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
-        .form-group input[type="file"] { padding: 7px; background: #f9f9f9; }
+        /* Form Styling */
+        .form-container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); border-top: 5px solid var(--saffron); }
+        .form-container h2 { text-align: center; color: var(--navy); margin-top: 0; font-size: 26px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 15px; }
         
-        .btn-submit { width: 100%; background: var(--green); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-submit:disabled { background: #999; cursor: not-allowed; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #444; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s; }
+        .form-group input:focus { border-color: var(--saffron); outline: none; box-shadow: 0 0 5px rgba(255,153,51,0.2); }
+        .form-group input[type="file"] { padding: 9px; background: #f8f9fa; border: 1px dashed #ccc; }
         
-        #successScreen { display: none; text-align: center; padding: 20px; }
-        #successScreen i { font-size: 50px; color: var(--green); margin-bottom: 15px; }
-        .id-card { background: #eef9f0; padding: 25px; border-radius: 12px; margin: 20px 0; border: 2px dashed var(--green); }
+        /* Password Highlight Box */
+        .password-box { background: #fff8f0; padding: 20px; border-radius: 8px; border: 1px solid var(--saffron); margin-top: 15px; }
+        .password-box label { color: var(--saffron); font-size: 15px; }
         
+        .section-title { margin-top: 30px; margin-bottom: 20px; color: var(--navy); border-bottom: 2px dashed #eee; padding-bottom: 10px; font-size: 18px; }
+        
+        .btn-submit { width: 100%; background: var(--green); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 30px; transition: 0.3s; box-shadow: 0 4px 10px rgba(19, 136, 8, 0.2); }
+        .btn-submit:hover { background: #0f6c06; }
+        .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
+        
+        /* Success Screen */
+        #successScreen { display: none; text-align: center; padding: 30px 20px; }
+        #successScreen i { font-size: 60px; color: var(--green); margin-bottom: 20px; }
+        .id-card { background: #f0fdf4; padding: 30px; border-radius: 12px; margin: 25px 0; border: 2px dashed var(--green); }
+        .id-card h1 { color: var(--navy); margin: 15px 0; font-size: 40px; letter-spacing: 3px; }
+        
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .brand-text h1 { font-size: 16px; }
+            .navbar { flex-direction: column; text-align: center; gap: 15px; padding: 15px; }
+            .logo-section { flex-direction: column; gap: 8px; }
+            .logo-section img { height: 60px; }
+            .brand-text h1 { font-size: 20px; line-height: 1.2; }
+            .brand-text span { font-size: 11px; }
+            .nav-links { flex-wrap: wrap; justify-content: center; width: 100%; }
+            .form-container { margin: 20px 15px; padding: 25px 20px; }
+            .form-container h2 { font-size: 22px; }
+            .id-card h1 { font-size: 28px; }
         }
     </style>
 </head>
@@ -43,45 +69,47 @@
     <div class="navbar">
         <div class="logo-section">
             <img src="assets/ojasvi-logo.png" alt="Logo">
-            <div class="brand-text"><h1>ओजस्वी फाउंडेशन</h1></div>
+            <div class="brand-text">
+                <h1>ओजस्वी जनकल्याण फाउंडेशन</h1>
+                <span>OJASVI JAN-KALYAN FOUNDATION</span>
+            </div>
         </div>
         <div class="nav-links">
-            <a href="index.html">होम</a>
-            <a href="login.html" style="background: var(--saffron); color: white; padding: 6px 15px; border-radius: 20px;">लॉगिन (Login)</a>
+            <a href="index.html"><i class="fas fa-home"></i> होम</a>
+            <a href="login.html" class="btn-login">पोर्टल लॉगिन <i class="fas fa-sign-in-alt"></i></a>
         </div>
     </div>
 
     <div class="form-container" id="mainFormBox">
         <h2><i class="fas fa-user-tie"></i> एजेंट रजिस्ट्रेशन फॉर्म</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 20px;">संस्था के साथ जुड़कर काम शुरू करें। तुरंत अपनी ID और पासवर्ड प्राप्त करें।</p>
+        <p class="subtitle">संस्था के साथ जुड़कर काम शुरू करें। तुरंत अपनी ID और पासवर्ड प्राप्त करें।</p>
         
         <form id="agentForm" onsubmit="submitAgent(event)">
             <div class="form-grid">
-                <div class="form-group"><label>पूरा नाम *</label><input type="text" id="a_name" required></div>
-                <div class="form-group"><label>पिता का नाम *</label><input type="text" id="a_father" required></div>
-                <div class="form-group"><label>जन्म तिथि *</label><input type="date" id="a_dob" required></div>
-                <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="a_mobile" pattern="[0-9]{10}" required></div>
-                <div class="form-group"><label>आधार नंबर *</label><input type="text" id="a_aadhaar" required></div>
-                <div class="form-group"><label>पैन नंबर *</label><input type="text" id="a_pan" required></div>
-                <div class="form-group"><label>बैंक का नाम *</label><input type="text" id="a_bank" required></div>
-                <div class="form-group"><label>अकाउंट नंबर *</label><input type="text" id="a_account" required></div>
+                <div class="form-group"><label>पूरा नाम *</label><input type="text" id="a_name" placeholder="अपना पूरा नाम लिखें" required></div>
+                <div class="form-group"><label>पिता का नाम *</label><input type="text" id="a_father" placeholder="पिता का पूरा नाम" required></div>
+                <div class="form-group"><label>जन्म तिथि (DOB) *</label><input type="date" id="a_dob" required></div>
+                <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="a_mobile" placeholder="10 अंकों का मोबाइल नंबर" pattern="[0-9]{10}" required></div>
+                <div class="form-group"><label>आधार कार्ड नंबर *</label><input type="text" id="a_aadhaar" placeholder="12 अंकों का आधार नंबर" required></div>
+                <div class="form-group"><label>पैन कार्ड नंबर *</label><input type="text" id="a_pan" placeholder="पैन कार्ड नंबर (उदहारण: ABCDE1234F)" required></div>
+                <div class="form-group"><label>बैंक का नाम *</label><input type="text" id="a_bank" placeholder="जिस बैंक में खाता है" required></div>
+                <div class="form-group"><label>अकाउंट नंबर *</label><input type="text" id="a_account" placeholder="बैंक खाता संख्या" required></div>
             </div>
             
-            <!-- New Password Field -->
-            <div class="form-group" style="margin-top: 10px; background: #fff8f0; padding: 15px; border-radius: 8px; border: 1px solid var(--saffron);">
-                <label style="color: var(--saffron);"><i class="fas fa-lock"></i> लॉगिन के लिए अपना पासवर्ड बनाएँ *</label>
-                <input type="text" id="a_password" placeholder="कम से कम 6 अक्षरों का पासवर्ड" required minlength="6">
+            <div class="password-box">
+                <label><i class="fas fa-lock"></i> पोर्टल लॉगिन के लिए अपना नया पासवर्ड बनाएँ *</label>
+                <input type="text" id="a_password" placeholder="कम से कम 6 अक्षरों का मजबूत पासवर्ड बनाएँ" required minlength="6">
             </div>
             
-            <h4 style="margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">डॉक्यूमेंट अपलोड</h4>
-            <div class="form-grid" style="margin-top: 15px;">
-                <div class="form-group"><label>पासपोर्ट फोटो *</label><input type="file" id="f_photo" accept="image/*" required></div>
-                <div class="form-group"><label>आधार कार्ड *</label><input type="file" id="f_aadhaar" accept="image/*,application/pdf" required></div>
+            <h4 class="section-title"><i class="fas fa-file-upload"></i> KYC डॉक्यूमेंट अपलोड</h4>
+            <div class="form-grid">
+                <div class="form-group"><label>पासपोर्ट साइज फोटो *</label><input type="file" id="f_photo" accept="image/*" required></div>
+                <div class="form-group"><label>आधार कार्ड (Front & Back) *</label><input type="file" id="f_aadhaar" accept="image/*,application/pdf" required></div>
                 <div class="form-group"><label>पैन कार्ड *</label><input type="file" id="f_pan" accept="image/*,application/pdf" required></div>
-                <div class="form-group"><label>बैंक पासबुक *</label><input type="file" id="f_passbook" accept="image/*,application/pdf" required></div>
+                <div class="form-group"><label>बैंक पासबुक / कैंसल चेक *</label><input type="file" id="f_passbook" accept="image/*,application/pdf" required></div>
             </div>
 
-            <button type="submit" class="btn-submit" id="submitBtn">रजिस्टर करें और ID प्राप्त करें</button>
+            <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-check-circle"></i> रजिस्टर करें और ID प्राप्त करें</button>
             <div id="statusMsg" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
         </form>
     </div>
@@ -93,12 +121,12 @@
         
         <div class="id-card">
             <p style="margin:0; font-size: 16px; color: #555;">आपकी लॉगिन आईडी (Agent ID)</p>
-            <h1 style="color: var(--navy); margin: 10px 0; font-size: 35px; letter-spacing: 2px;" id="generatedId"></h1>
-            <p style="margin:0; color: #d32f2f; font-weight: bold;">पासवर्ड: <span style="color: #333; font-weight: normal;">जो आपने अभी फॉर्म में बनाया है</span></p>
+            <h1 id="generatedId">OJKF-AG-0000</h1>
+            <p style="margin:0; color: #d32f2f; font-weight: bold; font-size: 16px;">पासवर्ड: <span style="color: #333; font-weight: normal;">जो आपने अभी फॉर्म में बनाया है</span></p>
         </div>
 
-        <p style="color: #666;">कृपया अपनी आईडी और पासवर्ड कहीं सुरक्षित लिख कर रख लें। आप अभी लॉगिन करके काम शुरू कर सकते हैं।</p>
-        <button onclick="window.location.href='login.html'" class="btn-submit" style="width: auto; padding: 12px 40px; margin-top: 20px;"><i class="fas fa-sign-in-alt"></i> अभी लॉगिन करें</button>
+        <p style="color: #666; line-height: 1.6; font-size: 15px;">कृपया अपनी <strong>Agent ID</strong> और <strong>पासवर्ड</strong> कहीं सुरक्षित लिख कर रख लें। <br>आप अभी लॉगिन करके अपना काम शुरू कर सकते हैं।</p>
+        <button onclick="window.location.href='login.html'" class="btn-submit" style="width: auto; padding: 12px 40px; margin-top: 25px;"><i class="fas fa-sign-in-alt"></i> अभी लॉगिन करें</button>
     </div>
 
     <script>
@@ -124,21 +152,18 @@
             const msg = document.getElementById('statusMsg');
             
             try {
-                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> जनरेट हो रहा है...";
+                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> जनरेट हो रहा है (कृपया प्रतीक्षा करें)...";
                 btn.disabled = true;
                 msg.innerText = "";
 
-                // Generate Random 4-digit ID
                 const randomNum = Math.floor(1000 + Math.random() * 9000);
                 const agentCode = "OJKF-AG-" + randomNum;
 
-                // File Uploads
                 const photoUrl = await uploadFile(document.getElementById('f_photo').files[0], 'photo');
                 const aadhaarUrl = await uploadFile(document.getElementById('f_aadhaar').files[0], 'aadhaar');
                 const panUrl = await uploadFile(document.getElementById('f_pan').files[0], 'pan');
                 const passbookUrl = await uploadFile(document.getElementById('f_passbook').files[0], 'passbook');
 
-                // Database Record
                 const agentData = {
                     agent_code: agentCode,
                     password: document.getElementById('a_password').value,
@@ -160,16 +185,16 @@
                 const { error } = await supabase.from('agents').insert([agentData]);
                 if (error) throw error;
 
-                // Show Success Screen with ID
                 document.getElementById('generatedId').innerText = agentCode;
                 document.getElementById('mainFormBox').style.display = 'none';
                 document.getElementById('successScreen').style.display = 'block';
+                window.scrollTo(0, 0);
 
             } catch (error) {
                 msg.style.color = "red";
                 msg.innerText = "❌ एरर: " + error.message;
             } finally {
-                btn.innerHTML = "रजिस्टर करें और ID प्राप्त करें";
+                btn.innerHTML = "<i class='fas fa-check-circle'></i> रजिस्टर करें और ID प्राप्त करें";
                 btn.disabled = false;
             }
         }
