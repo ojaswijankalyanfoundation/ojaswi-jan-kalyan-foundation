@@ -3,64 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>एजेंट रजिस्ट्रेशन | ओजस्वी जनकल्याण फाउंडेशन</title>
+    <title>नया एजेंट रजिस्ट्रेशन | ओजस्वी जनकल्याण फाउंडेशन</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --saffron: #FF9933; --green: #138808; --navy: #1c2c52; --light-bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--light-bg); color: #333; }
         
-        /* Navbar Styling */
+        /* Navbar */
         .navbar { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .logo-section { display: flex; align-items: center; gap: 15px; }
         .logo-section img { height: 55px; }
-        .brand-text h1 { margin: 0; font-size: 22px; color: var(--navy); letter-spacing: 0.5px; }
-        .brand-text span { font-size: 12px; color: var(--saffron); font-weight: bold; letter-spacing: 1px; }
+        .brand-text h1 { margin: 0; font-size: 22px; color: var(--navy); }
+        .brand-text span { font-size: 12px; color: var(--saffron); font-weight: bold; }
+        .nav-links a { text-decoration: none; color: var(--navy); font-weight: 600; margin-left: 20px; font-size: 15px; }
+        .btn-login { background: var(--navy); color: white !important; padding: 8px 20px; border-radius: 25px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
         
-        .nav-links { display: flex; align-items: center; gap: 15px; }
-        .nav-links a { text-decoration: none; color: var(--navy); font-weight: 600; font-size: 15px; }
-        .btn-login { background: var(--saffron); color: white !important; padding: 8px 20px; border-radius: 25px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); transition: 0.3s; }
-        .btn-login:hover { background: #e68a2e; }
+        /* Auth Container */
+        .auth-container { max-width: 450px; margin: 50px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid var(--saffron); }
+        .auth-container h2 { color: var(--navy); text-align: center; margin-top: 0; font-size: 24px; }
+        .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 25px; }
         
-        /* Form Styling */
-        .form-container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); border-top: 5px solid var(--saffron); }
-        .form-container h2 { text-align: center; color: var(--navy); margin-top: 0; font-size: 26px; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 15px; }
-        
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #444; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 13px; color: #444; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
         .form-group input:focus { border-color: var(--saffron); outline: none; box-shadow: 0 0 5px rgba(255,153,51,0.2); }
-        .form-group input[type="file"] { padding: 9px; background: #f8f9fa; border: 1px dashed #ccc; }
         
-        /* Password Highlight Box */
-        .password-box { background: #fff8f0; padding: 20px; border-radius: 8px; border: 1px solid var(--saffron); margin-top: 15px; }
-        .password-box label { color: var(--saffron); font-size: 15px; }
+        .btn-main { width: 100%; background: var(--green); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-main:hover { background: #0f6c06; }
+        .btn-main:disabled { background: #9ca3af; cursor: not-allowed; }
         
-        .section-title { margin-top: 30px; margin-bottom: 20px; color: var(--navy); border-bottom: 2px dashed #eee; padding-bottom: 10px; font-size: 18px; }
+        .switch-link { margin-top: 20px; font-size: 14px; text-align: center; color: #555; }
+        .switch-link a { color: var(--saffron); text-decoration: none; font-weight: bold; }
         
-        .btn-submit { width: 100%; background: var(--green); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 30px; transition: 0.3s; box-shadow: 0 4px 10px rgba(19, 136, 8, 0.2); }
-        .btn-submit:hover { background: #0f6c06; }
-        .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
+        /* Hidden Sections */
+        #otpSection, #successSection { display: none; }
         
-        /* Success Screen */
-        #successScreen { display: none; text-align: center; padding: 30px 20px; }
-        #successScreen i { font-size: 60px; color: var(--green); margin-bottom: 20px; }
-        .id-card { background: #f0fdf4; padding: 30px; border-radius: 12px; margin: 25px 0; border: 2px dashed var(--green); }
-        .id-card h1 { color: var(--navy); margin: 15px 0; font-size: 40px; letter-spacing: 3px; }
+        .id-box { background: #f0fdf4; padding: 20px; border-radius: 8px; text-align: center; border: 2px dashed var(--green); margin: 20px 0; }
+        .id-box h1 { margin: 10px 0; color: var(--navy); letter-spacing: 2px; }
         
-        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .navbar { flex-direction: column; text-align: center; gap: 15px; padding: 15px; }
-            .logo-section { flex-direction: column; gap: 8px; }
-            .logo-section img { height: 60px; }
-            .brand-text h1 { font-size: 20px; line-height: 1.2; }
-            .brand-text span { font-size: 11px; }
-            .nav-links { flex-wrap: wrap; justify-content: center; width: 100%; }
-            .form-container { margin: 20px 15px; padding: 25px 20px; }
-            .form-container h2 { font-size: 22px; }
-            .id-card h1 { font-size: 28px; }
+            .navbar { flex-direction: column; text-align: center; gap: 15px; }
+            .auth-container { margin: 20px; padding: 30px 20px; }
         }
     </style>
 </head>
@@ -80,121 +64,154 @@
         </div>
     </div>
 
-    <div class="form-container" id="mainFormBox">
-        <h2><i class="fas fa-user-tie"></i> एजेंट रजिस्ट्रेशन फॉर्म</h2>
-        <p class="subtitle">संस्था के साथ जुड़कर काम शुरू करें। तुरंत अपनी ID और पासवर्ड प्राप्त करें।</p>
+    <div class="auth-container">
         
-        <form id="agentForm" onsubmit="submitAgent(event)">
-            <div class="form-grid">
-                <div class="form-group"><label>पूरा नाम *</label><input type="text" id="a_name" placeholder="अपना पूरा नाम लिखें" required></div>
-                <div class="form-group"><label>पिता का नाम *</label><input type="text" id="a_father" placeholder="पिता का पूरा नाम" required></div>
-                <div class="form-group"><label>जन्म तिथि (DOB) *</label><input type="date" id="a_dob" required></div>
-                <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="a_mobile" placeholder="10 अंकों का मोबाइल नंबर" pattern="[0-9]{10}" required></div>
-                <div class="form-group"><label>आधार कार्ड नंबर *</label><input type="text" id="a_aadhaar" placeholder="12 अंकों का आधार नंबर" required></div>
-                <div class="form-group"><label>पैन कार्ड नंबर *</label><input type="text" id="a_pan" placeholder="पैन कार्ड नंबर (उदहारण: ABCDE1234F)" required></div>
-                <div class="form-group"><label>बैंक का नाम *</label><input type="text" id="a_bank" placeholder="जिस बैंक में खाता है" required></div>
-                <div class="form-group"><label>अकाउंट नंबर *</label><input type="text" id="a_account" placeholder="बैंक खाता संख्या" required></div>
-            </div>
+        <!-- STEP 1: REGISTRATION FORM -->
+        <div id="registerSection">
+            <h2><i class="fas fa-user-plus"></i> नया एजेंट रजिस्ट्रेशन</h2>
+            <p class="subtitle">सिर्फ 1 मिनट में अपना अकाउंट बनाएँ।</p>
             
-            <div class="password-box">
-                <label><i class="fas fa-lock"></i> पोर्टल लॉगिन के लिए अपना नया पासवर्ड बनाएँ *</label>
-                <input type="text" id="a_password" placeholder="कम से कम 6 अक्षरों का मजबूत पासवर्ड बनाएँ" required minlength="6">
-            </div>
-            
-            <h4 class="section-title"><i class="fas fa-file-upload"></i> KYC डॉक्यूमेंट अपलोड</h4>
-            <div class="form-grid">
-                <div class="form-group"><label>पासपोर्ट साइज फोटो *</label><input type="file" id="f_photo" accept="image/*" required></div>
-                <div class="form-group"><label>आधार कार्ड (Front & Back) *</label><input type="file" id="f_aadhaar" accept="image/*,application/pdf" required></div>
-                <div class="form-group"><label>पैन कार्ड *</label><input type="file" id="f_pan" accept="image/*,application/pdf" required></div>
-                <div class="form-group"><label>बैंक पासबुक / कैंसल चेक *</label><input type="file" id="f_passbook" accept="image/*,application/pdf" required></div>
-            </div>
-
-            <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-check-circle"></i> रजिस्टर करें और ID प्राप्त करें</button>
-            <div id="statusMsg" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
-        </form>
-    </div>
-
-    <!-- Success Screen with Generated ID -->
-    <div class="form-container" id="successScreen">
-        <i class="fas fa-check-circle"></i>
-        <h2 style="color: var(--green);">रजिस्ट्रेशन सफल!</h2>
-        
-        <div class="id-card">
-            <p style="margin:0; font-size: 16px; color: #555;">आपकी लॉगिन आईडी (Agent ID)</p>
-            <h1 id="generatedId">OJKF-AG-0000</h1>
-            <p style="margin:0; color: #d32f2f; font-weight: bold; font-size: 16px;">पासवर्ड: <span style="color: #333; font-weight: normal;">जो आपने अभी फॉर्म में बनाया है</span></p>
+            <form onsubmit="sendOtp(event)">
+                <div class="form-group"><label>पूरा नाम *</label><input type="text" id="r_name" placeholder="अपना पूरा नाम लिखें" required></div>
+                <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="r_mobile" placeholder="10 अंकों का मोबाइल नंबर" pattern="[0-9]{10}" required></div>
+                <div class="form-group"><label>ईमेल आईडी (इसी पर OTP आएगा) *</label><input type="email" id="r_email" placeholder="सही ईमेल आईडी डालें" required></div>
+                <div class="form-group"><label>नया पासवर्ड बनाएँ *</label><input type="password" id="r_password" placeholder="कम से कम 6 अक्षरों का पासवर्ड" minlength="6" required></div>
+                
+                <button type="submit" id="btnSendOtp" class="btn-main"><i class="fas fa-envelope"></i> रजिस्टर करें (Send OTP)</button>
+                <div id="regMsg" style="text-align: center; margin-top: 10px; font-weight: bold;"></div>
+            </form>
+            <div class="switch-link">पहले से अकाउंट है? <a href="login.html">यहाँ लॉगिन करें</a></div>
         </div>
 
-        <p style="color: #666; line-height: 1.6; font-size: 15px;">कृपया अपनी <strong>Agent ID</strong> और <strong>पासवर्ड</strong> कहीं सुरक्षित लिख कर रख लें। <br>आप अभी लॉगिन करके अपना काम शुरू कर सकते हैं।</p>
-        <button onclick="window.location.href='login.html'" class="btn-submit" style="width: auto; padding: 12px 40px; margin-top: 25px;"><i class="fas fa-sign-in-alt"></i> अभी लॉगिन करें</button>
+        <!-- STEP 2: OTP VERIFICATION -->
+        <div id="otpSection">
+            <h2><i class="fas fa-shield-alt"></i> OTP वेरीफाई करें</h2>
+            <p class="subtitle">हमने <strong id="showEmail" style="color:var(--navy);"></strong> पर एक 6-अंकों का OTP भेजा है।</p>
+            
+            <form onsubmit="verifyOtp(event)">
+                <div class="form-group"><label>OTP दर्ज करें *</label><input type="text" id="r_otp" placeholder="6-Digit OTP" required></div>
+                <button type="submit" id="btnVerifyOtp" class="btn-main"><i class="fas fa-check-circle"></i> वेरीफाई करें और ID प्राप्त करें</button>
+                <div id="otpMsg" style="text-align: center; margin-top: 10px; font-weight: bold;"></div>
+            </form>
+            <div class="switch-link"><a href="#" onclick="location.reload()">← वापस जाएँ और ईमेल बदलें</a></div>
+        </div>
+
+        <!-- STEP 3: SUCCESS SCREEN -->
+        <div id="successSection" style="text-align: center;">
+            <i class="fas fa-check-circle" style="font-size: 60px; color: var(--green);"></i>
+            <h2 style="margin-top: 15px; color: var(--green);">रजिस्ट्रेशन सफल!</h2>
+            <p style="color: #666;">आपका ईमेल वेरिफाई हो गया है और आपका अकाउंट बन गया है।</p>
+            
+            <div class="id-box">
+                <p style="margin:0; font-size: 14px; color: #666;">आपकी लॉगिन आईडी (Agent ID)</p>
+                <h1 id="newAgentId"></h1>
+                <p style="margin:0; font-size: 13px; color: red;">(पासवर्ड वही है जो आपने फॉर्म में बनाया था)</p>
+            </div>
+            
+            <p style="font-size: 13px; color: #555;">पोर्टल के अंदर जाकर अपनी <strong>KYC (आधार, पैन)</strong> पूरी करें।</p>
+            <button onclick="window.location.href='login.html'" class="btn-main" style="background: var(--navy);"><i class="fas fa-sign-in-alt"></i> अब लॉगिन करें</button>
+        </div>
+
     </div>
 
     <script>
+        // SUPABASE CONNECTION
         const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function uploadFile(file, folderName) {
-            if (!file) return null;
-            const fileExt = file.name.split('.').pop();
-            const fileName = `agent_kyc/${folderName}_${Date.now()}.${fileExt}`; 
-            
-            const { data, error } = await supabase.storage.from('kyc_documents').upload(fileName, file);
-            if (error) throw error;
-            
-            const { data: urlData } = supabase.storage.from('kyc_documents').getPublicUrl(fileName);
-            return urlData.publicUrl;
-        }
+        let tempUserData = {}; // To store data temporarily between OTP steps
 
-        async function submitAgent(e) {
+        // 1. SEND OTP FUNCTION
+        async function sendOtp(e) {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const msg = document.getElementById('statusMsg');
+            const btn = document.getElementById('btnSendOtp');
+            const msg = document.getElementById('regMsg');
             
+            tempUserData = {
+                name: document.getElementById('r_name').value,
+                mobile: document.getElementById('r_mobile').value,
+                email: document.getElementById('r_email').value,
+                password: document.getElementById('r_password').value
+            };
+
             try {
-                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> जनरेट हो रहा है (कृपया प्रतीक्षा करें)...";
+                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> OTP भेजा जा रहा है...";
                 btn.disabled = true;
                 msg.innerText = "";
 
-                const randomNum = Math.floor(1000 + Math.random() * 9000);
-                const agentCode = "OJKF-AG-" + randomNum;
+                // Send OTP via Supabase Auth
+                const { data, error } = await supabase.auth.signUp({
+                    email: tempUserData.email,
+                    password: tempUserData.password,
+                    options: { data: { name: tempUserData.name, mobile: tempUserData.mobile } }
+                });
 
-                const photoUrl = await uploadFile(document.getElementById('f_photo').files[0], 'photo');
-                const aadhaarUrl = await uploadFile(document.getElementById('f_aadhaar').files[0], 'aadhaar');
-                const panUrl = await uploadFile(document.getElementById('f_pan').files[0], 'pan');
-                const passbookUrl = await uploadFile(document.getElementById('f_passbook').files[0], 'passbook');
-
-                const agentData = {
-                    agent_code: agentCode,
-                    password: document.getElementById('a_password').value,
-                    name: document.getElementById('a_name').value,
-                    father_name: document.getElementById('a_father').value,
-                    dob: document.getElementById('a_dob').value,
-                    mobile: document.getElementById('a_mobile').value,
-                    aadhaar: document.getElementById('a_aadhaar').value,
-                    pan: document.getElementById('a_pan').value,
-                    bank_name: document.getElementById('a_bank').value,
-                    account_no: document.getElementById('a_account').value,
-                    status: 'Active', 
-                    photo_url: photoUrl,
-                    aadhaar_url: aadhaarUrl,
-                    pan_url: panUrl,
-                    passbook_url: passbookUrl
-                };
-
-                const { error } = await supabase.from('agents').insert([agentData]);
                 if (error) throw error;
 
-                document.getElementById('generatedId').innerText = agentCode;
-                document.getElementById('mainFormBox').style.display = 'none';
-                document.getElementById('successScreen').style.display = 'block';
-                window.scrollTo(0, 0);
+                // Move to Step 2 (OTP Screen)
+                document.getElementById('registerSection').style.display = 'none';
+                document.getElementById('otpSection').style.display = 'block';
+                document.getElementById('showEmail').innerText = tempUserData.email;
 
             } catch (error) {
                 msg.style.color = "red";
-                msg.innerText = "❌ एरर: " + error.message;
-            } finally {
-                btn.innerHTML = "<i class='fas fa-check-circle'></i> रजिस्टर करें और ID प्राप्त करें";
+                if(error.message.includes("already registered")) {
+                    msg.innerText = "❌ यह ईमेल पहले से रजिस्टर है। कृपया लॉगिन करें।";
+                } else {
+                    msg.innerText = "❌ एरर: " + error.message;
+                }
+                btn.innerHTML = "<i class='fas fa-envelope'></i> रजिस्टर करें (Send OTP)";
+                btn.disabled = false;
+            }
+        }
+
+        // 2. VERIFY OTP FUNCTION
+        async function verifyOtp(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnVerifyOtp');
+            const msg = document.getElementById('otpMsg');
+            const otpCode = document.getElementById('r_otp').value;
+
+            try {
+                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> वेरीफाई कर रहे हैं...";
+                btn.disabled = true;
+                msg.innerText = "";
+
+                // Verify OTP
+                const { data: authData, error: authError } = await supabase.auth.verifyOtp({
+                    email: tempUserData.email,
+                    token: otpCode,
+                    type: 'signup'
+                });
+
+                if (authError) throw authError;
+
+                // Create Unique Agent Code
+                const randomNum = Math.floor(1000 + Math.random() * 9000);
+                const agentCode = "OJKF-AG-" + randomNum;
+
+                // Save Data in 'agents' Database Table
+                const { error: dbError } = await supabase.from('agents').insert([{
+                    name: tempUserData.name,
+                    mobile: tempUserData.mobile,
+                    email: tempUserData.email,
+                    password: tempUserData.password, // Only storing for initial ref, Supabase hashes real pwd
+                    agent_code: agentCode,
+                    status: 'Pending KYC'
+                }]);
+
+                if (dbError) throw dbError;
+
+                // Move to Step 3 (Success Screen)
+                document.getElementById('newAgentId').innerText = agentCode;
+                document.getElementById('otpSection').style.display = 'none';
+                document.getElementById('successSection').style.display = 'block';
+
+            } catch (error) {
+                msg.style.color = "red";
+                msg.innerText = "❌ गलत OTP या एरर: " + error.message;
+                btn.innerHTML = "<i class='fas fa-check-circle'></i> वेरीफाई करें और ID प्राप्त करें";
                 btn.disabled = false;
             }
         }
