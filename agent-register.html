@@ -30,6 +30,7 @@
         
         #successScreen { display: none; text-align: center; padding: 20px; }
         #successScreen i { font-size: 50px; color: var(--green); margin-bottom: 15px; }
+        .id-card { background: #eef9f0; padding: 25px; border-radius: 12px; margin: 20px 0; border: 2px dashed var(--green); }
         
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -52,7 +53,7 @@
 
     <div class="form-container" id="mainFormBox">
         <h2><i class="fas fa-user-tie"></i> एजेंट रजिस्ट्रेशन फॉर्म</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 20px;">संस्था के अधिकृत एजेंट बनने के लिए अपनी जानकारी भरें।</p>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">संस्था के साथ जुड़कर काम शुरू करें। तुरंत अपनी ID और पासवर्ड प्राप्त करें।</p>
         
         <form id="agentForm" onsubmit="submitAgent(event)">
             <div class="form-grid">
@@ -66,6 +67,12 @@
                 <div class="form-group"><label>अकाउंट नंबर *</label><input type="text" id="a_account" required></div>
             </div>
             
+            <!-- New Password Field -->
+            <div class="form-group" style="margin-top: 10px; background: #fff8f0; padding: 15px; border-radius: 8px; border: 1px solid var(--saffron);">
+                <label style="color: var(--saffron);"><i class="fas fa-lock"></i> लॉगिन के लिए अपना पासवर्ड बनाएँ *</label>
+                <input type="text" id="a_password" placeholder="कम से कम 6 अक्षरों का पासवर्ड" required minlength="6">
+            </div>
+            
             <h4 style="margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">डॉक्यूमेंट अपलोड</h4>
             <div class="form-grid" style="margin-top: 15px;">
                 <div class="form-group"><label>पासपोर्ट फोटो *</label><input type="file" id="f_photo" accept="image/*" required></div>
@@ -74,18 +81,24 @@
                 <div class="form-group"><label>बैंक पासबुक *</label><input type="file" id="f_passbook" accept="image/*,application/pdf" required></div>
             </div>
 
-            <button type="submit" class="btn-submit" id="submitBtn">सबमिट करें</button>
+            <button type="submit" class="btn-submit" id="submitBtn">रजिस्टर करें और ID प्राप्त करें</button>
             <div id="statusMsg" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
         </form>
     </div>
 
-    <!-- Success Screen -->
+    <!-- Success Screen with Generated ID -->
     <div class="form-container" id="successScreen">
         <i class="fas fa-check-circle"></i>
         <h2 style="color: var(--green);">रजिस्ट्रेशन सफल!</h2>
-        <p>आपकी जानकारी और डाक्यूमेंट्स सफलतापूर्वक जमा हो गए हैं।</p>
-        <p style="color: #666; margin-top: 10px;">एडमिन द्वारा अप्रूवल मिलने के बाद आपके मोबाइल पर लॉगिन आईडी (Agent ID) और पासवर्ड भेज दिया जाएगा।</p>
-        <button onclick="window.location.href='index.html'" class="btn-submit" style="width: auto; padding: 10px 30px; margin-top: 20px;">होम पेज पर जाएँ</button>
+        
+        <div class="id-card">
+            <p style="margin:0; font-size: 16px; color: #555;">आपकी लॉगिन आईडी (Agent ID)</p>
+            <h1 style="color: var(--navy); margin: 10px 0; font-size: 35px; letter-spacing: 2px;" id="generatedId"></h1>
+            <p style="margin:0; color: #d32f2f; font-weight: bold;">पासवर्ड: <span style="color: #333; font-weight: normal;">जो आपने अभी फॉर्म में बनाया है</span></p>
+        </div>
+
+        <p style="color: #666;">कृपया अपनी आईडी और पासवर्ड कहीं सुरक्षित लिख कर रख लें। आप अभी लॉगिन करके काम शुरू कर सकते हैं।</p>
+        <button onclick="window.location.href='login.html'" class="btn-submit" style="width: auto; padding: 12px 40px; margin-top: 20px;"><i class="fas fa-sign-in-alt"></i> अभी लॉगिन करें</button>
     </div>
 
     <script>
@@ -111,18 +124,24 @@
             const msg = document.getElementById('statusMsg');
             
             try {
-                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> डाटा अपलोड हो रहा है...";
+                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> जनरेट हो रहा है...";
                 btn.disabled = true;
                 msg.innerText = "";
 
-                // Uploading 4 Files
+                // Generate Random 4-digit ID
+                const randomNum = Math.floor(1000 + Math.random() * 9000);
+                const agentCode = "OJKF-AG-" + randomNum;
+
+                // File Uploads
                 const photoUrl = await uploadFile(document.getElementById('f_photo').files[0], 'photo');
                 const aadhaarUrl = await uploadFile(document.getElementById('f_aadhaar').files[0], 'aadhaar');
                 const panUrl = await uploadFile(document.getElementById('f_pan').files[0], 'pan');
                 const passbookUrl = await uploadFile(document.getElementById('f_passbook').files[0], 'passbook');
 
-                // Inserting Database Record
+                // Database Record
                 const agentData = {
+                    agent_code: agentCode,
+                    password: document.getElementById('a_password').value,
                     name: document.getElementById('a_name').value,
                     father_name: document.getElementById('a_father').value,
                     dob: document.getElementById('a_dob').value,
@@ -131,7 +150,7 @@
                     pan: document.getElementById('a_pan').value,
                     bank_name: document.getElementById('a_bank').value,
                     account_no: document.getElementById('a_account').value,
-                    status: 'Pending',
+                    status: 'Active', 
                     photo_url: photoUrl,
                     aadhaar_url: aadhaarUrl,
                     pan_url: panUrl,
@@ -141,7 +160,8 @@
                 const { error } = await supabase.from('agents').insert([agentData]);
                 if (error) throw error;
 
-                // Show Success Screen
+                // Show Success Screen with ID
+                document.getElementById('generatedId').innerText = agentCode;
                 document.getElementById('mainFormBox').style.display = 'none';
                 document.getElementById('successScreen').style.display = 'block';
 
@@ -149,7 +169,7 @@
                 msg.style.color = "red";
                 msg.innerText = "❌ एरर: " + error.message;
             } finally {
-                btn.innerHTML = "सबमिट करें";
+                btn.innerHTML = "रजिस्टर करें और ID प्राप्त करें";
                 btn.disabled = false;
             }
         }
