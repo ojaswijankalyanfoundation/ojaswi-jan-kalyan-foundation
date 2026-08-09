@@ -3,110 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>पोर्टल लॉगिन | ओजस्वी जनकल्याण फाउंडेशन</title>
-    
-    <!-- FontAwesome for Icons -->
+    <title>एजेंट पोर्टल - लॉगिन | ओजस्वी फाउंडेशन</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
     <style>
-        :root {
-            --saffron: #FF9933;
-            --green: #138808;
-            --navy: #1c2c52;
-            --light-bg: #f4f7f6;
-        }
-        
+        :root { --saffron: #FF9933; --green: #138808; --navy: #1c2c52; --light-bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--light-bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
-        .login-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 400px; border-top: 5px solid var(--navy); text-align: center; }
-        .login-card img { height: 70px; margin-bottom: 10px; }
-        .login-card h2 { color: var(--navy); margin: 0 0 5px 0; font-size: 24px; }
-        .login-card p { color: #666; font-size: 14px; margin-bottom: 25px; }
+        .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid var(--navy); margin: 20px 0; }
+        .login-box img { height: 60px; margin-bottom: 10px; }
+        .login-box h2 { color: var(--navy); margin: 0 0 5px 0; }
+        .login-box p { color: #666; font-size: 14px; margin-bottom: 25px; }
         
-        /* Agent / Admin Toggle Buttons */
-        .role-toggle { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
-        .role-btn { flex: 1; padding: 10px; border: 2px solid var(--navy); background: white; color: var(--navy); border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 15px; }
-        .role-btn.active { background: var(--navy); color: white; box-shadow: 0 4px 10px rgba(28, 44, 82, 0.3); }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
         
-        /* Form Inputs */
-        .form-group { margin-bottom: 18px; text-align: left; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; color: #444; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; transition: 0.3s; }
-        .form-group input:focus { border-color: var(--saffron); outline: none; box-shadow: 0 0 8px rgba(255, 153, 51, 0.2); }
+        .btn-login { width: 100%; background: var(--saffron); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-login:hover { background: #e68a2e; }
         
-        .btn-login { width: 100%; background: var(--saffron); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-login:hover { background: #e68a2e; box-shadow: 0 4px 15px rgba(255, 153, 51, 0.3); }
+        .extra-links { display: flex; justify-content: space-between; margin-top: 15px; font-size: 13px; }
+        .extra-links a { color: var(--navy); text-decoration: none; font-weight: 600; }
+        .extra-links a:hover { text-decoration: underline; }
         
-        .back-link { display: inline-block; margin-top: 25px; color: var(--navy); text-decoration: none; font-size: 14px; font-weight: 600; }
-        .back-link:hover { color: var(--saffron); }
+        .register-box { margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; font-size: 14px; }
+        .btn-register { display: inline-block; margin-top: 10px; color: var(--green); text-decoration: none; font-weight: bold; border: 1px solid var(--green); padding: 8px 20px; border-radius: 20px; transition: 0.3s; }
+        .btn-register:hover { background: var(--green); color: white; }
+        
+        .back-home { position: absolute; top: 20px; left: 20px; color: var(--navy); text-decoration: none; font-weight: bold; font-size: 14px; }
+        
+        @media (max-width: 480px) {
+            .back-home { position: static; display: block; text-align: left; padding: 15px; width: 100%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
+            body { flex-direction: column; justify-content: flex-start; }
+            .login-box { padding: 25px; margin-top: 0; border-radius: 0; box-shadow: none; border-top: none; }
+        }
     </style>
 </head>
 <body>
-
-    <div class="login-card">
-        <!-- आपका लोगो -->
-        <img src="assets/ojasvi-logo.png" alt="Ojasvi Logo">
-        <h2>पोर्टल लॉगिन</h2>
-        <p>सिस्टम में प्रवेश करने के लिए लॉगिन करें</p>
+    <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> होमपेज पर लौटें</a>
+    
+    <div class="login-box">
+        <img src="assets/ojasvi-logo.png" alt="Logo">
+        <h2>एजेंट पोर्टल</h2>
+        <p>अपने अकाउंट में लॉगिन करें</p>
         
-        <!-- Role Selection -->
-        <div class="role-toggle">
-            <button class="role-btn active" id="btnAgent" onclick="setRole('Agent')"><i class="fas fa-user-tie"></i> एजेंट</button>
-            <button class="role-btn" id="btnAdmin" onclick="setRole('Admin')"><i class="fas fa-user-shield"></i> एडमिन</button>
-        </div>
-
-        <!-- Login Form -->
-        <form id="loginForm" onsubmit="handleLogin(event)">
+        <form onsubmit="event.preventDefault(); window.location.href='agent.html';">
             <div class="form-group">
-                <label>यूजर आईडी (User ID)</label>
-                <input type="text" id="userid" placeholder="उदा: OJKF-AG-001" required>
+                <label>लॉगिन आईडी (Agent ID)</label>
+                <input type="text" placeholder="OJKF-AG-0001" required>
             </div>
             <div class="form-group">
-                <label>पासवर्ड (Password)</label>
-                <input type="password" id="password" placeholder="अपना पासवर्ड डालें" required>
+                <label>पासवर्ड</label>
+                <input type="password" placeholder="अपना पासवर्ड डालें" required>
             </div>
-            <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> सुरक्षित लॉगिन करें</button>
+            
+            <div class="extra-links">
+                <label><input type="checkbox"> याद रखें</label>
+                <a href="#" onclick="alert('यह सर्विस जल्द शुरू होगी।')">पासवर्ड भूल गए?</a>
+            </div>
+            
+            <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> लॉगिन करें</button>
         </form>
         
-        <p id="errorMsg" style="color: red; font-size: 13px; margin-top: 15px; display: none;"><i class="fas fa-exclamation-circle"></i> आईडी या पासवर्ड गलत है!</p>
-        
-        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> वापस मुख्य वेबसाइट पर जाएँ</a>
+        <div class="register-box">
+            <span style="color: #555;">संस्था के साथ नए एजेंट के रूप में जुड़ना चाहते हैं?</span><br>
+            <a href="agent-register.html" class="btn-register"><i class="fas fa-user-plus"></i> नया रजिस्ट्रेशन करें</a>
+        </div>
     </div>
-
-    <!-- Script for Login Logic -->
-    <script>
-        let currentRole = 'Agent';
-
-        // Role बदलने का फंक्शन
-        function setRole(role) {
-            currentRole = role;
-            document.getElementById('btnAgent').classList.remove('active');
-            document.getElementById('btnAdmin').classList.remove('active');
-            
-            if(role === 'Agent') {
-                document.getElementById('btnAgent').classList.add('active');
-                document.getElementById('userid').placeholder = "उदा: OJKF-AG-001";
-            } else {
-                document.getElementById('btnAdmin').classList.add('active');
-                document.getElementById('userid').placeholder = "उदा: Admin-001";
-            }
-        }
-
-        // फॉर्म सबमिट करने का फंक्शन (अभी के लिए Demo Testing)
-        function handleLogin(event) {
-            event.preventDefault();
-            
-            const userid = document.getElementById('userid').value;
-            const pass = document.getElementById('password').value;
-
-            // अगर कुछ भी भरकर सबमिट किया, तो उसे डैशबोर्ड पर भेज देगा 
-            // (असली डेटाबेस चेकिंग हम Supabase से अगले स्टेप में जोड़ेंगे)
-            if(currentRole === 'Agent') {
-                window.location.href = "agent.html"; // एजेंट पेज पर जाएगा
-            } else {
-                window.location.href = "dashboard.html"; // एडमिन पेज पर जाएगा
-            }
-        }
-    </script>
 </body>
 </html>
