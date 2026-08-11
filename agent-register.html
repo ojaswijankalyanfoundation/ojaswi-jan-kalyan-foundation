@@ -14,8 +14,8 @@
         .navbar { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .logo-section { display: flex; align-items: center; gap: 15px; }
         .logo-section img { height: 55px; }
-        .brand-text h1 { margin: 0; font-size: 22px; color: var(--navy); }
-        .brand-text span { font-size: 12px; color: var(--saffron); font-weight: bold; }
+        .brand-text h1 { margin: 0; font-size: 22px; color: var(--navy); letter-spacing: 0.5px; }
+        .brand-text span { font-size: 12px; color: var(--saffron); font-weight: bold; letter-spacing: 1px; }
         .nav-links a { text-decoration: none; color: var(--navy); font-weight: 600; margin-left: 20px; font-size: 15px; }
         .btn-login { background: var(--navy); color: white !important; padding: 8px 20px; border-radius: 25px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
         
@@ -29,9 +29,9 @@
         .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
         .form-group input:focus { border-color: var(--saffron); outline: none; box-shadow: 0 0 5px rgba(255,153,51,0.2); }
         
-        .btn-main { width: 100%; background: var(--green); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-main { width: 100%; background: var(--green); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; box-shadow: 0 4px 10px rgba(19, 136, 8, 0.2); }
         .btn-main:hover { background: #0f6c06; }
-        .btn-main:disabled { background: #9ca3af; cursor: not-allowed; }
+        .btn-main:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
         
         .switch-link { margin-top: 20px; font-size: 14px; text-align: center; color: #555; }
         .switch-link a { color: var(--saffron); text-decoration: none; font-weight: bold; }
@@ -78,7 +78,7 @@
                 <div class="form-group"><label>नया पासवर्ड बनाएँ *</label><input type="password" id="r_password" placeholder="कम से कम 6 अक्षरों का पासवर्ड" minlength="6" required></div>
                 
                 <button type="submit" id="btnSendOtp" class="btn-main"><i class="fas fa-envelope"></i> रजिस्टर करें (Send OTP)</button>
-                <div id="regMsg" style="text-align: center; margin-top: 10px; font-weight: bold;"></div>
+                <div id="regMsg" style="text-align: center; margin-top: 10px; font-weight: bold; font-size: 14px;"></div>
             </form>
             <div class="switch-link">पहले से अकाउंट है? <a href="login.html">यहाँ लॉगिन करें</a></div>
         </div>
@@ -91,7 +91,7 @@
             <form onsubmit="verifyOtp(event)">
                 <div class="form-group"><label>OTP दर्ज करें *</label><input type="text" id="r_otp" placeholder="6-Digit OTP" required></div>
                 <button type="submit" id="btnVerifyOtp" class="btn-main"><i class="fas fa-check-circle"></i> वेरीफाई करें और ID प्राप्त करें</button>
-                <div id="otpMsg" style="text-align: center; margin-top: 10px; font-weight: bold;"></div>
+                <div id="otpMsg" style="text-align: center; margin-top: 10px; font-weight: bold; font-size: 14px;"></div>
             </form>
             <div class="switch-link"><a href="#" onclick="location.reload()">← वापस जाएँ और ईमेल बदलें</a></div>
         </div>
@@ -120,9 +120,9 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let tempUserData = {}; // To store data temporarily between OTP steps
+        let tempUserData = {}; // अस्थायी डेटा स्टोर करने के लिए
 
-        // 1. SEND OTP FUNCTION
+        // 1. OTP भेजने का फंक्शन
         async function sendOtp(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSendOtp');
@@ -140,7 +140,7 @@
                 btn.disabled = true;
                 msg.innerText = "";
 
-                // Send OTP via Supabase Auth
+                // Supabase Auth से OTP भेजना
                 const { data, error } = await supabase.auth.signUp({
                     email: tempUserData.email,
                     password: tempUserData.password,
@@ -149,14 +149,14 @@
 
                 if (error) throw error;
 
-                // Move to Step 2 (OTP Screen)
+                // स्टेप 2 (OTP स्क्रीन) दिखाएं
                 document.getElementById('registerSection').style.display = 'none';
                 document.getElementById('otpSection').style.display = 'block';
                 document.getElementById('showEmail').innerText = tempUserData.email;
 
             } catch (error) {
                 msg.style.color = "red";
-                if(error.message.includes("already registered")) {
+                if(error.message.includes("already registered") || error.message.includes("User already exists")) {
                     msg.innerText = "❌ यह ईमेल पहले से रजिस्टर है। कृपया लॉगिन करें।";
                 } else {
                     msg.innerText = "❌ एरर: " + error.message;
@@ -166,7 +166,7 @@
             }
         }
 
-        // 2. VERIFY OTP FUNCTION
+        // 2. OTP वेरीफाई करने का फंक्शन
         async function verifyOtp(e) {
             e.preventDefault();
             const btn = document.getElementById('btnVerifyOtp');
@@ -178,7 +178,7 @@
                 btn.disabled = true;
                 msg.innerText = "";
 
-                // Verify OTP
+                // OTP चेक करना
                 const { data: authData, error: authError } = await supabase.auth.verifyOtp({
                     email: tempUserData.email,
                     token: otpCode,
@@ -187,23 +187,23 @@
 
                 if (authError) throw authError;
 
-                // Create Unique Agent Code
+                // यूनीक Agent ID बनाना
                 const randomNum = Math.floor(1000 + Math.random() * 9000);
                 const agentCode = "OJKF-AG-" + randomNum;
 
-                // Save Data in 'agents' Database Table
+                // 'agents' टेबल में डेटा सेव करना
                 const { error: dbError } = await supabase.from('agents').insert([{
                     name: tempUserData.name,
                     mobile: tempUserData.mobile,
                     email: tempUserData.email,
-                    password: tempUserData.password, // Only storing for initial ref, Supabase hashes real pwd
+                    password: tempUserData.password, // भविष्य में लॉगिन चेक करने के लिए
                     agent_code: agentCode,
                     status: 'Pending KYC'
                 }]);
 
                 if (dbError) throw dbError;
 
-                // Move to Step 3 (Success Screen)
+                // स्टेप 3 (Success स्क्रीन) दिखाएं
                 document.getElementById('newAgentId').innerText = agentCode;
                 document.getElementById('otpSection').style.display = 'none';
                 document.getElementById('successSection').style.display = 'block';
