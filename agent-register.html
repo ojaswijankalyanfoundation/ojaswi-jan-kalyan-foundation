@@ -10,7 +10,6 @@
         :root { --saffron: #FF9933; --green: #138808; --navy: #1c2c52; --light-bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--light-bg); color: #333; }
         
-        /* Navbar */
         .navbar { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .logo-section { display: flex; align-items: center; gap: 15px; }
         .logo-section img { height: 55px; }
@@ -19,7 +18,6 @@
         .nav-links a { text-decoration: none; color: var(--navy); font-weight: 600; margin-left: 20px; font-size: 15px; }
         .btn-login { background: var(--navy); color: white !important; padding: 8px 20px; border-radius: 25px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
         
-        /* Auth Container */
         .auth-container { max-width: 450px; margin: 50px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid var(--saffron); }
         .auth-container h2 { color: var(--navy); text-align: center; margin-top: 0; font-size: 24px; }
         .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 25px; }
@@ -36,7 +34,6 @@
         .switch-link { margin-top: 20px; font-size: 14px; text-align: center; color: #555; }
         .switch-link a { color: var(--saffron); text-decoration: none; font-weight: bold; }
         
-        /* Hidden Sections */
         #otpSection, #successSection { display: none; }
         
         .id-box { background: #f0fdf4; padding: 20px; border-radius: 8px; text-align: center; border: 2px dashed var(--green); margin: 20px 0; }
@@ -71,7 +68,8 @@
             <h2><i class="fas fa-user-plus"></i> नया एजेंट रजिस्ट्रेशन</h2>
             <p class="subtitle">सिर्फ 1 मिनट में अपना अकाउंट बनाएँ।</p>
             
-            <form onsubmit="sendOtp(event)">
+            <!-- Bulletproof Form Tag -->
+            <form id="agentForm" onsubmit="event.preventDefault(); sendOtp(); return false;">
                 <div class="form-group"><label>पूरा नाम *</label><input type="text" id="r_name" placeholder="अपना पूरा नाम लिखें" required></div>
                 <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="r_mobile" placeholder="10 अंकों का मोबाइल नंबर" pattern="[0-9]{10}" required></div>
                 <div class="form-group"><label>ईमेल आईडी (इसी पर OTP आएगा) *</label><input type="email" id="r_email" placeholder="सही ईमेल आईडी डालें" required></div>
@@ -88,7 +86,8 @@
             <h2><i class="fas fa-shield-alt"></i> OTP वेरीफाई करें</h2>
             <p class="subtitle">हमने <strong id="showEmail" style="color:var(--navy);"></strong> पर एक 6-अंकों का OTP भेजा है।</p>
             
-            <form onsubmit="verifyOtp(event)">
+            <!-- Bulletproof Form Tag -->
+            <form id="otpForm" onsubmit="event.preventDefault(); verifyOtp(); return false;">
                 <div class="form-group"><label>OTP दर्ज करें *</label><input type="text" id="r_otp" placeholder="6-Digit OTP" required></div>
                 <button type="submit" id="btnVerifyOtp" class="btn-main"><i class="fas fa-check-circle"></i> वेरीफाई करें और ID प्राप्त करें</button>
                 <div id="otpMsg" style="text-align: center; margin-top: 10px; font-weight: bold; font-size: 14px;"></div>
@@ -115,16 +114,13 @@
     </div>
 
     <script>
-        // SUPABASE CONNECTION
         const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let tempUserData = {}; // अस्थायी डेटा स्टोर करने के लिए
+        let tempUserData = {}; 
 
-        // 1. OTP भेजने का फंक्शन
-        async function sendOtp(e) {
-            e.preventDefault();
+        async function sendOtp() {
             const btn = document.getElementById('btnSendOtp');
             const msg = document.getElementById('regMsg');
             
@@ -140,7 +136,6 @@
                 btn.disabled = true;
                 msg.innerText = "";
 
-                // Supabase Auth से OTP भेजना
                 const { data, error } = await supabase.auth.signUp({
                     email: tempUserData.email,
                     password: tempUserData.password,
@@ -149,7 +144,6 @@
 
                 if (error) throw error;
 
-                // स्टेप 2 (OTP स्क्रीन) दिखाएं
                 document.getElementById('registerSection').style.display = 'none';
                 document.getElementById('otpSection').style.display = 'block';
                 document.getElementById('showEmail').innerText = tempUserData.email;
@@ -166,9 +160,7 @@
             }
         }
 
-        // 2. OTP वेरीफाई करने का फंक्शन
-        async function verifyOtp(e) {
-            e.preventDefault();
+        async function verifyOtp() {
             const btn = document.getElementById('btnVerifyOtp');
             const msg = document.getElementById('otpMsg');
             const otpCode = document.getElementById('r_otp').value;
@@ -178,7 +170,6 @@
                 btn.disabled = true;
                 msg.innerText = "";
 
-                // OTP चेक करना
                 const { data: authData, error: authError } = await supabase.auth.verifyOtp({
                     email: tempUserData.email,
                     token: otpCode,
@@ -187,23 +178,20 @@
 
                 if (authError) throw authError;
 
-                // यूनीक Agent ID बनाना
                 const randomNum = Math.floor(1000 + Math.random() * 9000);
                 const agentCode = "OJKF-AG-" + randomNum;
 
-                // 'agents' टेबल में डेटा सेव करना
                 const { error: dbError } = await supabase.from('agents').insert([{
                     name: tempUserData.name,
                     mobile: tempUserData.mobile,
                     email: tempUserData.email,
-                    password: tempUserData.password, // भविष्य में लॉगिन चेक करने के लिए
+                    password: tempUserData.password, 
                     agent_code: agentCode,
                     status: 'Pending KYC'
                 }]);
 
                 if (dbError) throw dbError;
 
-                // स्टेप 3 (Success स्क्रीन) दिखाएं
                 document.getElementById('newAgentId').innerText = agentCode;
                 document.getElementById('otpSection').style.display = 'none';
                 document.getElementById('successSection').style.display = 'block';
