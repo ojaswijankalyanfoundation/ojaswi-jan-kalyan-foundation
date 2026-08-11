@@ -68,8 +68,7 @@
             <h2><i class="fas fa-user-plus"></i> नया एजेंट रजिस्ट्रेशन</h2>
             <p class="subtitle">सिर्फ 1 मिनट में अपना अकाउंट बनाएँ।</p>
             
-            <!-- Bulletproof Form Tag -->
-            <form id="agentForm" onsubmit="event.preventDefault(); sendOtp(); return false;">
+            <form onsubmit="sendOtp(event)">
                 <div class="form-group"><label>पूरा नाम *</label><input type="text" id="r_name" placeholder="अपना पूरा नाम लिखें" required></div>
                 <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="r_mobile" placeholder="10 अंकों का मोबाइल नंबर" pattern="[0-9]{10}" required></div>
                 <div class="form-group"><label>ईमेल आईडी (इसी पर OTP आएगा) *</label><input type="email" id="r_email" placeholder="सही ईमेल आईडी डालें" required></div>
@@ -86,8 +85,7 @@
             <h2><i class="fas fa-shield-alt"></i> OTP वेरीफाई करें</h2>
             <p class="subtitle">हमने <strong id="showEmail" style="color:var(--navy);"></strong> पर एक 6-अंकों का OTP भेजा है।</p>
             
-            <!-- Bulletproof Form Tag -->
-            <form id="otpForm" onsubmit="event.preventDefault(); verifyOtp(); return false;">
+            <form onsubmit="verifyOtp(event)">
                 <div class="form-group"><label>OTP दर्ज करें *</label><input type="text" id="r_otp" placeholder="6-Digit OTP" required></div>
                 <button type="submit" id="btnVerifyOtp" class="btn-main"><i class="fas fa-check-circle"></i> वेरीफाई करें और ID प्राप्त करें</button>
                 <div id="otpMsg" style="text-align: center; margin-top: 10px; font-weight: bold; font-size: 14px;"></div>
@@ -120,7 +118,9 @@
 
         let tempUserData = {}; 
 
-        async function sendOtp() {
+        // 1. OTP भेजने का फंक्शन
+        async function sendOtp(e) {
+            e.preventDefault();
             const btn = document.getElementById('btnSendOtp');
             const msg = document.getElementById('regMsg');
             
@@ -160,7 +160,9 @@
             }
         }
 
-        async function verifyOtp() {
+        // 2. OTP वेरीफाई करने का फंक्शन
+        async function verifyOtp(e) {
+            e.preventDefault();
             const btn = document.getElementById('btnVerifyOtp');
             const msg = document.getElementById('otpMsg');
             const otpCode = document.getElementById('r_otp').value;
