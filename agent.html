@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent Dashboard | Ojasvi Foundation</title>
+    <title>कार्यकर्ता पोर्टल | ओजस्वी फाउंडेशन</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -17,7 +17,6 @@
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 70px; }
         
-        /* HEADER PORTION */
         .header-section { background: linear-gradient(135deg, var(--purple-main), var(--purple-dark)); color: white; padding: 25px 20px 40px 20px; border-radius: 0 0 25px 25px; display: flex; justify-content: space-between; align-items: flex-start; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.3); }
         .user-info { display: flex; align-items: center; gap: 15px; }
         .profile-pic { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--purple-main); font-weight: bold; border: 2px solid var(--purple-light); }
@@ -25,18 +24,14 @@
         .user-details h2 { margin: 5px 0 0 0; font-size: 20px; letter-spacing: 0.5px; }
         .user-details span { font-size: 12px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 12px; margin-top: 5px; display: inline-block; }
         
-        /* LOGOUT BUTTON */
         .btn-logout { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.3s; }
-        .btn-logout:hover { background: rgba(255,255,255,0.4); }
-
-        /* STATS CARDS */
+        
         .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-top: -25px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: left; position: relative; overflow: hidden; border-bottom: 3px solid var(--purple-main); }
         .stat-card h3 { margin: 0; font-size: 24px; color: var(--purple-main); }
         .stat-card p { margin: 5px 0 0 0; font-size: 13px; color: var(--text-gray); font-weight: 600; }
         .stat-card i { position: absolute; right: -10px; bottom: -10px; font-size: 50px; color: var(--purple-light); opacity: 0.5; }
 
-        /* TARGET PROGRESS BAR */
         .target-section { background: white; margin: 20px; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .target-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .target-header h4 { margin: 0; color: var(--text-dark); font-size: 15px; }
@@ -45,31 +40,23 @@
         .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #d500f9, #6a1b9a); width: 0%; border-radius: 5px; transition: width 1s ease-in-out; }
         .target-details { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--text-gray); }
 
-        /* VIEWS (TABS) */
         .view-section { display: none; padding: 20px; animation: fadeIn 0.3s; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* FORM STYLES */
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #555; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
         .form-group input:focus { border-color: var(--purple-main); outline: none; }
         .btn-submit { width: 100%; background: var(--purple-main); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(106, 27, 154, 0.3); }
 
-        /* BOTTOM NAVIGATION BAR */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid #eee; }
         .nav-item { text-align: center; color: #999; cursor: pointer; flex: 1; transition: 0.3s; }
         .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
         .nav-item span { font-size: 11px; font-weight: 600; }
         .nav-item.active { color: var(--purple-main); }
-        .nav-item.active i { transform: scale(1.1); }
-        
-        /* FLOATING ACTION BUTTON (Center Nav) */
         .nav-item.fab { position: relative; top: -20px; }
         .nav-item.fab .fab-circle { background: var(--purple-main); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.4); border: 4px solid white; }
-        .nav-item.fab.active .fab-circle { background: var(--purple-dark); transform: scale(1.05); }
-
     </style>
 </head>
 <body>
@@ -92,23 +79,13 @@
         <div class="stats-container">
             <div class="stat-card">
                 <h3 id="totalMembers">0</h3>
-                <p>कुल सदस्य</p>
+                <p>कुल लाभार्थी</p>
                 <i class="fas fa-users"></i>
             </div>
             <div class="stat-card">
                 <h3 id="todayMembers" style="color: #2e7d32;">0</h3>
-                <p>आज के नए सदस्य</p>
+                <p>आज जुड़े</p>
                 <i class="fas fa-user-plus"></i>
-            </div>
-            <div class="stat-card">
-                <h3 id="pendingKyc" style="color: #ef6c00;">0</h3>
-                <p>पेंडिंग वेरिफिकेशन</p>
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-card">
-                <h3 id="totalCollection" style="color: #0277bd;">₹ 0</h3>
-                <p>कुल कलेक्शन</p>
-                <i class="fas fa-rupee-sign"></i>
             </div>
         </div>
 
@@ -121,38 +98,25 @@
                 <div class="progress-bar-fill" id="targetBar"></div>
             </div>
             <div class="target-details">
-                <span>लक्ष्य: 100 सदस्य</span>
-                <span>हासिल: <span id="achievedMembers">0</span></span>
+                <span>लक्ष्य: 100 लाभार्थी</span>
+                <span>हासिल: 0</span>
             </div>
         </div>
     </div>
 
     <!-- ADD MEMBER VIEW -->
     <div id="view-add" class="view-section">
-        <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-user-plus"></i> नया सदस्य जोड़ें</h3>
-        <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 20px;">सदस्य की सही जानकारी दर्ज करें।</p>
+        <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-user-plus"></i> नया लाभार्थी जोड़ें</h3>
+        <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 20px;">संस्था के नए सदस्य की सही जानकारी दर्ज करें।</p>
         
         <form id="addMemberForm" onsubmit="event.preventDefault(); alert('डेटाबेस कनेक्शन अगले स्टेप में!');">
             <div class="form-group">
                 <label>पूरा नाम *</label>
-                <input type="text" placeholder="सदस्य का नाम" required>
+                <input type="text" placeholder="लाभार्थी का नाम" required>
             </div>
             <div class="form-group">
                 <label>मोबाइल नंबर *</label>
                 <input type="tel" placeholder="10 अंकों का नंबर" pattern="[0-9]{10}" required>
-            </div>
-            <div class="form-group">
-                <label>जन्म तिथि *</label>
-                <input type="date" required>
-            </div>
-            <div class="form-group">
-                <label>लिंग *</label>
-                <select required>
-                    <option value="">चुनें</option>
-                    <option value="Male">पुरुष</option>
-                    <option value="Female">महिला</option>
-                    <option value="Other">अन्य</option>
-                </select>
             </div>
             <div class="form-group">
                 <label>पूरा पता *</label>
@@ -161,6 +125,19 @@
             <button type="submit" class="btn-submit">आगे बढ़ें <i class="fas fa-arrow-right"></i></button>
         </form>
     </div>
+
+    <!-- MY MEMBERS LIST VIEW -->
+    <div id="view-list" class="view-section">
+        <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-list-alt"></i> मेरे लाभार्थी</h3>
+        <p style="font-size: 13px; color: var(--text-gray);">आपके द्वारा जोड़े गए सभी लोगों की सूची</p>
+        
+        <div style="text-align: center; padding: 40px 20px; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <i class="fas fa-folder-open" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i>
+            <h4 style="margin: 0; color: #555;">अभी कोई डेटा नहीं है</h4>
+            <p style="font-size: 12px; color: #888;">आप जैसे ही नए लाभार्थी जोड़ेंगे, वो यहाँ दिखाई देंगे।</p>
+        </div>
+    </div>
+
     <!-- KYC / PROFILE VIEW -->
     <div id="view-kyc" class="view-section">
         <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
@@ -170,7 +147,7 @@
 
         <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-id-card"></i> कार्यकर्ता प्रोफाइल (KYC)</h3>
         
-        <form id="kycForm" onsubmit="submitKYC(event)">
+        <form id="kycForm" onsubmit="event.preventDefault(); alert('KYC सबमिट लॉजिक अगले स्टेप में!');">
             <div class="form-group">
                 <label>आधार कार्ड नंबर *</label>
                 <input type="text" id="kycAadhaar" placeholder="12 अंकों का आधार नंबर" pattern="[0-9]{12}" required>
@@ -199,19 +176,6 @@
         </form>
     </div>
 
-    
-    <!-- MY MEMBERS LIST VIEW -->
-    <div id="view-list" class="view-section">
-        <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-list-alt"></i> मेरे सदस्य</h3>
-        <p style="font-size: 13px; color: var(--text-gray);">आपके द्वारा जोड़े गए सभी सदस्यों की सूची (जल्द आ रहा है...)</p>
-        
-        <div style="text-align: center; padding: 40px 20px; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-            <i class="fas fa-folder-open" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i>
-            <h4 style="margin: 0; color: #555;">अभी कोई डेटा नहीं है</h4>
-            <p style="font-size: 12px; color: #888;">आप जैसे ही नए सदस्य जोड़ेंगे, वो यहाँ दिखाई देंगे।</p>
-        </div>
-    </div>
-
     <!-- BOTTOM NAVIGATION -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)">
@@ -224,9 +188,9 @@
         </div>
         <div class="nav-item" onclick="switchTab('list', this)">
             <i class="fas fa-users"></i>
-            <span>मेरे सदस्य</span>
+            <span>लाभार्थी</span>
         </div>
-        <div class="nav-item" onclick="alert('प्रोफाइल सेटिंग जल्द आ रही है!')">
+        <div class="nav-item" id="nav-profile" onclick="switchTab('kyc', this)">
             <i class="fas fa-user-circle"></i>
             <span>प्रोफाइल</span>
         </div>
@@ -237,6 +201,7 @@
         const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         let currentAgentId = null;
 
         // Check Login Status and Fetch Data
@@ -266,7 +231,7 @@
                 // असली लॉजिक: KYC पेंडिंग है या नहीं?
                 if (agentData.status === 'Pending KYC') {
                     // अगर KYC नहीं हुई है, तो सीधा KYC पेज दिखाओ
-                    switchTab('kyc', document.querySelector('.nav-item:last-child'));
+                    switchTab('kyc', document.getElementById('nav-profile'));
                     // नीचे के नेविगेशन बटन छुपा दो (ताकि बिना KYC वो सदस्य न जोड़ सके)
                     document.querySelector('.bottom-nav').style.display = 'none';
                 } else {
@@ -276,7 +241,25 @@
             }
         }
 
-  
+        // Tab Switching Logic
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('view-' + tabId).classList.add('active');
+            if(element) element.classList.add('active');
+        }
+
+        // Logout Function
+        async function logout() {
+            if(confirm("क्या आप वाकई लॉगआउट करना चाहते हैं?")) {
+                await supabase.auth.signOut();
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Run on page load
+        checkUser();
     </script>
 </body>
 </html>
