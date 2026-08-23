@@ -206,38 +206,52 @@
 
         // Check Login Status and Fetch Data
         async function checkUser() {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            
-            if (!session) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            const userEmail = session.user.email;
-
-            // Fetch Agent Details
-            const { data: agentData, error: dbError } = await supabase
-                .from('agents')
-                .select('*')
-                .eq('email', userEmail)
-                .single();
-
-            if (agentData) {
-                currentAgentId = agentData.id;
-                document.getElementById('agentName').innerText = agentData.name;
-                document.getElementById('agentId').innerText = "ID: " + agentData.agent_code;
-                document.getElementById('profileInitial').innerText = agentData.name.charAt(0).toUpperCase();
-
-                // असली लॉजिक: KYC पेंडिंग है या नहीं?
-                if (agentData.status === 'Pending KYC') {
-                    // अगर KYC नहीं हुई है, तो सीधा KYC पेज दिखाओ
-                    switchTab('kyc', document.getElementById('nav-profile'));
-                    // नीचे के नेविगेशन बटन छुपा दो (ताकि बिना KYC वो सदस्य न जोड़ सके)
-                    document.querySelector('.bottom-nav').style.display = 'none';
-                } else {
-                    // अगर KYC पूरी है, तो होम पेज दिखाओ
-                    switchTab('home', document.querySelector('.nav-item.active'));
+            try {
+                // 1. Session चेक करो
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) throw sessionError;
+                
+                if (!session) {
+                    console.log("No session found, redirecting to login...");
+                    window.location.href = 'login.html';
+                    return;
                 }
+
+                const userEmail = session.user.email;
+                console.log("Logged in user email:", userEmail);
+
+                // 2. Database से डेटा लाओ
+                const { data: agentData, error: dbError } = await supabase
+                    .from('agents')
+                    .select('*')
+                    .eq('email', userEmail)
+                    .single();
+
+                if (dbError) throw dbError;
+
+                if (agentData) {
+                    console.log("Agent data found:", agentData);
+                    currentAgentId = agentData.id;
+                    document.getElementById('agentName').innerText = agentData.name || "नाम नहीं मिला";
+                    document.getElementById('agentId').innerText = "ID: " + (agentData.agent_code || "पेंडिंग");
+                    document.getElementById('profileInitial').innerText = (agentData.name ? agentData.name.charAt(0).toUpperCase() : "O");
+
+                    if (agentData.status === 'Pending KYC') {
+                        switchTab('kyc', document.getElementById('nav-profile'));
+                        document.querySelector('.bottom-nav').style.display = 'none';
+                    } else {
+                        switchTab('home', document.querySelector('.nav-item.active'));
+                    }
+                } else {
+                    console.log("No agent data found for this email in 'agents' table.");
+                    alert("कार्यकर्ता का डेटा नहीं मिला। कृपया एडमिन से संपर्क करें।");
+                }
+
+            } catch (error) {
+                console.error("Error in checkUser:", error.message);
+                document.getElementById('agentName').innerText = "एरर आ गया!";
+                alert("डेटा लाने में समस्या: " + error.message);
             }
         }
 
