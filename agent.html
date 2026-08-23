@@ -237,20 +237,20 @@
         const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let currentAgentId = null;
 
         // Check Login Status and Fetch Data
         async function checkUser() {
             const { data: { session }, error } = await supabase.auth.getSession();
             
             if (!session) {
-                // If not logged in, send back to login page
                 window.location.href = 'login.html';
                 return;
             }
 
             const userEmail = session.user.email;
 
-            // Fetch Agent Details from 'agents' table
+            // Fetch Agent Details
             const { data: agentData, error: dbError } = await supabase
                 .from('agents')
                 .select('*')
@@ -258,35 +258,25 @@
                 .single();
 
             if (agentData) {
+                currentAgentId = agentData.id;
                 document.getElementById('agentName').innerText = agentData.name;
                 document.getElementById('agentId').innerText = "ID: " + agentData.agent_code;
                 document.getElementById('profileInitial').innerText = agentData.name.charAt(0).toUpperCase();
+
+                // असली लॉजिक: KYC पेंडिंग है या नहीं?
+                if (agentData.status === 'Pending KYC') {
+                    // अगर KYC नहीं हुई है, तो सीधा KYC पेज दिखाओ
+                    switchTab('kyc', document.querySelector('.nav-item:last-child'));
+                    // नीचे के नेविगेशन बटन छुपा दो (ताकि बिना KYC वो सदस्य न जोड़ सके)
+                    document.querySelector('.bottom-nav').style.display = 'none';
+                } else {
+                    // अगर KYC पूरी है, तो होम पेज दिखाओ
+                    switchTab('home', document.querySelector('.nav-item.active'));
+                }
             }
         }
 
-        // Tab Switching Logic
-        function switchTab(tabId, element) {
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            // Remove active class from all nav items
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            // Show selected view
-            document.getElementById('view-' + tabId).classList.add('active');
-            // Highlight selected nav item
-            element.classList.add('active');
-        }
-
-        // Logout Function
-        async function logout() {
-            if(confirm("क्या आप वाकई लॉगआउट करना चाहते हैं?")) {
-                await supabase.auth.signOut();
-                window.location.href = 'login.html';
-            }
-        }
-
-        // Run on page load
-        checkUser();
+  
     </script>
 </body>
 </html>
