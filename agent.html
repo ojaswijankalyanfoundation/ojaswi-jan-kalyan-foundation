@@ -21,7 +21,7 @@
         .user-info { display: flex; align-items: center; gap: 15px; }
         .profile-pic { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--purple-main); font-weight: bold; border: 2px solid var(--purple-light); }
         .user-details p { margin: 0; font-size: 14px; opacity: 0.9; }
-        .user-details h2 { margin: 5px 0 0 0; font-size: 20px; letter-spacing: 0.5px; }
+        .user-details h2 { margin: 5px 0 0 0; font-size: 18px; letter-spacing: 0.5px; }
         .user-details span { font-size: 12px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 12px; margin-top: 5px; display: inline-block; }
         
         .btn-logout { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.3s; }
@@ -67,7 +67,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है...</h2>
+                <h2 id="agentName">शुरू हो रहा है... (v2)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -197,43 +197,74 @@
     </div>
 
     <script>
-        // Supabase Initialization
-        const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // एरर दिखाने का फंक्शन (ताकि हमें बीमारी का पता चले)
+        function showError(msg) {
+            const nameEl = document.getElementById('agentName');
+            if(nameEl) {
+                nameEl.innerText = "❌ एरर: " + msg;
+                nameEl.style.color = "#ff4444";
+                nameEl.style.fontSize = "13px";
+            }
+        }
 
-        let currentAgentId = null;
-
-        // Check Login Status and Fetch Data
-        async function checkUser() {
+        // टैब बदलने का फंक्शन (इसे पूरी तरह सुरक्षित कर दिया है)
+        function switchTab(tabId, element) {
             try {
-                // 1. Session चेक करो
+                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                
+                document.getElementById('view-' + tabId).classList.add('active');
+                if(element) element.classList.add('active');
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function logout() {
+            if(confirm("क्या आप वाकई लॉगआउट करना चाहते हैं?")) {
+                if(window.supabase) await window.supabase.auth.signOut();
+                window.location.href = 'login.html';
+            }
+        }
+
+        // मेन डेटा लोडिंग फंक्शन
+        async function initApp() {
+            try {
+                document.getElementById('agentName').innerText = "स्टेप 1: सिस्टम चेक...";
+                
+                if (typeof window.supabase === 'undefined') {
+                    throw new Error("Supabase कनेक्ट नहीं हुआ!");
+                }
+
+                const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
+                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                
+                document.getElementById('agentName').innerText = "स्टेप 2: लॉगिन चेक...";
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 
-                if (sessionError) throw sessionError;
+                if (sessionError) throw new Error(sessionError.message);
                 
                 if (!session) {
-                    console.log("No session found, redirecting to login...");
-                    window.location.href = 'login.html';
+                    showError("लॉगिन नहीं है! पेज वापस जा रहा है...");
+                    setTimeout(() => { window.location.href = 'login.html'; }, 2000);
                     return;
                 }
 
                 const userEmail = session.user.email;
-                console.log("Logged in user email:", userEmail);
+                document.getElementById('agentName').innerText = "स्टेप 3: डेटा खोज रहे हैं...";
 
-                // 2. Database से डेटा लाओ
                 const { data: agentData, error: dbError } = await supabase
                     .from('agents')
                     .select('*')
                     .eq('email', userEmail)
                     .single();
 
-                if (dbError) throw dbError;
+                if (dbError) throw new Error(dbError.message);
 
                 if (agentData) {
-                    console.log("Agent data found:", agentData);
-                    currentAgentId = agentData.id;
                     document.getElementById('agentName').innerText = agentData.name || "नाम नहीं मिला";
+                    document.getElementById('agentName').style.color = "white"; 
                     document.getElementById('agentId').innerText = "ID: " + (agentData.agent_code || "पेंडिंग");
                     document.getElementById('profileInitial').innerText = (agentData.name ? agentData.name.charAt(0).toUpperCase() : "O");
 
@@ -244,36 +275,16 @@
                         switchTab('home', document.querySelector('.nav-item.active'));
                     }
                 } else {
-                    console.log("No agent data found for this email in 'agents' table.");
-                    alert("कार्यकर्ता का डेटा नहीं मिला। कृपया एडमिन से संपर्क करें।");
+                    throw new Error("डेटाबेस में आपका नाम नहीं है!");
                 }
 
-            } catch (error) {
-                console.error("Error in checkUser:", error.message);
-                document.getElementById('agentName').innerText = "एरर आ गया!";
-                alert("डेटा लाने में समस्या: " + error.message);
+            } catch (err) {
+                showError(err.message);
             }
         }
 
-        // Tab Switching Logic
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById('view-' + tabId).classList.add('active');
-            if(element) element.classList.add('active');
-        }
-
-        // Logout Function
-        async function logout() {
-            if(confirm("क्या आप वाकई लॉगआउट करना चाहते हैं?")) {
-                await supabase.auth.signOut();
-                window.location.href = 'login.html';
-            }
-        }
-
-        // Run on page load
-        checkUser();
+        // पेज लोड होते ही शुरू करो
+        initApp();
     </script>
 </body>
 </html>
