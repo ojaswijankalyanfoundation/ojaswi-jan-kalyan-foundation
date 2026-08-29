@@ -1,22 +1,65 @@
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
-.header { background-color: #f26522; color: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-.header h1 { margin: 0; font-size: 24px; }
-.slogan { font-size: 14px; margin-top: 8px; opacity: 0.9; }
+/* style.css - सिर्फ डिज़ाइन और कलर */
+:root {
+    --saffron: #FF9933;
+    --green: #138808;
+    --navy: #1c2c52;
+    --light-bg: #f4f7f6;
+}
 
-.container { padding: 15px; max-width: 800px; margin: auto; }
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin: 0; 
+    background-color: var(--light-bg); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh; 
+    width: 100%; /* इससे डेस्कटॉप मोड की गड़बड़ ठीक हो गई */
+    overflow-x: hidden;
+}
 
-.plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
-.plan-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid #1c2c52; text-align: center; }
-.plan-card h3 { color: #1c2c52; margin-top: 0; }
+.auth-container { 
+    background: white; 
+    padding: 40px; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+    width: 90%; 
+    max-width: 400px; 
+    text-align: center; 
+    border-top: 5px solid var(--saffron); 
+    position: relative; 
+    margin: 20px auto; /* इससे बॉक्स हमेशा सेंटर में रहेगा */
+}
 
-.form-section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.form-section h2 { text-align: center; color: #f26522; margin-top: 0; }
+.auth-container img { height: 60px; margin-bottom: 15px; }
+h2 { margin: 0 0 5px 0; color: var(--navy); font-size: 24px; }
+p.subtitle { color: #666; font-size: 14px; margin-bottom: 25px; }
 
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; color: #444; }
+.form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: 0.3s; }
+.form-group input:focus { border-color: var(--saffron); outline: none; box-shadow: 0 0 5px rgba(255,153,51,0.2); }
 
-.btn-submit { width: 100%; background-color: #198754; color: white; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-.btn-submit:hover { background-color: #146c43; }
+.btn-main { width: 100%; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+.btn-login-color { background: var(--navy); }
+.btn-login-color:hover { background: #121c36; }
+.btn-forgot-color { background: var(--saffron); }
 
-.msg { text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px; }
+.forgot-link { text-align: right; margin-bottom: 15px; }
+.forgot-link a { font-size: 13px; color: var(--saffron); text-decoration: none; }
+
+.switch-link { margin-top: 20px; font-size: 14px; color: #555; }
+.switch-link a { color: var(--saffron); text-decoration: none; font-weight: bold; cursor: pointer; }
+.switch-link a:hover { text-decoration: underline; }
+
+.back-home { position: absolute; top: 15px; left: 15px; color: #888; text-decoration: none; font-size: 14px; transition: 0.3s; }
+.back-home:hover { color: var(--navy); }
+
+/* पेज बदलने का स्मूथ एनीमेशन */
+.auth-section { display: none; }
+.auth-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
