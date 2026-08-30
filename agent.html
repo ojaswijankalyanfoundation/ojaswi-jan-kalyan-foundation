@@ -45,6 +45,7 @@
         .form-group input:focus, .form-group select:focus { border-color: var(--purple-main); outline: none; }
         
         .file-hint { display: block; color: #d32f2f; font-size: 11px; margin-top: 4px; font-weight: bold; }
+        .section-title { margin: 20px 0 10px 0; color: var(--purple-main); font-size: 15px; border-bottom: 2px solid var(--purple-light); padding-bottom: 5px; }
         
         .btn-submit { width: 100%; background: var(--purple-main); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(106, 27, 154, 0.3); }
 
@@ -65,7 +66,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है... (v6)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v7)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -94,14 +95,8 @@
         <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 20px;">संस्था की सेवाओं के लिए लाभार्थी का विवरण दर्ज करें।</p>
         
         <form id="addLeadForm" onsubmit="submitLead(event)">
-            <div class="form-group">
-                <label>पूरा नाम *</label>
-                <input type="text" id="leadName" placeholder="लाभार्थी का नाम" required>
-            </div>
-            <div class="form-group">
-                <label>मोबाइल नंबर *</label>
-                <input type="tel" id="leadMobile" placeholder="10 अंकों का नंबर" pattern="[0-9]{10}" required>
-            </div>
+            <div class="form-group"><label>पूरा नाम *</label><input type="text" id="leadName" placeholder="लाभार्थी का नाम" required></div>
+            <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="leadMobile" placeholder="10 अंकों का नंबर" pattern="[0-9]{10}" required></div>
             <div class="form-group">
                 <label>सेवा / योजना चुनें *</label>
                 <select id="leadService" required>
@@ -112,10 +107,7 @@
                     <option value="बुजुर्ग योजना">बुजुर्ग सहायता योजना</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>पिनकोड *</label>
-                <input type="text" id="leadPincode" placeholder="उदा: 344022" required>
-            </div>
+            <div class="form-group"><label>पिनकोड *</label><input type="text" id="leadPincode" placeholder="उदा: 344022" required></div>
             <button type="submit" id="btnSubmitLead" class="btn-submit">सबमिट करें <i class="fas fa-paper-plane"></i></button>
         </form>
     </div>
@@ -130,15 +122,26 @@
         <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-id-card"></i> कार्यकर्ता प्रोफाइल (KYC)</h3>
         
         <form id="kycForm" onsubmit="submitKYC(event)">
-            <!-- Bank Details -->
+            
+            <!-- 1. व्यक्तिगत जानकारी (नंबर) -->
+            <h4 class="section-title"><i class="fas fa-user"></i> व्यक्तिगत जानकारी</h4>
+            <div class="form-group">
+                <label>आधार कार्ड नंबर *</label>
+                <input type="text" id="kycAadhaarNo" placeholder="12 अंकों का आधार नंबर" pattern="[0-9]{12}" required>
+            </div>
+            <div class="form-group">
+                <label>पैन कार्ड नंबर *</label>
+                <input type="text" id="kycPanNo" placeholder="अपना 10 अंकों का पैन नंबर" style="text-transform: uppercase;" required>
+            </div>
+
+            <!-- 2. बैंक डिटेल्स -->
+            <h4 class="section-title"><i class="fas fa-university"></i> बैंक डिटेल्स</h4>
             <div class="form-group"><label>बैंक का नाम *</label><input type="text" id="kycBankName" placeholder="उदा. SBI, PNB, BOB" required></div>
             <div class="form-group"><label>खाता संख्या (Account No) *</label><input type="text" id="kycAccountNo" placeholder="अपना अकाउंट नंबर दर्ज करें" required></div>
             <div class="form-group"><label>IFSC कोड *</label><input type="text" id="kycIfsc" placeholder="उदा. SBIN0001234" required></div>
             
-            <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
-            <h4 style="margin: 0 0 15px 0; color: var(--purple-main);">डॉक्यूमेंट अपलोड</h4>
-
-            <!-- Profile & PAN -->
+            <!-- 3. डॉक्यूमेंट अपलोड -->
+            <h4 class="section-title"><i class="fas fa-file-upload"></i> डॉक्यूमेंट अपलोड</h4>
             <div class="form-group">
                 <label>पासपोर्ट साइज फोटो *</label>
                 <input type="file" id="kycProfilePic" accept=".jpg, .jpeg" required style="background: white;">
@@ -149,8 +152,6 @@
                 <input type="file" id="kycPanPic" accept=".jpg, .jpeg, .pdf" required style="background: white;">
                 <span class="file-hint">JPG या PDF (Max 500KB)</span>
             </div>
-
-            <!-- Aadhaar Updates (Front/Back/PDF) -->
             <div class="form-group">
                 <label>आधार कार्ड (फ्रंट फोटो या पूरी PDF) *</label>
                 <input type="file" id="kycAadhaarFront" accept=".jpg, .jpeg, .pdf" required style="background: white;">
@@ -160,8 +161,6 @@
                 <label>आधार कार्ड (बैक फोटो) - <span style="color:gray;">अगर ऊपर PDF डाली है तो इसे खाली छोड़ दें</span></label>
                 <input type="file" id="kycAadhaarBack" accept=".jpg, .jpeg" style="background: white;">
             </div>
-
-            <!-- Banking Proof -->
             <div class="form-group">
                 <label>बैंकिंग प्रूफ (पासबुक / कैंसिल चेक / स्टेटमेंट) *</label>
                 <input type="file" id="kycBankProof" accept=".jpg, .jpeg, .pdf" required style="background: white;">
@@ -199,7 +198,7 @@
             }
         }
 
-        // Updated Validation (Accepts PDF and up to 500KB)
+        // File Validation
         function checkFileValidity(file, fieldName, isOptional = false) {
             if (!file) {
                 if(isOptional) return null;
@@ -238,7 +237,7 @@
                     checkFileValidity(files.profile, "पासपोर्ट फोटो"),
                     checkFileValidity(files.pan, "पैन कार्ड"),
                     checkFileValidity(files.aadhaarFront, "आधार कार्ड (फ्रंट)"),
-                    checkFileValidity(files.aadhaarBack, "आधार कार्ड (बैक)", true), // Optional
+                    checkFileValidity(files.aadhaarBack, "आधार कार्ड (बैक)", true),
                     checkFileValidity(files.bankProof, "बैंकिंग प्रूफ")
                 ].filter(e => e !== null);
 
@@ -248,7 +247,6 @@
                 const timeStamp = Date.now();
                 const uploadedUrls = {};
 
-                // Helper to upload files
                 async function uploadFile(fileObj, folderName) {
                     if(!fileObj) return null;
                     const ext = fileObj.type === 'application/pdf' ? 'pdf' : 'jpg';
@@ -258,15 +256,19 @@
                     return supabaseClient.storage.from('kyc-documents').getPublicUrl(path).data.publicUrl;
                 }
 
+                // Uploading all files
                 uploadedUrls.profile = await uploadFile(files.profile, 'profiles');
                 uploadedUrls.pan = await uploadFile(files.pan, 'pan');
                 uploadedUrls.aadhaarFront = await uploadFile(files.aadhaarFront, 'aadhaar');
                 uploadedUrls.aadhaarBack = await uploadFile(files.aadhaarBack, 'aadhaar');
                 uploadedUrls.bankProof = await uploadFile(files.bankProof, 'bank');
 
+                // ✅ Updating Database with Numbers + Files
                 const { error: dbUpdateError } = await supabaseClient
                     .from('agents')
                     .update({
+                        aadhaar_no: document.getElementById('kycAadhaarNo').value,
+                        pan_no: document.getElementById('kycPanNo').value.toUpperCase(),
                         bank_name: document.getElementById('kycBankName').value,
                         account_no: document.getElementById('kycAccountNo').value,
                         ifsc_code: document.getElementById('kycIfsc').value,
