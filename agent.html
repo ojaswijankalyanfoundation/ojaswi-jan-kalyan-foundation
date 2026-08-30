@@ -41,8 +41,8 @@
 
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #555; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        .form-group input:focus { border-color: var(--purple-main); outline: none; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--purple-main); outline: none; }
         
         .file-hint { display: block; color: #d32f2f; font-size: 11px; margin-top: 4px; font-weight: bold; }
         
@@ -65,14 +65,14 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है... (v5)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v6)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
         <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
     </div>
 
-    <!-- HOME VIEW (DASHBOARD) -->
+    <!-- HOME VIEW -->
     <div id="view-home" class="view-section active" style="padding: 0;">
         <div class="stats-container">
             <div class="stat-card">
@@ -86,43 +86,45 @@
                 <i class="fas fa-user-plus"></i>
             </div>
         </div>
-        <div class="target-section">
-            <div class="target-header">
-                <h4><i class="fas fa-bullseye" style="color:var(--purple-main);"></i> मासिक लक्ष्य प्रगति</h4>
-                <span id="targetPercent">0%</span>
-            </div>
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="targetBar"></div></div>
-            <div class="target-details"><span>लक्ष्य: 100 लाभार्थी</span><span>हासिल: 0</span></div>
-        </div>
     </div>
 
-    <!-- ADD MEMBER VIEW -->
+    <!-- ADD MEMBER (LEAD) VIEW -->
     <div id="view-add" class="view-section">
         <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-user-plus"></i> नया लाभार्थी जोड़ें</h3>
-        <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 20px;">संस्था के नए सदस्य की सही जानकारी दर्ज करें।</p>
-        <form id="addMemberForm" onsubmit="event.preventDefault(); alert('डेटाबेस कनेक्शन अगले स्टेप में!');">
-            <div class="form-group"><label>पूरा नाम *</label><input type="text" placeholder="लाभार्थी का नाम" required></div>
-            <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" placeholder="10 अंकों का नंबर" pattern="[0-9]{10}" required></div>
-            <div class="form-group"><label>पूरा पता *</label><input type="text" placeholder="गाँव / शहर का नाम" required></div>
-            <button type="submit" class="btn-submit">आगे बढ़ें <i class="fas fa-arrow-right"></i></button>
+        <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 20px;">संस्था की सेवाओं के लिए लाभार्थी का विवरण दर्ज करें।</p>
+        
+        <form id="addLeadForm" onsubmit="submitLead(event)">
+            <div class="form-group">
+                <label>पूरा नाम *</label>
+                <input type="text" id="leadName" placeholder="लाभार्थी का नाम" required>
+            </div>
+            <div class="form-group">
+                <label>मोबाइल नंबर *</label>
+                <input type="tel" id="leadMobile" placeholder="10 अंकों का नंबर" pattern="[0-9]{10}" required>
+            </div>
+            <div class="form-group">
+                <label>सेवा / योजना चुनें *</label>
+                <select id="leadService" required>
+                    <option value="">-- योजना चुनें --</option>
+                    <option value="विवाह योजना">पुत्र/पुत्री विवाह योजना</option>
+                    <option value="मायरा योजना">मायरा योगदान योजना</option>
+                    <option value="सहायता योजना">सहायता योगदान योजना</option>
+                    <option value="बुजुर्ग योजना">बुजुर्ग सहायता योजना</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>पिनकोड *</label>
+                <input type="text" id="leadPincode" placeholder="उदा: 344022" required>
+            </div>
+            <button type="submit" id="btnSubmitLead" class="btn-submit">सबमिट करें <i class="fas fa-paper-plane"></i></button>
         </form>
-    </div>
-
-    <!-- MY MEMBERS LIST VIEW -->
-    <div id="view-list" class="view-section">
-        <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-list-alt"></i> मेरे लाभार्थी</h3>
-        <div style="text-align: center; padding: 40px 20px; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-            <i class="fas fa-folder-open" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i>
-            <h4 style="margin: 0; color: #555;">अभी कोई डेटा नहीं है</h4>
-            <p style="font-size: 12px; color: #888;">आप जैसे ही नए लाभार्थी जोड़ेंगे, वो यहाँ दिखाई देंगे।</p>
-        </div>
     </div>
 
     <!-- KYC / PROFILE VIEW -->
     <div id="view-kyc" class="view-section">
         <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
             <h4 style="margin: 0; color: #e65100; font-size: 15px;"><i class="fas fa-exclamation-triangle"></i> KYC पेंडिंग है</h4>
-            <p style="margin: 5px 0 0 0; font-size: 12px; color: #555;">संस्था में नए सदस्यों को जोड़ने का कार्य शुरू करने से पहले कृपया अपनी पहचान और बैंक डिटेल्स (मानदेय के लिए) सबमिट करें।</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #555;">संस्था में कार्य शुरू करने से पहले अपनी पहचान और बैंक डिटेल्स सबमिट करें।</p>
         </div>
 
         <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-id-card"></i> कार्यकर्ता प्रोफाइल (KYC)</h3>
@@ -136,21 +138,34 @@
             <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
             <h4 style="margin: 0 0 15px 0; color: var(--purple-main);">डॉक्यूमेंट अपलोड</h4>
 
-            <!-- Photos -->
+            <!-- Profile & PAN -->
             <div class="form-group">
-                <label>अपनी पासपोर्ट साइज फोटो *</label>
+                <label>पासपोर्ट साइज फोटो *</label>
                 <input type="file" id="kycProfilePic" accept=".jpg, .jpeg" required style="background: white;">
-                <span class="file-hint">⚠️ साइज 50KB से 100KB के बीच (सिर्फ JPG)</span>
-            </div>
-            <div class="form-group">
-                <label>आधार कार्ड की फोटो *</label>
-                <input type="file" id="kycAadhaarPic" accept=".jpg, .jpeg" required style="background: white;">
-                <span class="file-hint">⚠️ साइज 50KB से 100KB के बीच (सिर्फ JPG)</span>
+                <span class="file-hint">सिर्फ JPG (Max 500KB)</span>
             </div>
             <div class="form-group">
                 <label>पैन कार्ड की फोटो *</label>
-                <input type="file" id="kycPanPic" accept=".jpg, .jpeg" required style="background: white;">
-                <span class="file-hint">⚠️ साइज 50KB से 100KB के बीच (सिर्फ JPG)</span>
+                <input type="file" id="kycPanPic" accept=".jpg, .jpeg, .pdf" required style="background: white;">
+                <span class="file-hint">JPG या PDF (Max 500KB)</span>
+            </div>
+
+            <!-- Aadhaar Updates (Front/Back/PDF) -->
+            <div class="form-group">
+                <label>आधार कार्ड (फ्रंट फोटो या पूरी PDF) *</label>
+                <input type="file" id="kycAadhaarFront" accept=".jpg, .jpeg, .pdf" required style="background: white;">
+                <span class="file-hint">JPG या PDF (Max 500KB)</span>
+            </div>
+            <div class="form-group">
+                <label>आधार कार्ड (बैक फोटो) - <span style="color:gray;">अगर ऊपर PDF डाली है तो इसे खाली छोड़ दें</span></label>
+                <input type="file" id="kycAadhaarBack" accept=".jpg, .jpeg" style="background: white;">
+            </div>
+
+            <!-- Banking Proof -->
+            <div class="form-group">
+                <label>बैंकिंग प्रूफ (पासबुक / कैंसिल चेक / स्टेटमेंट) *</label>
+                <input type="file" id="kycBankProof" accept=".jpg, .jpeg, .pdf" required style="background: white;">
+                <span class="file-hint">JPG या PDF (Max 500KB)</span>
             </div>
 
             <button type="submit" id="kycSubmitBtn" class="btn-submit" style="margin-top: 20px;">KYC सबमिट करें <i class="fas fa-upload"></i></button>
@@ -161,24 +176,12 @@
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)"><i class="fas fa-home"></i><span>होम</span></div>
         <div class="nav-item fab" onclick="switchTab('add', this)"><div class="fab-circle"><i class="fas fa-plus"></i></div><span>नया सदस्य</span></div>
-        <div class="nav-item" onclick="switchTab('list', this)"><i class="fas fa-users"></i><span>लाभार्थी</span></div>
         <div class="nav-item" id="nav-profile" onclick="switchTab('kyc', this)"><i class="fas fa-user-circle"></i><span>प्रोफाइल</span></div>
     </div>
 
     <script>
-        // ग्लोबल वेरिएबल्स
         let supabaseClient;
         window.currentUserEmail = null;
-
-        function showError(msg) {
-            const nameEl = document.getElementById('agentName');
-            if(nameEl) {
-                nameEl.innerText = "❌ एरर: " + msg;
-                nameEl.style.color = "#ff4444";
-                nameEl.style.fontSize = "12px";
-            }
-            alert("सिस्टम एरर: " + msg);
-        }
 
         function switchTab(tabId, element) {
             try {
@@ -190,86 +193,95 @@
         }
 
         async function logout() {
-            if(confirm("क्या आप वाकई लॉगआउट करना चाहते हैं?")) {
+            if(confirm("लॉगआउट करना चाहते हैं?")) {
                 if(supabaseClient) await supabaseClient.auth.signOut();
                 window.location.href = 'login.html';
             }
         }
 
-        function checkFileValidity(file, fieldName) {
-            if (!file) return `${fieldName} अपलोड करें!`;
-            if (file.type !== "image/jpeg" && file.type !== "image/jpg") {
-                return `❌ ${fieldName} सिर्फ JPG फॉर्मेट में होनी चाहिए!`;
+        // Updated Validation (Accepts PDF and up to 500KB)
+        function checkFileValidity(file, fieldName, isOptional = false) {
+            if (!file) {
+                if(isOptional) return null;
+                return `${fieldName} अपलोड करें!`;
+            }
+            const allowedTypes = ["image/jpeg", "image/jpg", "application/pdf"];
+            if (!allowedTypes.includes(file.type)) {
+                return `❌ ${fieldName} सिर्फ JPG या PDF फॉर्मेट में होनी चाहिए!`;
             }
             const sizeInKB = file.size / 1024;
-            if (sizeInKB < 50 || sizeInKB > 100) {
-                return `❌ ${fieldName} का साइज ${Math.round(sizeInKB)}KB है। यह 50KB से 100KB के बीच ही होना चाहिए!`;
+            if (sizeInKB > 500) {
+                return `❌ ${fieldName} का साइज ${Math.round(sizeInKB)}KB है। कृपया 500KB से कम की फाइल चुनें।`;
             }
             return null; 
         }
 
+        // --- SUBMIT KYC LOGIC ---
         async function submitKYC(event) {
             event.preventDefault(); 
             const btn = document.getElementById('kycSubmitBtn');
             const originalText = btn.innerHTML;
 
             try {
-                if(!window.currentUserEmail) throw new Error("यूजर सेशन नहीं मिला, फिर से लॉगिन करें।");
-                if(!supabaseClient) throw new Error("डेटाबेस कनेक्ट नहीं हुआ!");
-
-                const profilePic = document.getElementById('kycProfilePic').files[0];
-                const aadhaarPic = document.getElementById('kycAadhaarPic').files[0];
-                const panPic = document.getElementById('kycPanPic').files[0];
-
-                const profileErr = checkFileValidity(profilePic, "पासपोर्ट फोटो");
-                const aadhaarErr = checkFileValidity(aadhaarPic, "आधार फोटो");
-                const panErr = checkFileValidity(panPic, "पैन कार्ड फोटो");
-
-                if (profileErr) throw new Error(profileErr);
-                if (aadhaarErr) throw new Error(aadhaarErr);
-                if (panErr) throw new Error(panErr);
-
                 btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> अपलोड हो रहा है... कृपया रुकें";
                 btn.disabled = true;
-                
+
+                const files = {
+                    profile: document.getElementById('kycProfilePic').files[0],
+                    pan: document.getElementById('kycPanPic').files[0],
+                    aadhaarFront: document.getElementById('kycAadhaarFront').files[0],
+                    aadhaarBack: document.getElementById('kycAadhaarBack').files[0],
+                    bankProof: document.getElementById('kycBankProof').files[0]
+                };
+
+                const errors = [
+                    checkFileValidity(files.profile, "पासपोर्ट फोटो"),
+                    checkFileValidity(files.pan, "पैन कार्ड"),
+                    checkFileValidity(files.aadhaarFront, "आधार कार्ड (फ्रंट)"),
+                    checkFileValidity(files.aadhaarBack, "आधार कार्ड (बैक)", true), // Optional
+                    checkFileValidity(files.bankProof, "बैंकिंग प्रूफ")
+                ].filter(e => e !== null);
+
+                if (errors.length > 0) throw new Error(errors.join("\n"));
+
                 const cleanEmail = window.currentUserEmail.replace(/[^a-zA-Z0-9]/g, '_');
                 const timeStamp = Date.now();
+                const uploadedUrls = {};
 
-                // 1. Profile Upload
-                const profilePath = `profiles/${cleanEmail}_${timeStamp}.jpg`;
-                const { error: err1 } = await supabaseClient.storage.from('kyc-documents').upload(profilePath, profilePic);
-                if (err1) throw new Error("प्रोफाइल फोटो अपलोड फेल: " + err1.message);
-                const { data: profileUrlData } = supabaseClient.storage.from('kyc-documents').getPublicUrl(profilePath);
+                // Helper to upload files
+                async function uploadFile(fileObj, folderName) {
+                    if(!fileObj) return null;
+                    const ext = fileObj.type === 'application/pdf' ? 'pdf' : 'jpg';
+                    const path = `${folderName}/${cleanEmail}_${timeStamp}.${ext}`;
+                    const { error } = await supabaseClient.storage.from('kyc-documents').upload(path, fileObj);
+                    if (error) throw new Error(`${folderName} अपलोड फेल: ` + error.message);
+                    return supabaseClient.storage.from('kyc-documents').getPublicUrl(path).data.publicUrl;
+                }
 
-                // 2. Aadhaar Upload
-                const aadhaarPath = `aadhaar/${cleanEmail}_${timeStamp}.jpg`;
-                const { error: err2 } = await supabaseClient.storage.from('kyc-documents').upload(aadhaarPath, aadhaarPic);
-                if (err2) throw new Error("आधार अपलोड फेल: " + err2.message);
-                const { data: aadhaarUrlData } = supabaseClient.storage.from('kyc-documents').getPublicUrl(aadhaarPath);
+                uploadedUrls.profile = await uploadFile(files.profile, 'profiles');
+                uploadedUrls.pan = await uploadFile(files.pan, 'pan');
+                uploadedUrls.aadhaarFront = await uploadFile(files.aadhaarFront, 'aadhaar');
+                uploadedUrls.aadhaarBack = await uploadFile(files.aadhaarBack, 'aadhaar');
+                uploadedUrls.bankProof = await uploadFile(files.bankProof, 'bank');
 
-                // 3. PAN Upload
-                const panPath = `pan/${cleanEmail}_${timeStamp}.jpg`;
-                const { error: err3 } = await supabaseClient.storage.from('kyc-documents').upload(panPath, panPic);
-                if (err3) throw new Error("पैन कार्ड अपलोड फेल: " + err3.message);
-                const { data: panUrlData } = supabaseClient.storage.from('kyc-documents').getPublicUrl(panPath);
-
-                // 4. Update Database
                 const { error: dbUpdateError } = await supabaseClient
                     .from('agents')
                     .update({
                         bank_name: document.getElementById('kycBankName').value,
                         account_no: document.getElementById('kycAccountNo').value,
                         ifsc_code: document.getElementById('kycIfsc').value,
-                        profile_photo: profileUrlData.publicUrl,
-                        aadhaar_photo: aadhaarUrlData.publicUrl,
-                        pan_photo: panUrlData.publicUrl,
+                        profile_photo: uploadedUrls.profile,
+                        pan_photo: uploadedUrls.pan,
+                        aadhaar_file_front: uploadedUrls.aadhaarFront,
+                        aadhaar_file_back: uploadedUrls.aadhaarBack,
+                        bank_proof_file: uploadedUrls.bankProof,
                         status: 'Active'
                     })
                     .eq('email', window.currentUserEmail);
 
-                if (dbUpdateError) throw new Error("डेटाबेस में सेव नहीं हुआ: " + dbUpdateError.message);
+                if (dbUpdateError) throw new Error("डेटाबेस एरर: " + dbUpdateError.message);
 
-                alert("🎉 बहुत बढ़िया! आपकी KYC सबमिट हो गई है।");
+                alert("🎉 KYC सफलतापूर्वक सबमिट हो गई है!");
                 window.location.reload(); 
 
             } catch (error) {
@@ -280,45 +292,59 @@
             }
         }
 
-        // मेन फंक्शन - अब यह बिना इंतज़ार किए सीधा रन करेगा!
+        // --- SUBMIT NEW LEAD (MEMBER) LOGIC ---
+        async function submitLead(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnSubmitLead');
+            const originalText = btn.innerHTML;
+
+            try {
+                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> सेव कर रहे हैं...";
+                btn.disabled = true;
+
+                const leadData = {
+                    name: document.getElementById('leadName').value,
+                    mobile: document.getElementById('leadMobile').value,
+                    scheme_name: document.getElementById('leadService').value,
+                    pincode: document.getElementById('leadPincode').value,
+                    agent_email: window.currentUserEmail,
+                    status: 'Pending'
+                };
+
+                const { error } = await supabaseClient.from('leads').insert([leadData]);
+                if (error) throw error;
+
+                alert("✅ नया लाभार्थी सफलतापूर्वक जोड़ा गया! यह एडमिन अप्रूवल के लिए भेज दिया गया है।");
+                document.getElementById('addLeadForm').reset();
+                switchTab('home', document.querySelector('.nav-item.active'));
+
+            } catch (error) {
+                alert("एरर: " + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
         async function initApp() {
             try {
-                document.getElementById('agentName').innerText = "1. सिस्टम चेक...";
-                
-                if (typeof window.supabase === 'undefined') {
-                    throw new Error("सुपाबेस लोड नहीं हुआ! अपना इंटरनेट चेक करें या पेज रिफ्रेश करें।");
-                }
-
                 const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
                 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
-                
-                // ग्लोबल वेरिएबल में सेव कर रहे हैं
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-                document.getElementById('agentName').innerText = "2. लॉगिन चेक...";
                 const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-                
                 if (sessionError) throw new Error(sessionError.message);
-                if (!session) { 
-                    alert("लॉगिन सेशन खत्म हो गया है। कृपया दोबारा लॉगिन करें।");
-                    window.location.href = 'login.html'; 
-                    return; 
-                }
+                if (!session) { window.location.href = 'login.html'; return; }
 
                 window.currentUserEmail = session.user.email;
-                document.getElementById('agentName').innerText = "3. डेटा ला रहे हैं...";
 
                 const { data: agentData, error: dbError } = await supabaseClient
                     .from('agents').select('*').eq('email', window.currentUserEmail).single();
 
-                if (dbError) {
-                    if(dbError.code === 'PGRST116') throw new Error("डेटाबेस में आपका अकाउंट नहीं मिला!");
-                    throw new Error(dbError.message);
-                }
+                if (dbError) throw new Error(dbError.message);
 
                 if (agentData) {
                     document.getElementById('agentName').innerText = agentData.name || "नाम नहीं मिला";
-                    document.getElementById('agentName').style.color = "white";
                     document.getElementById('agentId').innerText = "ID: " + (agentData.agent_code || "पेंडिंग");
                     document.getElementById('profileInitial').innerText = (agentData.name ? agentData.name.charAt(0).toUpperCase() : "O");
 
@@ -331,12 +357,11 @@
                     }
                 }
             } catch (err) {
-                showError(err.message);
+                alert("सिस्टम एरर: " + err.message);
             }
         }
 
-        // पहले यहाँ window.onload था, जो इंतज़ार कर रहा था। अब सीधा कॉल कर दिया है!
-        initApp();
+        window.onload = initApp;
     </script>
 </body>
 </html>
