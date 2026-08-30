@@ -66,7 +66,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है... (v9)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v10)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -140,31 +140,32 @@
             <div class="form-group"><label>खाता संख्या (Account No) *</label><input type="text" id="kycAccountNo" placeholder="अपना अकाउंट नंबर दर्ज करें" required></div>
             <div class="form-group"><label>IFSC कोड *</label><input type="text" id="kycIfsc" placeholder="उदा. SBIN0001234" required></div>
             
-            <!-- 3. डॉक्यूमेंट अपलोड -->
+            <!-- 3. डॉक्यूमेंट अपलोड (REAL-TIME VALIDATION ADDED) -->
             <h4 class="section-title"><i class="fas fa-file-upload"></i> डॉक्यूमेंट अपलोड</h4>
             
             <div class="form-group">
                 <label>पासपोर्ट साइज फोटो *</label>
-                <input type="file" id="kycProfilePic" accept=".jpg, .jpeg" required style="background: white;">
+                <!-- यहाँ onchange लगाया है जो तुरंत चेक करेगा -->
+                <input type="file" id="kycProfilePic" accept=".jpg, .jpeg" onchange="validateRealTime(this, 'पासपोर्ट फोटो', 30, 100, false)" required style="background: white;">
                 <span class="file-hint">सिर्फ JPG (30KB से 100KB)</span>
             </div>
             <div class="form-group">
                 <label>पैन कार्ड की फोटो *</label>
-                <input type="file" id="kycPanPic" accept=".jpg, .jpeg, .pdf" required style="background: white;">
+                <input type="file" id="kycPanPic" accept=".jpg, .jpeg, .pdf" onchange="validateRealTime(this, 'पैन कार्ड', 30, 200, true)" required style="background: white;">
                 <span class="file-hint">JPG या PDF (30KB से 200KB)</span>
             </div>
             <div class="form-group">
                 <label>आधार कार्ड (फ्रंट फोटो या पूरी PDF) *</label>
-                <input type="file" id="kycAadhaarFront" accept=".jpg, .jpeg, .pdf" required style="background: white;">
+                <input type="file" id="kycAadhaarFront" accept=".jpg, .jpeg, .pdf" onchange="validateRealTime(this, 'आधार कार्ड (फ्रंट)', 30, 200, true)" required style="background: white;">
                 <span class="file-hint">JPG या PDF (30KB से 200KB)</span>
             </div>
             <div class="form-group">
-                <label>आधार कार्ड (बैक फोटो) - <span style="color:gray;">अगर ऊपर PDF डाली है तो इसे खाली छोड़ दें</span></label>
-                <input type="file" id="kycAadhaarBack" accept=".jpg, .jpeg" style="background: white;">
+                <label>आधार कार्ड (बैक फोटो) - <span style="color:gray;">अगर ऊपर PDF है तो खाली छोड़ दें</span></label>
+                <input type="file" id="kycAadhaarBack" accept=".jpg, .jpeg" onchange="validateRealTime(this, 'आधार कार्ड (बैक)', 30, 200, false)" style="background: white;">
             </div>
             <div class="form-group">
                 <label>बैंकिंग प्रूफ (पासबुक / कैंसिल चेक / स्टेटमेंट) *</label>
-                <input type="file" id="kycBankProof" accept=".jpg, .jpeg, .pdf" required style="background: white;">
+                <input type="file" id="kycBankProof" accept=".jpg, .jpeg, .pdf" onchange="validateRealTime(this, 'बैंकिंग प्रूफ', 30, 300, true)" required style="background: white;">
                 <span class="file-hint">JPG या PDF (30KB से 300KB)</span>
             </div>
 
@@ -199,61 +200,51 @@
             }
         }
 
-        // 🚨 डायनामिक फाइल चेकर (जिसमें साइज और समाधान दोनों हैं)
-        function checkFileValidity(file, fieldName, minKB, maxKB, isOptional = false) {
-            if (!file) {
-                if(isOptional) return null;
-                return `❌ ${fieldName} अपलोड करना ज़रूरी है!`;
-            }
-            const allowedTypes = ["image/jpeg", "image/jpg", "application/pdf"];
+        // 🚨 यह है आपका "रियल-टाइम" सिक्योरिटी गार्ड (तुरंत रिजेक्ट करेगा) 🚨
+        function validateRealTime(inputElement, fieldName, minKB, maxKB, isPdfAllowed) {
+            const file = inputElement.files[0];
+            if (!file) return; // अगर कोई फाइल नहीं चुनी, तो कुछ मत करो
+
+            const allowedTypes = isPdfAllowed ? ["image/jpeg", "image/jpg", "application/pdf"] : ["image/jpeg", "image/jpg"];
+            
             if (!allowedTypes.includes(file.type)) {
-                return `❌ ${fieldName} का फॉर्मेट गलत है। सिर्फ JPG या PDF अपलोड करें!`;
+                alert(`❌ ${fieldName} का फॉर्मेट गलत है। सिर्फ ${isPdfAllowed ? "JPG या PDF" : "JPG"} अपलोड करें!`);
+                inputElement.value = ""; // ⚠️ डिब्बे को तुरंत खाली कर दो
+                return;
             }
             
             const sizeInKB = file.size / 1024;
             if (sizeInKB < minKB || sizeInKB > maxKB) {
-                // यहाँ एरर के साथ-साथ समाधान (Solution) भी दिया गया है
-                return `❌ ${fieldName} का साइज ${Math.round(sizeInKB)}KB है, जबकि यह ${minKB}KB से ${maxKB}KB के बीच होना चाहिए।\n\n💡 समाधान: कृपया Google पर "Image Resizer" या "Image Compressor" सर्च करें और अपनी फोटो का साइज कम/ज़्यादा करके दोबारा अपलोड करें।`;
+                alert(`❌ ${fieldName} का साइज ${Math.round(sizeInKB)}KB है, जबकि यह ${minKB}KB से ${maxKB}KB के बीच होना चाहिए।\n\n💡 समाधान: कृपया "Image Resizer" से अपनी फोटो का साइज सही करें और दोबारा चुनें।`);
+                inputElement.value = ""; // ⚠️ डिब्बे को तुरंत खाली कर दो, ताकि वो सबमिट ही न कर पाए!
+                return;
             }
-            return null; 
         }
 
         // --- SUBMIT KYC LOGIC ---
         async function submitKYC(event) {
             event.preventDefault(); 
-            
-            // 1. सबसे पहले फाइलें निकालें (बटन घुमाने से पहले!)
-            const files = {
-                profile: document.getElementById('kycProfilePic').files[0],
-                pan: document.getElementById('kycPanPic').files[0],
-                aadhaarFront: document.getElementById('kycAadhaarFront').files[0],
-                aadhaarBack: document.getElementById('kycAadhaarBack').files[0],
-                bankProof: document.getElementById('kycBankProof').files[0]
-            };
-
-            // 2. तुरंत फाइल साइज और फॉर्मेट चेक करें
-            const errors = [
-                checkFileValidity(files.profile, "पासपोर्ट फोटो", 30, 100),
-                checkFileValidity(files.pan, "पैन कार्ड", 30, 200),
-                checkFileValidity(files.aadhaarFront, "आधार कार्ड (फ्रंट)", 30, 200),
-                checkFileValidity(files.aadhaarBack, "आधार कार्ड (बैक)", 30, 200, true), // Optional
-                checkFileValidity(files.bankProof, "बैंकिंग प्रूफ", 30, 300)
-            ].filter(e => e !== null);
-
-            // 3. 🚨 अगर एक भी एरर है, तो अपलोड प्रोसेस यहीं रोक दें (Return कर दें)
-            if (errors.length > 0) {
-                alert(errors.join("\n\n--------------------------\n\n"));
-                return; // ⚠️ आगे का कोड नहीं चलेगा!
-            }
-
-            // 4. अगर सब सही है, तब जाकर बटन को घुमाएं और अपलोड शुरू करें
             const btn = document.getElementById('kycSubmitBtn');
             const originalText = btn.innerHTML;
+
             btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> अपलोड हो रहा है... कृपया रुकें";
             btn.disabled = true;
 
             try {
                 if(!window.currentUserEmail) throw new Error("यूजर सेशन नहीं मिला, फिर से लॉगिन करें।");
+
+                const files = {
+                    profile: document.getElementById('kycProfilePic').files[0],
+                    pan: document.getElementById('kycPanPic').files[0],
+                    aadhaarFront: document.getElementById('kycAadhaarFront').files[0],
+                    aadhaarBack: document.getElementById('kycAadhaarBack').files[0],
+                    bankProof: document.getElementById('kycBankProof').files[0]
+                };
+
+                // अगर कोई डिब्बा खाली रह गया हो (जो required है)
+                if (!files.profile || !files.pan || !files.aadhaarFront || !files.bankProof) {
+                    throw new Error("कृपया सभी ज़रूरी डॉक्यूमेंट अपलोड करें!");
+                }
 
                 const cleanEmail = window.currentUserEmail.replace(/[^a-zA-Z0-9]/g, '_');
                 const timeStamp = Date.now();
@@ -268,14 +259,14 @@
                     return supabaseClient.storage.from('kyc-documents').getPublicUrl(path).data.publicUrl;
                 }
 
-                // Uploading all files to Supabase
+                // Uploading files
                 uploadedUrls.profile = await uploadFile(files.profile, 'profiles');
                 uploadedUrls.pan = await uploadFile(files.pan, 'pan');
                 uploadedUrls.aadhaarFront = await uploadFile(files.aadhaarFront, 'aadhaar');
                 uploadedUrls.aadhaarBack = await uploadFile(files.aadhaarBack, 'aadhaar');
                 uploadedUrls.bankProof = await uploadFile(files.bankProof, 'bank');
 
-                // ✅ Updating Database with Numbers + Files
+                // Updating DB
                 const { error: dbUpdateError } = await supabaseClient
                     .from('agents')
                     .update({
@@ -299,14 +290,14 @@
                 window.location.reload(); 
 
             } catch (error) {
-                alert(error.message); // एरर मैसेज पॉप-अप में आएगा
+                alert(error.message);
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
         }
 
-        // --- SUBMIT NEW LEAD (MEMBER) LOGIC ---
+        // --- SUBMIT NEW LEAD LOGIC ---
         async function submitLead(event) {
             event.preventDefault();
             const btn = document.getElementById('btnSubmitLead');
