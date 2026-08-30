@@ -66,7 +66,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है... (v11)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v12)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -243,22 +243,27 @@
                 const timeStamp = Date.now();
                 const uploadedUrls = {};
 
+                // 🚨 यहाँ upsert: true जोड़ा है और फोल्डर के नाम अलग-अलग किए हैं
                 async function uploadFile(fileObj, folderName) {
                     if(!fileObj) return null;
                     const ext = fileObj.type === 'application/pdf' ? 'pdf' : 'jpg';
                     const path = `${folderName}/${cleanEmail}_${timeStamp}.${ext}`;
                     
-                    // ⚠️ यहाँ kyc_documents कर दिया गया है ⚠️
-                    const { error } = await supabaseClient.storage.from('kyc_documents').upload(path, fileObj);
+                    const { error } = await supabaseClient.storage.from('kyc_documents').upload(path, fileObj, {
+                        cacheControl: '3600',
+                        upsert: true // ⚠️ यह पुरानी फाइल को रिप्लेस कर देगा
+                    });
+                    
                     if (error) throw new Error(`${folderName} अपलोड फेल: ` + error.message);
                     return supabaseClient.storage.from('kyc_documents').getPublicUrl(path).data.publicUrl;
                 }
 
+                // अलग-अलग फोल्डर के नाम ताकि टकराव न हो
                 uploadedUrls.profile = await uploadFile(files.profile, 'profiles');
                 uploadedUrls.pan = await uploadFile(files.pan, 'pan');
-                uploadedUrls.aadhaarFront = await uploadFile(files.aadhaarFront, 'aadhaar');
-                uploadedUrls.aadhaarBack = await uploadFile(files.aadhaarBack, 'aadhaar');
-                uploadedUrls.bankProof = await uploadFile(files.bankProof, 'bank');
+                uploadedUrls.aadhaarFront = await uploadFile(files.aadhaarFront, 'aadhaar_front');
+                uploadedUrls.aadhaarBack = await uploadFile(files.aadhaarBack, 'aadhaar_back');
+                uploadedUrls.bankProof = await uploadFile(files.bankProof, 'bank_proof');
 
                 const { error: dbUpdateError } = await supabaseClient
                     .from('agents')
