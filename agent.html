@@ -65,8 +65,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <!-- यहाँ मैंने (v4) लिख दिया है ताकि हमें पता चले कोड नया है -->
-                <h2 id="agentName">लोड हो रहा है... (v4)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v5)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -119,7 +118,7 @@
         </div>
     </div>
 
-    <!-- KYC / PROFILE VIEW (UPDATED WITH SIZE LIMITS & PAN) -->
+    <!-- KYC / PROFILE VIEW -->
     <div id="view-kyc" class="view-section">
         <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
             <h4 style="margin: 0; color: #e65100; font-size: 15px;"><i class="fas fa-exclamation-triangle"></i> KYC पेंडिंग है</h4>
@@ -137,21 +136,17 @@
             <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
             <h4 style="margin: 0 0 15px 0; color: var(--purple-main);">डॉक्यूमेंट अपलोड</h4>
 
-            <!-- Profile Photo -->
+            <!-- Photos -->
             <div class="form-group">
                 <label>अपनी पासपोर्ट साइज फोटो *</label>
                 <input type="file" id="kycProfilePic" accept=".jpg, .jpeg" required style="background: white;">
                 <span class="file-hint">⚠️ साइज 50KB से 100KB के बीच (सिर्फ JPG)</span>
             </div>
-            
-            <!-- Aadhaar Photo -->
             <div class="form-group">
                 <label>आधार कार्ड की फोटो *</label>
                 <input type="file" id="kycAadhaarPic" accept=".jpg, .jpeg" required style="background: white;">
                 <span class="file-hint">⚠️ साइज 50KB से 100KB के बीच (सिर्फ JPG)</span>
             </div>
-
-            <!-- PAN Photo (New Option) -->
             <div class="form-group">
                 <label>पैन कार्ड की फोटो *</label>
                 <input type="file" id="kycPanPic" accept=".jpg, .jpeg" required style="background: white;">
@@ -171,13 +166,10 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+        // ग्लोबल वेरिएबल्स
+        let supabaseClient;
         window.currentUserEmail = null;
 
-        // एरर को स्क्रीन पर दिखाने वाला फंक्शन
         function showError(msg) {
             const nameEl = document.getElementById('agentName');
             if(nameEl) {
@@ -185,7 +177,7 @@
                 nameEl.style.color = "#ff4444";
                 nameEl.style.fontSize = "12px";
             }
-            alert("सिस्टम एरर: " + msg); // पॉप-अप भी आएगा ताकि छुप न सके!
+            alert("सिस्टम एरर: " + msg);
         }
 
         function switchTab(tabId, element) {
@@ -199,7 +191,7 @@
 
         async function logout() {
             if(confirm("क्या आप वाकई लॉगआउट करना चाहते हैं?")) {
-                await supabase.auth.signOut();
+                if(supabaseClient) await supabaseClient.auth.signOut();
                 window.location.href = 'login.html';
             }
         }
@@ -223,6 +215,7 @@
 
             try {
                 if(!window.currentUserEmail) throw new Error("यूजर सेशन नहीं मिला, फिर से लॉगिन करें।");
+                if(!supabaseClient) throw new Error("डेटाबेस कनेक्ट नहीं हुआ!");
 
                 const profilePic = document.getElementById('kycProfilePic').files[0];
                 const aadhaarPic = document.getElementById('kycAadhaarPic').files[0];
@@ -242,22 +235,26 @@
                 const cleanEmail = window.currentUserEmail.replace(/[^a-zA-Z0-9]/g, '_');
                 const timeStamp = Date.now();
 
+                // 1. Profile Upload
                 const profilePath = `profiles/${cleanEmail}_${timeStamp}.jpg`;
-                const { error: err1 } = await supabase.storage.from('kyc-documents').upload(profilePath, profilePic);
+                const { error: err1 } = await supabaseClient.storage.from('kyc-documents').upload(profilePath, profilePic);
                 if (err1) throw new Error("प्रोफाइल फोटो अपलोड फेल: " + err1.message);
-                const { data: profileUrlData } = supabase.storage.from('kyc-documents').getPublicUrl(profilePath);
+                const { data: profileUrlData } = supabaseClient.storage.from('kyc-documents').getPublicUrl(profilePath);
 
+                // 2. Aadhaar Upload
                 const aadhaarPath = `aadhaar/${cleanEmail}_${timeStamp}.jpg`;
-                const { error: err2 } = await supabase.storage.from('kyc-documents').upload(aadhaarPath, aadhaarPic);
+                const { error: err2 } = await supabaseClient.storage.from('kyc-documents').upload(aadhaarPath, aadhaarPic);
                 if (err2) throw new Error("आधार अपलोड फेल: " + err2.message);
-                const { data: aadhaarUrlData } = supabase.storage.from('kyc-documents').getPublicUrl(aadhaarPath);
+                const { data: aadhaarUrlData } = supabaseClient.storage.from('kyc-documents').getPublicUrl(aadhaarPath);
 
+                // 3. PAN Upload
                 const panPath = `pan/${cleanEmail}_${timeStamp}.jpg`;
-                const { error: err3 } = await supabase.storage.from('kyc-documents').upload(panPath, panPic);
+                const { error: err3 } = await supabaseClient.storage.from('kyc-documents').upload(panPath, panPic);
                 if (err3) throw new Error("पैन कार्ड अपलोड फेल: " + err3.message);
-                const { data: panUrlData } = supabase.storage.from('kyc-documents').getPublicUrl(panPath);
+                const { data: panUrlData } = supabaseClient.storage.from('kyc-documents').getPublicUrl(panPath);
 
-                const { error: dbUpdateError } = await supabase
+                // 4. Update Database
+                const { error: dbUpdateError } = await supabaseClient
                     .from('agents')
                     .update({
                         bank_name: document.getElementById('kycBankName').value,
@@ -283,16 +280,23 @@
             }
         }
 
+        // मेन फंक्शन - अब यह बिना इंतज़ार किए सीधा रन करेगा!
         async function initApp() {
             try {
                 document.getElementById('agentName').innerText = "1. सिस्टम चेक...";
                 
                 if (typeof window.supabase === 'undefined') {
-                    throw new Error("सुपाबेस लोड नहीं हुआ! अपना इंटरनेट चेक करें।");
+                    throw new Error("सुपाबेस लोड नहीं हुआ! अपना इंटरनेट चेक करें या पेज रिफ्रेश करें।");
                 }
 
+                const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
+                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+                
+                // ग्लोबल वेरिएबल में सेव कर रहे हैं
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
                 document.getElementById('agentName').innerText = "2. लॉगिन चेक...";
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
                 
                 if (sessionError) throw new Error(sessionError.message);
                 if (!session) { 
@@ -304,7 +308,7 @@
                 window.currentUserEmail = session.user.email;
                 document.getElementById('agentName').innerText = "3. डेटा ला रहे हैं...";
 
-                const { data: agentData, error: dbError } = await supabase
+                const { data: agentData, error: dbError } = await supabaseClient
                     .from('agents').select('*').eq('email', window.currentUserEmail).single();
 
                 if (dbError) {
@@ -331,8 +335,8 @@
             }
         }
 
-        // पेज लोड होते ही शुरू करो
-        window.onload = initApp;
+        // पहले यहाँ window.onload था, जो इंतज़ार कर रहा था। अब सीधा कॉल कर दिया है!
+        initApp();
     </script>
 </body>
 </html>
