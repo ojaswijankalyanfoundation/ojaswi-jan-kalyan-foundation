@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>एजेंट पोर्टल | ओजस्वी जनकल्याण फाउंडेशन</title>
+    
     <!-- Supabase & Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- आपकी अलग की गई CSS फाइल को यहाँ लिंक किया है -->
-    <link rel="stylesheet" href="style.css">
+    <!-- CSS फाइल को फोर्स रीलोड करने के लिए ?v=3 लगाया है -->
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
     <div class="auth-container">
@@ -20,22 +21,21 @@
         <div id="loginSection" class="auth-section active">
             <h2>एजेंट लॉगिन</h2>
             <p class="subtitle">पोर्टल में जाने के लिए अपनी डिटेल्स भरें</p>
-                        <form id="loginForm">
+            
+            <form id="loginForm">
                 <div class="form-group">
                     <label>ईमेल आईडी (Email)</label>
-                    <!-- यहाँ name और autocomplete="username" जोड़ा गया है -->
                     <input type="email" id="email" name="email" autocomplete="username" placeholder="अपनी रजिस्टर्ड ईमेल डालें" required>
                 </div>
                 <div class="form-group">
                     <label>पासवर्ड</label>
-                    <!-- यहाँ name और autocomplete="current-password" जोड़ा गया है -->
                     <input type="password" id="password" name="password" autocomplete="current-password" placeholder="अपना पासवर्ड डालें" required>
                 </div>
                 <div class="forgot-link">
                     <a href="#" id="showForgot">पासवर्ड भूल गए?</a>
                 </div>
                 <button type="submit" id="loginBtn" class="btn-main btn-login-color"><i class="fas fa-sign-in-alt"></i> सुरक्षित लॉगिन करें</button>
-                   </form>
+            </form>
             
             <div class="switch-link">
                 संस्था से नए जुड़ रहे हैं? <a href="agent-register.html">यहाँ रजिस्टर करें</a>
@@ -50,7 +50,7 @@
             <form id="forgotForm">
                 <div class="form-group">
                     <label>रजिस्टर्ड ईमेल आईडी</label>
-                    <input type="email" id="resetEmail" placeholder="अपनी ईमेल आईडी डालें" required>
+                    <input type="email" id="resetEmail" name="resetEmail" autocomplete="email" placeholder="अपनी ईमेल आईडी डालें" required>
                 </div>
                 <button type="submit" id="resetBtn" class="btn-main btn-forgot-color"><i class="fas fa-envelope"></i> रीसेट लिंक भेजें</button>
             </form>
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <!-- आपकी अलग की गई JavaScript फाइल को यहाँ लिंक किया है -->
-    <script src="script.js"></script>
+    <!-- JavaScript फाइल को फोर्स रीलोड करने के लिए ?v=3 लगाया है -->
+    <script src="script.js?v=3"></script>
 </body>
 </html>
