@@ -18,12 +18,12 @@
         .login-box p { color: #888; font-size: 13px; margin-bottom: 25px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; font-size: 14px; }
         .form-group input:focus { border-color: var(--accent); outline: none; }
-        .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px; }
+        .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; box-shadow: 0 4px 10px rgba(225, 78, 202, 0.3); }
         
-        /* नया एरर बॉक्स */
-        #loginError { color: #fd5d93; font-size: 13px; font-weight: bold; margin-top: 15px; display: none; background: rgba(253, 93, 147, 0.1); padding: 10px; border-radius: 6px; }
+        /* एरर बॉक्स का नया डिज़ाइन */
+        #loginError { color: white; font-size: 13px; font-weight: bold; margin-top: 15px; display: none; background: var(--danger); padding: 10px; border-radius: 6px; text-align: center; }
 
         #admin-dashboard { display: none; padding-bottom: 30px; }
         .header { background: var(--admin-card); padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; }
@@ -80,8 +80,8 @@
             <h2><i class="fas fa-user-shield"></i> एडमिन लॉगिन</h2>
             <p>केवल अधिकृत ब्रांच मैनेजर और एडमिन के लिए</p>
             
-            <!-- ⚠️ फॉर्म का रीफ्रेश होना यहाँ बंद किया गया है -->
-            <form id="loginForm">
+            <!-- 🚨 फॉर्म सबमिट पर event.preventDefault() लगाया गया है -->
+            <form onsubmit="doAdminLogin(event)">
                 <div class="form-group">
                     <label>एडमिन ईमेल</label>
                     <input type="email" id="adminEmail" required placeholder="email@example.com">
@@ -90,11 +90,9 @@
                     <label>पासवर्ड</label>
                     <input type="password" id="adminPassword" required placeholder="••••••••">
                 </div>
+                <button type="submit" id="loginBtn" class="btn-login">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
                 
-                <!-- ⚠️ बटन को type="button" कर दिया है -->
-                <button type="button" id="loginBtn" class="btn-login" onclick="doAdminLogin()">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
-                
-                <!-- 🚨 एरर दिखाने का डिब्बा -->
+                <!-- एरर बॉक्स -->
                 <div id="loginError"></div>
             </form>
         </div>
@@ -184,17 +182,20 @@
 
         let allAgents = [];
 
-        // 🚨 नया, मजबूत लॉगिन फंक्शन 🚨
-        async function doAdminLogin() {
+        // 🚨 V4 MASTER LOGIN LOGIC 🚨
+        async function doAdminLogin(event) {
+            // यह लाइन पेज को रिफ्रेश होने से 100% रोकेगी
+            event.preventDefault(); 
+            
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
             const errorBox = document.getElementById('loginError');
 
-            errorBox.style.display = 'none'; // पुराना एरर हटाओ
+            errorBox.style.display = 'none';
 
             if(!email || !password) {
-                errorBox.innerHTML = "❌ कृपया ईमेल और पासवर्ड दोनों डालें!";
+                errorBox.innerHTML = "❌ कृपया ईमेल और पासवर्ड भरें!";
                 errorBox.style.display = 'block';
                 return;
             }
@@ -203,20 +204,20 @@
             btn.disabled = true;
 
             try {
-                // 1. ऑथेंटिकेशन चेक
+                // 1. Supabase Auth
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                 
                 if (error) {
                     if (error.message.includes("Email not confirmed")) {
-                        throw new Error("❌ आपका ईमेल वेरीफाई नहीं है! कृपया Supabase में जाकर 'Confirm email' सेटिंग को बंद करें।");
+                        throw new Error("❌ आपका ईमेल वेरीफाई नहीं है! Supabase में 'Confirm email' सेटिंग बंद करें।");
                     }
                     if (error.message.includes("Invalid login credentials")) {
-                        throw new Error("❌ पासवर्ड गलत है! (ध्यान दें: पासवर्ड में Ojaswi का O बड़ा होना चाहिए)");
+                        throw new Error("❌ पासवर्ड गलत है! (ध्यान दें: Ojaswi का 'O' बड़ा होना चाहिए)");
                     }
                     throw error;
                 }
 
-                // 2. एडमिन टेबल में चेक
+                // 2. Admin Check
                 const { data: adminData, error: adminErr } = await supabase
                     .from('admin_users')
                     .select('*')
@@ -225,14 +226,14 @@
 
                 if (adminErr || !adminData) {
                     await supabase.auth.signOut();
-                    throw new Error("❌ इस आईडी के पास एडमिन पैनल खोलने की परमिशन नहीं है! (SQL में नाम नहीं है)");
+                    throw new Error("❌ SQL डेटाबेस में इस ईमेल को एडमिन पावर नहीं दी गई है!");
                 }
 
-                // 3. सक्सेस!
+                // 3. Success
                 showDashboard(adminData);
 
             } catch (error) {
-                errorBox.innerHTML = error.message; // एरर को लाल डिब्बे में दिखाओ
+                errorBox.innerHTML = error.message; 
                 errorBox.style.display = 'block';
                 btn.innerHTML = "लॉगिन करें <i class='fas fa-sign-in-alt'></i>";
                 btn.disabled = false;
@@ -256,15 +257,17 @@
         }
 
         async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                const { data: adminData } = await supabase.from('admin_users').select('*').eq('email', session.user.email).single();
-                if (adminData) {
-                    showDashboard(adminData);
-                } else {
-                    await supabase.auth.signOut();
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const { data: adminData } = await supabase.from('admin_users').select('*').eq('email', session.user.email).single();
+                    if (adminData) {
+                        showDashboard(adminData);
+                    } else {
+                        await supabase.auth.signOut();
+                    }
                 }
-            }
+            } catch (e) { console.error(e); }
         }
 
         function switchTab(tabId, el) {
