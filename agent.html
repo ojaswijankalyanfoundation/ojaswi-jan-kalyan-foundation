@@ -56,6 +56,11 @@
         .nav-item.active { color: var(--purple-main); }
         .nav-item.fab { position: relative; top: -20px; }
         .nav-item.fab .fab-circle { background: var(--purple-main); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.4); border: 4px solid white; }
+        
+        /* स्टेटस बॉक्स के डिज़ाइन */
+        .status-box { background: white; padding: 30px 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 20px; }
+        .status-box i { font-size: 50px; margin-bottom: 15px; }
+        .btn-edit { background: #ff9800; margin-top: 20px; font-size: 14px; padding: 10px; width: auto; display: inline-block; padding-left: 20px; padding-right: 20px; }
     </style>
 </head>
 <body>
@@ -66,7 +71,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है... (v12)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v13)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -114,74 +119,83 @@
 
     <!-- KYC / PROFILE VIEW -->
     <div id="view-kyc" class="view-section">
-        <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-            <h4 style="margin: 0; color: #e65100; font-size: 15px;"><i class="fas fa-exclamation-triangle"></i> KYC पेंडिंग है</h4>
-            <p style="margin: 5px 0 0 0; font-size: 12px; color: #555;">संस्था में कार्य शुरू करने से पहले अपनी पहचान और बैंक डिटेल्स सबमिट करें।</p>
+        
+        <!-- MESSAGE 1: UNDER REVIEW (प्रोसेसिंग में) -->
+        <div id="kyc-processing-msg" class="status-box" style="display: none; border-top: 5px solid #2196F3;">
+            <i class="fas fa-clock" style="color: #2196F3;"></i>
+            <h3 style="color: #2196F3; margin: 0 0 10px 0;">KYC प्रोसेसिंग में है</h3>
+            <p style="font-size: 14px; color: #555;">आपकी जानकारी संस्था को भेज दी गई है। अप्रूवल मिलने के बाद ही आप नए सदस्य जोड़ पाएंगे।</p>
+            <button class="btn-submit btn-edit" onclick="enableKycEdit()"><i class="fas fa-edit"></i> जानकारी सुधारें (Edit)</button>
         </div>
 
-        <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-id-card"></i> कार्यकर्ता प्रोफाइल (KYC)</h3>
-        
-        <form id="kycForm" onsubmit="submitKYC(event)">
-            
-            <!-- 1. व्यक्तिगत जानकारी -->
-            <h4 class="section-title"><i class="fas fa-user"></i> व्यक्तिगत जानकारी</h4>
-            <div class="form-group">
-                <label>आधार कार्ड नंबर *</label>
-                <input type="text" id="kycAadhaarNo" placeholder="12 अंकों का आधार नंबर" pattern="[0-9]{12}" required>
-            </div>
-            <div class="form-group">
-                <label>पैन कार्ड नंबर *</label>
-                <input type="text" id="kycPanNo" placeholder="अपना 10 अंकों का पैन नंबर" style="text-transform: uppercase;" required>
+        <!-- MESSAGE 2: APPROVED (एक्टिव) -->
+        <div id="kyc-approved-msg" class="status-box" style="display: none; border-top: 5px solid #4CAF50;">
+            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+            <h3 style="color: #4CAF50; margin: 0 0 10px 0;">KYC अप्रूव्ड (एक्टिव)</h3>
+            <p style="font-size: 14px; color: #555;">आपकी प्रोफाइल वेरीफाई हो चुकी है। अब आप संस्था में नए सदस्य जोड़ सकते हैं।</p>
+        </div>
+
+        <!-- THE ACTUAL KYC FORM -->
+        <div id="kyc-form-container" style="display: none;">
+            <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h4 style="margin: 0; color: #e65100; font-size: 15px;"><i class="fas fa-exclamation-triangle"></i> KYC पेंडिंग है</h4>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #555;">संस्था में कार्य शुरू करने से पहले अपनी पहचान और बैंक डिटेल्स सबमिट करें।</p>
             </div>
 
-            <!-- 2. बैंक डिटेल्स -->
-            <h4 class="section-title"><i class="fas fa-university"></i> बैंक डिटेल्स</h4>
-            <div class="form-group"><label>बैंक का नाम *</label><input type="text" id="kycBankName" placeholder="उदा. SBI, PNB, BOB" required></div>
-            <div class="form-group"><label>खाता संख्या (Account No) *</label><input type="text" id="kycAccountNo" placeholder="अपना अकाउंट नंबर दर्ज करें" required></div>
-            <div class="form-group"><label>IFSC कोड *</label><input type="text" id="kycIfsc" placeholder="उदा. SBIN0001234" required></div>
+            <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-id-card"></i> कार्यकर्ता प्रोफाइल (KYC)</h3>
             
-            <!-- 3. डॉक्यूमेंट अपलोड -->
-            <h4 class="section-title"><i class="fas fa-file-upload"></i> डॉक्यूमेंट अपलोड</h4>
-            
-            <div class="form-group">
-                <label>पासपोर्ट साइज फोटो *</label>
-                <input type="file" id="kycProfilePic" accept=".jpg, .jpeg" onchange="validateRealTime(this, 'पासपोर्ट फोटो', 30, 100, false)" required style="background: white;">
-                <span class="file-hint">सिर्फ JPG (30KB से 100KB)</span>
-            </div>
-            <div class="form-group">
-                <label>पैन कार्ड की फोटो *</label>
-                <input type="file" id="kycPanPic" accept=".jpg, .jpeg, .pdf" onchange="validateRealTime(this, 'पैन कार्ड', 30, 200, true)" required style="background: white;">
-                <span class="file-hint">JPG या PDF (30KB से 200KB)</span>
-            </div>
-            <div class="form-group">
-                <label>आधार कार्ड (फ्रंट फोटो या पूरी PDF) *</label>
-                <input type="file" id="kycAadhaarFront" accept=".jpg, .jpeg, .pdf" onchange="validateRealTime(this, 'आधार कार्ड (फ्रंट)', 30, 200, true)" required style="background: white;">
-                <span class="file-hint">JPG या PDF (30KB से 200KB)</span>
-            </div>
-            <div class="form-group">
-                <label>आधार कार्ड (बैक फोटो) - <span style="color:gray;">अगर ऊपर PDF है तो खाली छोड़ दें</span></label>
-                <input type="file" id="kycAadhaarBack" accept=".jpg, .jpeg" onchange="validateRealTime(this, 'आधार कार्ड (बैक)', 30, 200, false)" style="background: white;">
-            </div>
-            <div class="form-group">
-                <label>बैंकिंग प्रूफ (पासबुक / कैंसिल चेक / स्टेटमेंट) *</label>
-                <input type="file" id="kycBankProof" accept=".jpg, .jpeg, .pdf" onchange="validateRealTime(this, 'बैंकिंग प्रूफ', 30, 300, true)" required style="background: white;">
-                <span class="file-hint">JPG या PDF (30KB से 300KB)</span>
-            </div>
+            <form id="kycForm" onsubmit="submitKYC(event)">
+                <h4 class="section-title"><i class="fas fa-user"></i> व्यक्तिगत जानकारी</h4>
+                <div class="form-group"><label>आधार कार्ड नंबर *</label><input type="text" id="kycAadhaarNo" placeholder="12 अंकों का आधार नंबर" pattern="[0-9]{12}" required></div>
+                <div class="form-group"><label>पैन कार्ड नंबर *</label><input type="text" id="kycPanNo" placeholder="अपना 10 अंकों का पैन नंबर" style="text-transform: uppercase;" required></div>
 
-            <button type="submit" id="kycSubmitBtn" class="btn-submit" style="margin-top: 20px;">KYC सबमिट करें <i class="fas fa-upload"></i></button>
-        </form>
+                <h4 class="section-title"><i class="fas fa-university"></i> बैंक डिटेल्स</h4>
+                <div class="form-group"><label>बैंक का नाम *</label><input type="text" id="kycBankName" placeholder="उदा. SBI, PNB, BOB" required></div>
+                <div class="form-group"><label>खाता संख्या (Account No) *</label><input type="text" id="kycAccountNo" placeholder="अपना अकाउंट नंबर दर्ज करें" required></div>
+                <div class="form-group"><label>IFSC कोड *</label><input type="text" id="kycIfsc" placeholder="उदा. SBIN0001234" required></div>
+                
+                <h4 class="section-title"><i class="fas fa-file-upload"></i> डॉक्यूमेंट अपलोड</h4>
+                <div class="form-group">
+                    <label>पासपोर्ट साइज फोटो *</label>
+                    <input type="file" id="kycProfilePic" accept=".jpg, .jpeg" onchange="validateRealTime(this, 'पासपोर्ट फोटो', 30, 100, false)" required style="background: white;">
+                    <span class="file-hint">सिर्फ JPG (30KB से 100KB)</span>
+                </div>
+                <div class="form-group">
+                    <label>पैन कार्ड की फोटो *</label>
+                    <input type="file" id="kycPanPic" accept=".jpg, .jpeg, .pdf" onchange="validateRealTime(this, 'पैन कार्ड', 30, 200, true)" required style="background: white;">
+                    <span class="file-hint">JPG या PDF (30KB से 200KB)</span>
+                </div>
+                <div class="form-group">
+                    <label>आधार कार्ड (फ्रंट फोटो या पूरी PDF) *</label>
+                    <input type="file" id="kycAadhaarFront" accept=".jpg, .jpeg, .pdf" onchange="validateRealTime(this, 'आधार कार्ड (फ्रंट)', 30, 200, true)" required style="background: white;">
+                    <span class="file-hint">JPG या PDF (30KB से 200KB)</span>
+                </div>
+                <div class="form-group">
+                    <label>आधार कार्ड (बैक फोटो) - <span style="color:gray;">अगर ऊपर PDF है तो खाली छोड़ दें</span></label>
+                    <input type="file" id="kycAadhaarBack" accept=".jpg, .jpeg" onchange="validateRealTime(this, 'आधार कार्ड (बैक)', 30, 200, false)" style="background: white;">
+                </div>
+                <div class="form-group">
+                    <label>बैंकिंग प्रूफ (पासबुक / कैंसिल चेक / स्टेटमेंट) *</label>
+                    <input type="file" id="kycBankProof" accept=".jpg, .jpeg, .pdf" onchange="validateRealTime(this, 'बैंकिंग प्रूफ', 30, 300, true)" required style="background: white;">
+                    <span class="file-hint">JPG या PDF (30KB से 300KB)</span>
+                </div>
+
+                <button type="submit" id="kycSubmitBtn" class="btn-submit" style="margin-top: 20px;">KYC सबमिट करें <i class="fas fa-upload"></i></button>
+            </form>
+        </div>
     </div>
 
     <!-- BOTTOM NAVIGATION -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)"><i class="fas fa-home"></i><span>होम</span></div>
-        <div class="nav-item fab" onclick="switchTab('add', this)"><div class="fab-circle"><i class="fas fa-plus"></i></div><span>नया सदस्य</span></div>
+        <div class="nav-item active" id="nav-home" onclick="switchTab('home', this)"><i class="fas fa-home"></i><span>होम</span></div>
+        <div class="nav-item fab" id="nav-add" onclick="switchTab('add', this)" style="display:none;"><div class="fab-circle"><i class="fas fa-plus"></i></div><span>नया सदस्य</span></div>
         <div class="nav-item" id="nav-profile" onclick="switchTab('kyc', this)"><i class="fas fa-user-circle"></i><span>प्रोफाइल</span></div>
     </div>
 
     <script>
         let supabaseClient;
         window.currentUserEmail = null;
+        window.agentGlobalInfo = null; // डाटा को याद रखने के लिए
 
         function switchTab(tabId, element) {
             try {
@@ -202,27 +216,37 @@
         function validateRealTime(inputElement, fieldName, minKB, maxKB, isPdfAllowed) {
             const file = inputElement.files[0];
             if (!file) return;
-
             const allowedTypes = isPdfAllowed ? ["image/jpeg", "image/jpg", "application/pdf"] : ["image/jpeg", "image/jpg"];
-            
             if (!allowedTypes.includes(file.type)) {
                 alert(`❌ ${fieldName} का फॉर्मेट गलत है। सिर्फ ${isPdfAllowed ? "JPG या PDF" : "JPG"} अपलोड करें!`);
-                inputElement.value = ""; 
-                return;
+                inputElement.value = ""; return;
             }
-            
             const sizeInKB = file.size / 1024;
             if (sizeInKB < minKB || sizeInKB > maxKB) {
                 alert(`❌ ${fieldName} का साइज ${Math.round(sizeInKB)}KB है, जबकि यह ${minKB}KB से ${maxKB}KB के बीच होना चाहिए।\n\n💡 समाधान: कृपया "Image Resizer" से अपनी फोटो का साइज सही करें और दोबारा चुनें।`);
-                inputElement.value = ""; 
-                return;
+                inputElement.value = ""; return;
             }
+        }
+
+        // ✍️ जानकारी एडिट करने का फंक्शन
+        function enableKycEdit() {
+            document.getElementById('kyc-processing-msg').style.display = 'none';
+            document.getElementById('kyc-form-container').style.display = 'block';
+
+            // पुरानी जानकारी डिब्बों में भरें
+            if(window.agentGlobalInfo) {
+                document.getElementById('kycAadhaarNo').value = window.agentGlobalInfo.aadhaar_no || '';
+                document.getElementById('kycPanNo').value = window.agentGlobalInfo.pan_no || '';
+                document.getElementById('kycBankName').value = window.agentGlobalInfo.bank_name || '';
+                document.getElementById('kycAccountNo').value = window.agentGlobalInfo.account_no || '';
+                document.getElementById('kycIfsc').value = window.agentGlobalInfo.ifsc_code || '';
+            }
+            alert("✏️ एडिट मोड चालू: कृपया अपनी जानकारी सुधारें और सुरक्षा के लिए सभी 'डॉक्यूमेंट्स' दोबारा चुनें!");
         }
 
         // --- SUBMIT KYC LOGIC ---
         async function submitKYC(event) {
             event.preventDefault(); 
-            
             const files = {
                 profile: document.getElementById('kycProfilePic').files[0],
                 pan: document.getElementById('kycPanPic').files[0],
@@ -241,24 +265,21 @@
 
                 const cleanEmail = window.currentUserEmail.replace(/[^a-zA-Z0-9]/g, '_');
                 const timeStamp = Date.now();
-                const uploadedUrls = {};
+                
+                // 🛑 जादुई रैंडम कोड: इससे पुरानी फाइल कभी आपस में नहीं टकराएगी!
+                const randomCode = Math.random().toString(36).substring(2, 8); 
 
-                // 🚨 यहाँ upsert: true जोड़ा है और फोल्डर के नाम अलग-अलग किए हैं
                 async function uploadFile(fileObj, folderName) {
                     if(!fileObj) return null;
                     const ext = fileObj.type === 'application/pdf' ? 'pdf' : 'jpg';
-                    const path = `${folderName}/${cleanEmail}_${timeStamp}.${ext}`;
+                    const path = `${folderName}/${cleanEmail}_${timeStamp}_${randomCode}.${ext}`;
                     
-                    const { error } = await supabaseClient.storage.from('kyc_documents').upload(path, fileObj, {
-                        cacheControl: '3600',
-                        upsert: true // ⚠️ यह पुरानी फाइल को रिप्लेस कर देगा
-                    });
-                    
+                    const { error } = await supabaseClient.storage.from('kyc_documents').upload(path, fileObj, { upsert: false });
                     if (error) throw new Error(`${folderName} अपलोड फेल: ` + error.message);
                     return supabaseClient.storage.from('kyc_documents').getPublicUrl(path).data.publicUrl;
                 }
 
-                // अलग-अलग फोल्डर के नाम ताकि टकराव न हो
+                const uploadedUrls = {};
                 uploadedUrls.profile = await uploadFile(files.profile, 'profiles');
                 uploadedUrls.pan = await uploadFile(files.pan, 'pan');
                 uploadedUrls.aadhaarFront = await uploadFile(files.aadhaarFront, 'aadhaar_front');
@@ -278,13 +299,13 @@
                         aadhaar_file_front: uploadedUrls.aadhaarFront,
                         aadhaar_file_back: uploadedUrls.aadhaarBack,
                         bank_proof_file: uploadedUrls.bankProof,
-                        status: 'Active'
+                        status: 'Under Review' // 🛑 स्टेटस बदल दिया गया है!
                     })
                     .eq('email', window.currentUserEmail);
 
                 if (dbUpdateError) throw new Error("डेटाबेस एरर: " + dbUpdateError.message);
 
-                alert("🎉 KYC सफलतापूर्वक सबमिट हो गई है!");
+                alert("🎉 KYC सफलतापूर्वक सबमिट हो गई है! अब यह एडमिन के पास चेकिंग के लिए है।");
                 window.location.reload(); 
 
             } catch (error) {
@@ -297,6 +318,7 @@
 
         // --- SUBMIT NEW LEAD LOGIC ---
         async function submitLead(event) {
+            // (Same as before)
             event.preventDefault();
             const btn = document.getElementById('btnSubmitLead');
             const originalText = btn.innerHTML;
@@ -319,7 +341,7 @@
 
                 alert("✅ नया लाभार्थी सफलतापूर्वक जोड़ा गया! यह एडमिन अप्रूवल के लिए भेज दिया गया है।");
                 document.getElementById('addLeadForm').reset();
-                switchTab('home', document.querySelector('.nav-item.active'));
+                switchTab('home', document.getElementById('nav-home'));
 
             } catch (error) {
                 alert("एरर: " + error.message);
@@ -347,16 +369,27 @@
                 if (dbError) throw new Error(dbError.message);
 
                 if (agentData) {
+                    window.agentGlobalInfo = agentData; // डाटा सेव कर लिया
                     document.getElementById('agentName').innerText = agentData.name || "नाम नहीं मिला";
                     document.getElementById('agentId').innerText = "ID: " + (agentData.agent_code || "पेंडिंग");
                     document.getElementById('profileInitial').innerText = (agentData.name ? agentData.name.charAt(0).toUpperCase() : "O");
 
-                    if (agentData.status === 'Pending KYC') {
+                    // 🛑 स्टेटस के हिसाब से स्क्रीन कंट्रोल 🛑
+                    if (agentData.status === 'Active') {
+                        document.getElementById('nav-add').style.display = 'block'; // नया सदस्य बटन दिखाएँ
+                        document.getElementById('kyc-approved-msg').style.display = 'block'; // हरा मैसेज दिखाएँ
+                        switchTab('home', document.getElementById('nav-home'));
+                    } 
+                    else if (agentData.status === 'Under Review') {
+                        document.getElementById('nav-add').style.display = 'none'; // नया सदस्य बटन छुपाएं
+                        document.getElementById('kyc-processing-msg').style.display = 'block'; // प्रोसेसिंग मैसेज
                         switchTab('kyc', document.getElementById('nav-profile'));
-                        document.querySelector('.bottom-nav').style.display = 'none';
-                    } else {
-                        switchTab('home', document.querySelector('.nav-item.active'));
-                        document.querySelector('.bottom-nav').style.display = 'flex'; 
+                    } 
+                    else {
+                        // Pending KYC
+                        document.getElementById('nav-add').style.display = 'none'; // नया सदस्य बटन छुपाएं
+                        document.getElementById('kyc-form-container').style.display = 'block'; // फॉर्म दिखाएँ
+                        switchTab('kyc', document.getElementById('nav-profile'));
                     }
                 }
             } catch (err) {
