@@ -20,21 +20,22 @@
         <div id="loginSection" class="auth-section active">
             <h2>एजेंट लॉगिन</h2>
             <p class="subtitle">पोर्टल में जाने के लिए अपनी डिटेल्स भरें</p>
-            
-            <form id="loginForm">
+                        <form id="loginForm">
                 <div class="form-group">
                     <label>ईमेल आईडी (Email)</label>
-                    <input type="email" id="email" placeholder="अपनी रजिस्टर्ड ईमेल डालें" required>
+                    <!-- यहाँ name और autocomplete="username" जोड़ा गया है -->
+                    <input type="email" id="email" name="email" autocomplete="username" placeholder="अपनी रजिस्टर्ड ईमेल डालें" required>
                 </div>
                 <div class="form-group">
                     <label>पासवर्ड</label>
-                    <input type="password" id="password" placeholder="अपना पासवर्ड डालें" required>
+                    <!-- यहाँ name और autocomplete="current-password" जोड़ा गया है -->
+                    <input type="password" id="password" name="password" autocomplete="current-password" placeholder="अपना पासवर्ड डालें" required>
                 </div>
                 <div class="forgot-link">
                     <a href="#" id="showForgot">पासवर्ड भूल गए?</a>
                 </div>
                 <button type="submit" id="loginBtn" class="btn-main btn-login-color"><i class="fas fa-sign-in-alt"></i> सुरक्षित लॉगिन करें</button>
-            </form>
+                   </form>
             
             <div class="switch-link">
                 संस्था से नए जुड़ रहे हैं? <a href="agent-register.html">यहाँ रजिस्टर करें</a>
