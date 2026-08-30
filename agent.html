@@ -66,7 +66,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है... (v7)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v8)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -123,7 +123,7 @@
         
         <form id="kycForm" onsubmit="submitKYC(event)">
             
-            <!-- 1. व्यक्तिगत जानकारी (नंबर) -->
+            <!-- 1. व्यक्तिगत जानकारी -->
             <h4 class="section-title"><i class="fas fa-user"></i> व्यक्तिगत जानकारी</h4>
             <div class="form-group">
                 <label>आधार कार्ड नंबर *</label>
@@ -142,20 +142,21 @@
             
             <!-- 3. डॉक्यूमेंट अपलोड -->
             <h4 class="section-title"><i class="fas fa-file-upload"></i> डॉक्यूमेंट अपलोड</h4>
+            
             <div class="form-group">
                 <label>पासपोर्ट साइज फोटो *</label>
                 <input type="file" id="kycProfilePic" accept=".jpg, .jpeg" required style="background: white;">
-                <span class="file-hint">सिर्फ JPG (Max 500KB)</span>
+                <span class="file-hint">सिर्फ JPG (30KB से 100KB)</span>
             </div>
             <div class="form-group">
                 <label>पैन कार्ड की फोटो *</label>
                 <input type="file" id="kycPanPic" accept=".jpg, .jpeg, .pdf" required style="background: white;">
-                <span class="file-hint">JPG या PDF (Max 500KB)</span>
+                <span class="file-hint">JPG या PDF (30KB से 200KB)</span>
             </div>
             <div class="form-group">
                 <label>आधार कार्ड (फ्रंट फोटो या पूरी PDF) *</label>
                 <input type="file" id="kycAadhaarFront" accept=".jpg, .jpeg, .pdf" required style="background: white;">
-                <span class="file-hint">JPG या PDF (Max 500KB)</span>
+                <span class="file-hint">JPG या PDF (30KB से 200KB)</span>
             </div>
             <div class="form-group">
                 <label>आधार कार्ड (बैक फोटो) - <span style="color:gray;">अगर ऊपर PDF डाली है तो इसे खाली छोड़ दें</span></label>
@@ -164,7 +165,7 @@
             <div class="form-group">
                 <label>बैंकिंग प्रूफ (पासबुक / कैंसिल चेक / स्टेटमेंट) *</label>
                 <input type="file" id="kycBankProof" accept=".jpg, .jpeg, .pdf" required style="background: white;">
-                <span class="file-hint">JPG या PDF (Max 500KB)</span>
+                <span class="file-hint">JPG या PDF (30KB से 300KB)</span>
             </div>
 
             <button type="submit" id="kycSubmitBtn" class="btn-submit" style="margin-top: 20px;">KYC सबमिट करें <i class="fas fa-upload"></i></button>
@@ -198,19 +199,21 @@
             }
         }
 
-        // File Validation
-        function checkFileValidity(file, fieldName, isOptional = false) {
+        // 🚨 नया डायनामिक फाइल चेकर (जिसमें साइज और समाधान दोनों हैं)
+        function checkFileValidity(file, fieldName, minKB, maxKB, isOptional = false) {
             if (!file) {
                 if(isOptional) return null;
-                return `${fieldName} अपलोड करें!`;
+                return `❌ ${fieldName} अपलोड करना ज़रूरी है!`;
             }
             const allowedTypes = ["image/jpeg", "image/jpg", "application/pdf"];
             if (!allowedTypes.includes(file.type)) {
-                return `❌ ${fieldName} सिर्फ JPG या PDF फॉर्मेट में होनी चाहिए!`;
+                return `❌ ${fieldName} का फॉर्मेट गलत है। सिर्फ JPG या PDF अपलोड करें!`;
             }
+            
             const sizeInKB = file.size / 1024;
-            if (sizeInKB > 500) {
-                return `❌ ${fieldName} का साइज ${Math.round(sizeInKB)}KB है। कृपया 500KB से कम की फाइल चुनें।`;
+            if (sizeInKB < minKB || sizeInKB > maxKB) {
+                // यहाँ एरर के साथ-साथ समाधान (Solution) भी दिया गया है
+                return `❌ ${fieldName} का साइज ${Math.round(sizeInKB)}KB है, जबकि यह ${minKB}KB से ${maxKB}KB के बीच होना चाहिए।\n\n💡 समाधान: कृपया Google पर "Image Resizer" या "Image Compressor" सर्च करें और अपनी फोटो का साइज कम/ज़्यादा करके दोबारा अपलोड करें।`;
             }
             return null; 
         }
@@ -233,15 +236,19 @@
                     bankProof: document.getElementById('kycBankProof').files[0]
                 };
 
+                // हर फाइल के लिए अलग-अलग साइज लिमिट सेट की है
                 const errors = [
-                    checkFileValidity(files.profile, "पासपोर्ट फोटो"),
-                    checkFileValidity(files.pan, "पैन कार्ड"),
-                    checkFileValidity(files.aadhaarFront, "आधार कार्ड (फ्रंट)"),
-                    checkFileValidity(files.aadhaarBack, "आधार कार्ड (बैक)", true),
-                    checkFileValidity(files.bankProof, "बैंकिंग प्रूफ")
+                    checkFileValidity(files.profile, "पासपोर्ट फोटो", 30, 100),
+                    checkFileValidity(files.pan, "पैन कार्ड", 30, 200),
+                    checkFileValidity(files.aadhaarFront, "आधार कार्ड (फ्रंट)", 30, 200),
+                    checkFileValidity(files.aadhaarBack, "आधार कार्ड (बैक)", 30, 200, true), // Optional
+                    checkFileValidity(files.bankProof, "बैंकिंग प्रूफ", 30, 300)
                 ].filter(e => e !== null);
 
-                if (errors.length > 0) throw new Error(errors.join("\n"));
+                if (errors.length > 0) {
+                    // अगर एक से ज़्यादा एरर हों तो सबको अलग-अलग लाइन में दिखाएगा
+                    throw new Error(errors.join("\n\n--------------------------\n\n"));
+                }
 
                 const cleanEmail = window.currentUserEmail.replace(/[^a-zA-Z0-9]/g, '_');
                 const timeStamp = Date.now();
@@ -287,7 +294,7 @@
                 window.location.reload(); 
 
             } catch (error) {
-                alert(error.message);
+                alert(error.message); // एरर मैसेज पॉप-अप में आएगा
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
