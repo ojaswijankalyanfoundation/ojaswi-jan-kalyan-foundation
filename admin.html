@@ -22,6 +22,9 @@
         .form-group input:focus { border-color: var(--accent); outline: none; }
         .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px; }
         
+        /* नया एरर बॉक्स */
+        #loginError { color: #fd5d93; font-size: 13px; font-weight: bold; margin-top: 15px; display: none; background: rgba(253, 93, 147, 0.1); padding: 10px; border-radius: 6px; }
+
         #admin-dashboard { display: none; padding-bottom: 30px; }
         .header { background: var(--admin-card); padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; }
         .header-title h2 { margin: 0; color: white; font-size: 20px; }
@@ -76,7 +79,9 @@
         <div class="login-box">
             <h2><i class="fas fa-user-shield"></i> एडमिन लॉगिन</h2>
             <p>केवल अधिकृत ब्रांच मैनेजर और एडमिन के लिए</p>
-            <form onsubmit="doAdminLogin(event)">
+            
+            <!-- ⚠️ फॉर्म का रीफ्रेश होना यहाँ बंद किया गया है -->
+            <form id="loginForm">
                 <div class="form-group">
                     <label>एडमिन ईमेल</label>
                     <input type="email" id="adminEmail" required placeholder="email@example.com">
@@ -85,7 +90,12 @@
                     <label>पासवर्ड</label>
                     <input type="password" id="adminPassword" required placeholder="••••••••">
                 </div>
-                <button type="submit" id="loginBtn" class="btn-login">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
+                
+                <!-- ⚠️ बटन को type="button" कर दिया है -->
+                <button type="button" id="loginBtn" class="btn-login" onclick="doAdminLogin()">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
+                
+                <!-- 🚨 एरर दिखाने का डिब्बा -->
+                <div id="loginError"></div>
             </form>
         </div>
     </div>
@@ -174,18 +184,39 @@
 
         let allAgents = [];
 
-        async function doAdminLogin(event) {
-            event.preventDefault();
+        // 🚨 नया, मजबूत लॉगिन फंक्शन 🚨
+        async function doAdminLogin() {
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
+            const errorBox = document.getElementById('loginError');
+
+            errorBox.style.display = 'none'; // पुराना एरर हटाओ
+
+            if(!email || !password) {
+                errorBox.innerHTML = "❌ कृपया ईमेल और पासवर्ड दोनों डालें!";
+                errorBox.style.display = 'block';
+                return;
+            }
+
             btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> चेक कर रहे हैं...";
             btn.disabled = true;
 
             try {
+                // 1. ऑथेंटिकेशन चेक
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
+                
+                if (error) {
+                    if (error.message.includes("Email not confirmed")) {
+                        throw new Error("❌ आपका ईमेल वेरीफाई नहीं है! कृपया Supabase में जाकर 'Confirm email' सेटिंग को बंद करें।");
+                    }
+                    if (error.message.includes("Invalid login credentials")) {
+                        throw new Error("❌ पासवर्ड गलत है! (ध्यान दें: पासवर्ड में Ojaswi का O बड़ा होना चाहिए)");
+                    }
+                    throw error;
+                }
 
+                // 2. एडमिन टेबल में चेक
                 const { data: adminData, error: adminErr } = await supabase
                     .from('admin_users')
                     .select('*')
@@ -194,13 +225,15 @@
 
                 if (adminErr || !adminData) {
                     await supabase.auth.signOut();
-                    throw new Error("❌ इस आईडी के पास एडमिन पैनल का एक्सेस नहीं है!");
+                    throw new Error("❌ इस आईडी के पास एडमिन पैनल खोलने की परमिशन नहीं है! (SQL में नाम नहीं है)");
                 }
 
+                // 3. सक्सेस!
                 showDashboard(adminData);
 
             } catch (error) {
-                alert(error.message);
+                errorBox.innerHTML = error.message; // एरर को लाल डिब्बे में दिखाओ
+                errorBox.style.display = 'block';
                 btn.innerHTML = "लॉगिन करें <i class='fas fa-sign-in-alt'></i>";
                 btn.disabled = false;
             }
