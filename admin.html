@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>एडमिन पैनल | ओजस्वी फाउंडेशन</title>
     
-    <!-- Supabase & Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -13,7 +12,6 @@
         :root { --admin-dark: #1e1e2f; --admin-card: #27293d; --admin-text: #e1e1e6; --accent: #e14eca; --success: #00f2c3; --danger: #fd5d93; --warning: #ff8d72; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--admin-dark); color: var(--admin-text); }
         
-        /* 🔒 LOGIN SCREEN STYLES */
         #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1e1e2f, #11111a); }
         .login-box { background: var(--admin-card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; border-top: 4px solid var(--accent); }
         .login-box h2 { margin: 0 0 5px 0; color: white; }
@@ -24,9 +22,7 @@
         .form-group input:focus { border-color: var(--accent); outline: none; }
         .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px; }
         
-        /* 📊 DASHBOARD STYLES (HIDDEN BY DEFAULT) */
         #admin-dashboard { display: none; padding-bottom: 30px; }
-        
         .header { background: var(--admin-card); padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; }
         .header-title h2 { margin: 0; color: white; font-size: 20px; }
         .header-title span { font-size: 12px; color: var(--warning); background: rgba(255,141,114,0.1); padding: 3px 8px; border-radius: 10px; }
@@ -96,7 +92,6 @@
 
     <!-- 📊 SECURE DASHBOARD -->
     <div id="admin-dashboard">
-        <!-- Header -->
         <div class="header">
             <div class="header-title">
                 <h2>ओजस्वी कंट्रोल रूम</h2>
@@ -109,7 +104,6 @@
             </div>
         </div>
 
-        <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card" style="border-color: var(--success);">
                 <h3 id="statAgents">0</h3>
@@ -121,13 +115,11 @@
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="tab-nav">
             <div class="tab-btn active" onclick="switchTab('kycList', this)"><i class="fas fa-id-card"></i> KYC अप्रूवल</div>
             <div class="tab-btn" onclick="switchTab('leadList', this)"><i class="fas fa-users"></i> नए लाभार्थी</div>
         </div>
 
-        <!-- TAB 1: KYC -->
         <div id="kycList" class="tab-view active">
             <h3 style="color: white; margin-top: 0;">KYC रिक्वेस्ट</h3>
             <div class="table-container">
@@ -147,7 +139,6 @@
             </div>
         </div>
 
-        <!-- TAB 2: LEADS -->
         <div id="leadList" class="tab-view">
             <h3 style="color: white; margin-top: 0;">लाभार्थी (Leads) लिस्ट</h3>
             <div class="table-container">
@@ -161,14 +152,13 @@
                         </tr>
                     </thead>
                     <tbody id="leadsTableBody">
-                        <tr><td colspan="4" style="text-align:center;">डेटा लोड हो रहा है...</td></tr>
+                        <tr><td colspan="4" style="text-align:center;">कोई लाभार्थी नहीं मिला</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: VIEW DOCUMENTS -->
     <div id="docModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">×</span>
@@ -183,23 +173,19 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let allAgents = [];
-        let currentAdmin = null;
 
-        // 🔒 ADMIN LOGIN LOGIC
         async function doAdminLogin(event) {
             event.preventDefault();
-            const email = document.getElementById('adminEmail').value;
+            const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
             btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> चेक कर रहे हैं...";
             btn.disabled = true;
 
             try {
-                // 1. Supabase में लॉगिन करें
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
 
-                // 2. चेक करें कि क्या यह ईमेल 'admin_users' टेबल में है?
                 const { data: adminData, error: adminErr } = await supabase
                     .from('admin_users')
                     .select('*')
@@ -207,11 +193,10 @@
                     .single();
 
                 if (adminErr || !adminData) {
-                    await supabase.auth.signOut(); // तुरंत बाहर फेंको
-                    throw new Error("❌ आपके पास एडमिन पैनल का एक्सेस नहीं है!");
+                    await supabase.auth.signOut();
+                    throw new Error("❌ इस आईडी के पास एडमिन पैनल का एक्सेस नहीं है!");
                 }
 
-                // 3. सक्सेस! डैशबोर्ड दिखाएं
                 showDashboard(adminData);
 
             } catch (error) {
@@ -221,16 +206,13 @@
             }
         }
 
-        // 🔓 SHOW DASHBOARD & FETCH DATA
         function showDashboard(adminData) {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-dashboard').style.display = 'block';
             
-            // एडमिन की जानकारी सेट करें (जैसे Super Admin, Balotra Branch)
             document.getElementById('adminNameDisplay').innerText = adminData.name || adminData.email;
             document.getElementById('adminRoleDisplay').innerText = adminData.role || 'Manager';
             document.getElementById('adminBranchBadge').innerText = `ब्रांच: ${adminData.branch || 'All'}`;
-            currentAdmin = adminData;
 
             fetchAdminData();
         }
@@ -240,21 +222,18 @@
             window.location.reload();
         }
 
-        // CHECK SESSION ON PAGE LOAD
         async function checkSession() {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
-                // अगर पहले से लॉगिन है, तो चेक करो कि एडमिन है या नहीं
                 const { data: adminData } = await supabase.from('admin_users').select('*').eq('email', session.user.email).single();
                 if (adminData) {
                     showDashboard(adminData);
                 } else {
-                    await supabase.auth.signOut(); // आम यूजर को लॉगआउट कर दो
+                    await supabase.auth.signOut();
                 }
             }
         }
 
-        // Tab Switcher
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
@@ -264,11 +243,8 @@
 
         function closeModal() { document.getElementById('docModal').style.display = 'none'; }
 
-        // FETCH DATA
         async function fetchAdminData() {
             try {
-                // भविष्य में: अगर ब्रांच मैनेजर है, तो .eq('branch', currentAdmin.branch) लगाएंगे
-                // अभी Super Admin के लिए सब कुछ ला रहे हैं
                 const { data: agents, error: err1 } = await supabase.from('agents').select('*').order('created_at', { ascending: false });
                 if(err1) throw err1;
                 allAgents = agents;
@@ -281,11 +257,9 @@
 
                 renderKYC(agents);
                 renderLeads(leads);
-
-            } catch (error) { console.error("Error fetching data:", error.message); }
+            } catch (error) { console.error("Error:", error.message); }
         }
 
-        // RENDER KYC
         function renderKYC(agents) {
             const tbody = document.getElementById('kycTableBody');
             tbody.innerHTML = '';
@@ -313,7 +287,6 @@
             });
         }
 
-        // RENDER LEADS
         function renderLeads(leads) {
             const tbody = document.getElementById('leadsTableBody');
             tbody.innerHTML = '';
@@ -330,7 +303,6 @@
             });
         }
 
-        // VIEW DOCS
         function viewDocs(email) {
             const agent = allAgents.find(a => a.email === email);
             if(!agent) return;
@@ -360,7 +332,7 @@
                     html += `
                         <div class="doc-item">
                             <h4>${doc.title}</h4>
-                            ${isPdf ? `<a href="${doc.url}" target="_blank"><i class="fas fa-file-pdf"></i> PDF डाउनलोड करें/देखें</a>` : `<a href="${doc.url}" target="_blank"><img src="${doc.url}" alt="${doc.title}"></a>`}
+                            ${isPdf ? `<a href="${doc.url}" target="_blank"><i class="fas fa-file-pdf"></i> PDF देखें</a>` : `<a href="${doc.url}" target="_blank"><img src="${doc.url}"></a>`}
                         </div>
                     `;
                 }
@@ -370,20 +342,18 @@
             document.getElementById('docModal').style.display = 'block';
         }
 
-        // APPROVE / REJECT
         async function updateAgentStatus(email, newStatus) {
-            let msg = newStatus === 'Active' ? 'क्या आप इस एजेंट को अप्रूव (Approve) करना चाहते हैं?' : 'क्या आप इस एजेंट को रिजेक्ट (Reject) करना चाहते हैं?';
+            let msg = newStatus === 'Active' ? 'क्या आप इस एजेंट को अप्रूव करना चाहते हैं?' : 'क्या आप इस एजेंट को रिजेक्ट करना चाहते हैं?';
             if(!confirm(msg)) return;
 
             try {
                 const { error } = await supabase.from('agents').update({ status: newStatus }).eq('email', email);
                 if (error) throw error;
-                alert(`सफलता! एजेंट का स्टेटस "${newStatus}" कर दिया गया है।`);
+                alert(`सफलता! स्टेटस "${newStatus}" कर दिया गया है।`);
                 fetchAdminData(); 
             } catch(e) { alert("एरर: " + e.message); }
         }
 
-        // Start
         window.onload = checkSession;
     </script>
 </body>
