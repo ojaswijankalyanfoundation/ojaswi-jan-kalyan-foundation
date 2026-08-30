@@ -66,7 +66,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है... (v8)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v9)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -199,7 +199,7 @@
             }
         }
 
-        // 🚨 नया डायनामिक फाइल चेकर (जिसमें साइज और समाधान दोनों हैं)
+        // 🚨 डायनामिक फाइल चेकर (जिसमें साइज और समाधान दोनों हैं)
         function checkFileValidity(file, fieldName, minKB, maxKB, isOptional = false) {
             if (!file) {
                 if(isOptional) return null;
@@ -221,34 +221,39 @@
         // --- SUBMIT KYC LOGIC ---
         async function submitKYC(event) {
             event.preventDefault(); 
+            
+            // 1. सबसे पहले फाइलें निकालें (बटन घुमाने से पहले!)
+            const files = {
+                profile: document.getElementById('kycProfilePic').files[0],
+                pan: document.getElementById('kycPanPic').files[0],
+                aadhaarFront: document.getElementById('kycAadhaarFront').files[0],
+                aadhaarBack: document.getElementById('kycAadhaarBack').files[0],
+                bankProof: document.getElementById('kycBankProof').files[0]
+            };
+
+            // 2. तुरंत फाइल साइज और फॉर्मेट चेक करें
+            const errors = [
+                checkFileValidity(files.profile, "पासपोर्ट फोटो", 30, 100),
+                checkFileValidity(files.pan, "पैन कार्ड", 30, 200),
+                checkFileValidity(files.aadhaarFront, "आधार कार्ड (फ्रंट)", 30, 200),
+                checkFileValidity(files.aadhaarBack, "आधार कार्ड (बैक)", 30, 200, true), // Optional
+                checkFileValidity(files.bankProof, "बैंकिंग प्रूफ", 30, 300)
+            ].filter(e => e !== null);
+
+            // 3. 🚨 अगर एक भी एरर है, तो अपलोड प्रोसेस यहीं रोक दें (Return कर दें)
+            if (errors.length > 0) {
+                alert(errors.join("\n\n--------------------------\n\n"));
+                return; // ⚠️ आगे का कोड नहीं चलेगा!
+            }
+
+            // 4. अगर सब सही है, तब जाकर बटन को घुमाएं और अपलोड शुरू करें
             const btn = document.getElementById('kycSubmitBtn');
             const originalText = btn.innerHTML;
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> अपलोड हो रहा है... कृपया रुकें";
+            btn.disabled = true;
 
             try {
-                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> अपलोड हो रहा है... कृपया रुकें";
-                btn.disabled = true;
-
-                const files = {
-                    profile: document.getElementById('kycProfilePic').files[0],
-                    pan: document.getElementById('kycPanPic').files[0],
-                    aadhaarFront: document.getElementById('kycAadhaarFront').files[0],
-                    aadhaarBack: document.getElementById('kycAadhaarBack').files[0],
-                    bankProof: document.getElementById('kycBankProof').files[0]
-                };
-
-                // हर फाइल के लिए अलग-अलग साइज लिमिट सेट की है
-                const errors = [
-                    checkFileValidity(files.profile, "पासपोर्ट फोटो", 30, 100),
-                    checkFileValidity(files.pan, "पैन कार्ड", 30, 200),
-                    checkFileValidity(files.aadhaarFront, "आधार कार्ड (फ्रंट)", 30, 200),
-                    checkFileValidity(files.aadhaarBack, "आधार कार्ड (बैक)", 30, 200, true), // Optional
-                    checkFileValidity(files.bankProof, "बैंकिंग प्रूफ", 30, 300)
-                ].filter(e => e !== null);
-
-                if (errors.length > 0) {
-                    // अगर एक से ज़्यादा एरर हों तो सबको अलग-अलग लाइन में दिखाएगा
-                    throw new Error(errors.join("\n\n--------------------------\n\n"));
-                }
+                if(!window.currentUserEmail) throw new Error("यूजर सेशन नहीं मिला, फिर से लॉगिन करें।");
 
                 const cleanEmail = window.currentUserEmail.replace(/[^a-zA-Z0-9]/g, '_');
                 const timeStamp = Date.now();
@@ -263,7 +268,7 @@
                     return supabaseClient.storage.from('kyc-documents').getPublicUrl(path).data.publicUrl;
                 }
 
-                // Uploading all files
+                // Uploading all files to Supabase
                 uploadedUrls.profile = await uploadFile(files.profile, 'profiles');
                 uploadedUrls.pan = await uploadFile(files.pan, 'pan');
                 uploadedUrls.aadhaarFront = await uploadFile(files.aadhaarFront, 'aadhaar');
