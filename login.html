@@ -5,12 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>एजेंट पोर्टल | ओजस्वी जनकल्याण फाउंडेशन</title>
     
-    <!-- Supabase & Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- CSS फाइल को फोर्स रीलोड करने के लिए ?v=3 लगाया है -->
-    <link rel="stylesheet" href="style.css?v=3">
+    <style>
+        :root { --saffron: #FF9933; --green: #138808; --navy: #1c2c52; --light-bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--light-bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100%; overflow-x: hidden; }
+        
+        .auth-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid var(--saffron); position: relative; margin: 20px auto; }
+        .auth-container img { height: 60px; margin-bottom: 15px; }
+        
+        h2 { margin: 0 0 5px 0; color: var(--navy); font-size: 24px; }
+        p.subtitle { color: #666; font-size: 14px; margin-bottom: 25px; }
+        
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; color: #444; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: 0.3s; }
+        .form-group input:focus { border-color: var(--saffron); outline: none; box-shadow: 0 0 5px rgba(255,153,51,0.2); }
+        
+        .btn-main { width: 100%; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-login-color { background: var(--navy); }
+        .btn-login-color:hover { background: #121c36; }
+        .btn-forgot-color { background: var(--saffron); }
+        
+        .forgot-link { text-align: right; margin-bottom: 15px; }
+        .forgot-link a { font-size: 13px; color: var(--saffron); text-decoration: none; }
+        
+        .switch-link { margin-top: 20px; font-size: 14px; color: #555; }
+        .switch-link a { color: var(--saffron); text-decoration: none; font-weight: bold; cursor: pointer; }
+        
+        .back-home { position: absolute; top: 15px; left: 15px; color: #888; text-decoration: none; font-size: 14px; transition: 0.3s; }
+        
+        .auth-section { display: none; }
+        .auth-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
 <body>
     <div class="auth-container">
@@ -32,9 +61,13 @@
                     <input type="password" id="password" name="password" autocomplete="current-password" placeholder="अपना पासवर्ड डालें" required>
                 </div>
                 <div class="forgot-link">
-                    <a href="#" id="showForgot">पासवर्ड भूल गए?</a>
+                    <a href="#" onclick="switchTab('forgotSection')">पासवर्ड भूल गए?</a>
                 </div>
-                <button type="submit" id="loginBtn" class="btn-main btn-login-color"><i class="fas fa-sign-in-alt"></i> सुरक्षित लॉगिन करें</button>
+                
+                <!-- यहाँ type="button" कर दिया है ताकि पेज रिफ्रेश/डायरेक्ट न हो -->
+                <button type="button" id="loginBtn" class="btn-main btn-login-color" onclick="doLogin()">
+                    <i class="fas fa-sign-in-alt"></i> सुरक्षित लॉगिन करें
+                </button>
             </form>
             
             <div class="switch-link">
@@ -52,16 +85,91 @@
                     <label>रजिस्टर्ड ईमेल आईडी</label>
                     <input type="email" id="resetEmail" name="resetEmail" autocomplete="email" placeholder="अपनी ईमेल आईडी डालें" required>
                 </div>
-                <button type="submit" id="resetBtn" class="btn-main btn-forgot-color"><i class="fas fa-envelope"></i> रीसेट लिंक भेजें</button>
+                <button type="button" id="resetBtn" class="btn-main btn-forgot-color" onclick="doReset()">
+                    <i class="fas fa-envelope"></i> रीसेट लिंक भेजें
+                </button>
             </form>
             
             <div class="switch-link">
-                याद आ गया? <a href="#" id="showLogin">वापस लॉगिन पर जाएँ</a>
+                याद आ गया? <a href="#" onclick="switchTab('loginSection')">वापस लॉगिन पर जाएँ</a>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript फाइल को फोर्स रीलोड करने के लिए ?v=3 लगाया है -->
-    <script src="script.js?v=3"></script>
+    <script>
+        // Supabase Setup
+        const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // टैब बदलने का फंक्शन
+        function switchTab(tabId) {
+            document.querySelectorAll('.auth-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // असली लॉगिन फंक्शन (अब पेज कहीं नहीं भागेगा)
+        async function doLogin() {
+            const emailInput = document.getElementById('email').value;
+            const passwordInput = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+
+            if(!emailInput || !passwordInput) {
+                alert("कृपया ईमेल और पासवर्ड दोनों भरें!");
+                return;
+            }
+
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> चेक कर रहे हैं...";
+            loginBtn.disabled = true;
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: emailInput,
+                    password: passwordInput,
+                });
+
+                if (error) throw error; 
+
+                loginBtn.innerHTML = "<i class='fas fa-check-circle'></i> सफल! डैशबोर्ड खुल रहा है...";
+                
+                // लॉगिन पक्का होने के बाद ही पेज बदलेगा
+                setTimeout(() => {
+                    window.location.href = 'agent.html';
+                }, 800);
+
+            } catch (error) {
+                alert("लॉगिन फेल: ईमेल या पासवर्ड गलत है!");
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
+            }
+        }
+
+        // पासवर्ड रीसेट फंक्शन
+        async function doReset() {
+            const email = document.getElementById('resetEmail').value;
+            const resetBtn = document.getElementById('resetBtn');
+
+            if(!email) {
+                alert("कृपया ईमेल भरें!");
+                return;
+            }
+
+            resetBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> भेज रहे हैं...";
+            resetBtn.disabled = true;
+
+            try {
+                const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+                if (error) throw error;
+                alert("पासवर्ड रीसेट लिंक आपकी ईमेल पर भेज दिया गया है!");
+                switchTab('loginSection');
+            } catch (error) {
+                alert("एरर: " + error.message);
+            } finally {
+                resetBtn.innerHTML = "<i class='fas fa-envelope'></i> रीसेट लिंक भेजें";
+                resetBtn.disabled = false;
+            }
+        }
+    </script>
 </body>
 </html>
