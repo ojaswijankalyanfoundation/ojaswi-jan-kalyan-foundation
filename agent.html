@@ -66,7 +66,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है... (v10)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v11)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -140,12 +140,11 @@
             <div class="form-group"><label>खाता संख्या (Account No) *</label><input type="text" id="kycAccountNo" placeholder="अपना अकाउंट नंबर दर्ज करें" required></div>
             <div class="form-group"><label>IFSC कोड *</label><input type="text" id="kycIfsc" placeholder="उदा. SBIN0001234" required></div>
             
-            <!-- 3. डॉक्यूमेंट अपलोड (REAL-TIME VALIDATION ADDED) -->
+            <!-- 3. डॉक्यूमेंट अपलोड -->
             <h4 class="section-title"><i class="fas fa-file-upload"></i> डॉक्यूमेंट अपलोड</h4>
             
             <div class="form-group">
                 <label>पासपोर्ट साइज फोटो *</label>
-                <!-- यहाँ onchange लगाया है जो तुरंत चेक करेगा -->
                 <input type="file" id="kycProfilePic" accept=".jpg, .jpeg" onchange="validateRealTime(this, 'पासपोर्ट फोटो', 30, 100, false)" required style="background: white;">
                 <span class="file-hint">सिर्फ JPG (30KB से 100KB)</span>
             </div>
@@ -200,23 +199,22 @@
             }
         }
 
-        // 🚨 यह है आपका "रियल-टाइम" सिक्योरिटी गार्ड (तुरंत रिजेक्ट करेगा) 🚨
         function validateRealTime(inputElement, fieldName, minKB, maxKB, isPdfAllowed) {
             const file = inputElement.files[0];
-            if (!file) return; // अगर कोई फाइल नहीं चुनी, तो कुछ मत करो
+            if (!file) return;
 
             const allowedTypes = isPdfAllowed ? ["image/jpeg", "image/jpg", "application/pdf"] : ["image/jpeg", "image/jpg"];
             
             if (!allowedTypes.includes(file.type)) {
                 alert(`❌ ${fieldName} का फॉर्मेट गलत है। सिर्फ ${isPdfAllowed ? "JPG या PDF" : "JPG"} अपलोड करें!`);
-                inputElement.value = ""; // ⚠️ डिब्बे को तुरंत खाली कर दो
+                inputElement.value = ""; 
                 return;
             }
             
             const sizeInKB = file.size / 1024;
             if (sizeInKB < minKB || sizeInKB > maxKB) {
                 alert(`❌ ${fieldName} का साइज ${Math.round(sizeInKB)}KB है, जबकि यह ${minKB}KB से ${maxKB}KB के बीच होना चाहिए।\n\n💡 समाधान: कृपया "Image Resizer" से अपनी फोटो का साइज सही करें और दोबारा चुनें।`);
-                inputElement.value = ""; // ⚠️ डिब्बे को तुरंत खाली कर दो, ताकि वो सबमिट ही न कर पाए!
+                inputElement.value = ""; 
                 return;
             }
         }
@@ -224,27 +222,22 @@
         // --- SUBMIT KYC LOGIC ---
         async function submitKYC(event) {
             event.preventDefault(); 
+            
+            const files = {
+                profile: document.getElementById('kycProfilePic').files[0],
+                pan: document.getElementById('kycPanPic').files[0],
+                aadhaarFront: document.getElementById('kycAadhaarFront').files[0],
+                aadhaarBack: document.getElementById('kycAadhaarBack').files[0],
+                bankProof: document.getElementById('kycBankProof').files[0]
+            };
+
             const btn = document.getElementById('kycSubmitBtn');
             const originalText = btn.innerHTML;
-
             btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> अपलोड हो रहा है... कृपया रुकें";
             btn.disabled = true;
 
             try {
                 if(!window.currentUserEmail) throw new Error("यूजर सेशन नहीं मिला, फिर से लॉगिन करें।");
-
-                const files = {
-                    profile: document.getElementById('kycProfilePic').files[0],
-                    pan: document.getElementById('kycPanPic').files[0],
-                    aadhaarFront: document.getElementById('kycAadhaarFront').files[0],
-                    aadhaarBack: document.getElementById('kycAadhaarBack').files[0],
-                    bankProof: document.getElementById('kycBankProof').files[0]
-                };
-
-                // अगर कोई डिब्बा खाली रह गया हो (जो required है)
-                if (!files.profile || !files.pan || !files.aadhaarFront || !files.bankProof) {
-                    throw new Error("कृपया सभी ज़रूरी डॉक्यूमेंट अपलोड करें!");
-                }
 
                 const cleanEmail = window.currentUserEmail.replace(/[^a-zA-Z0-9]/g, '_');
                 const timeStamp = Date.now();
@@ -254,19 +247,19 @@
                     if(!fileObj) return null;
                     const ext = fileObj.type === 'application/pdf' ? 'pdf' : 'jpg';
                     const path = `${folderName}/${cleanEmail}_${timeStamp}.${ext}`;
-                    const { error } = await supabaseClient.storage.from('kyc-documents').upload(path, fileObj);
+                    
+                    // ⚠️ यहाँ kyc_documents कर दिया गया है ⚠️
+                    const { error } = await supabaseClient.storage.from('kyc_documents').upload(path, fileObj);
                     if (error) throw new Error(`${folderName} अपलोड फेल: ` + error.message);
-                    return supabaseClient.storage.from('kyc-documents').getPublicUrl(path).data.publicUrl;
+                    return supabaseClient.storage.from('kyc_documents').getPublicUrl(path).data.publicUrl;
                 }
 
-                // Uploading files
                 uploadedUrls.profile = await uploadFile(files.profile, 'profiles');
                 uploadedUrls.pan = await uploadFile(files.pan, 'pan');
                 uploadedUrls.aadhaarFront = await uploadFile(files.aadhaarFront, 'aadhaar');
                 uploadedUrls.aadhaarBack = await uploadFile(files.aadhaarBack, 'aadhaar');
                 uploadedUrls.bankProof = await uploadFile(files.bankProof, 'bank');
 
-                // Updating DB
                 const { error: dbUpdateError } = await supabaseClient
                     .from('agents')
                     .update({
@@ -290,7 +283,7 @@
                 window.location.reload(); 
 
             } catch (error) {
-                alert(error.message);
+                alert(error.message); 
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
