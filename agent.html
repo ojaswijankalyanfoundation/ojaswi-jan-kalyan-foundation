@@ -57,7 +57,7 @@
         .nav-item.fab { position: relative; top: -20px; }
         .nav-item.fab .fab-circle { background: var(--purple-main); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.4); border: 4px solid white; }
         
-        /* स्टेटस बॉक्स के डिज़ाइन */
+        /* 🎨 स्टेटस बॉक्स के डिज़ाइन */
         .status-box { background: white; padding: 30px 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         .status-box i { font-size: 50px; margin-bottom: 15px; }
         .btn-edit { background: #ff9800; margin-top: 20px; font-size: 14px; padding: 10px; width: auto; display: inline-block; padding-left: 20px; padding-right: 20px; }
@@ -71,7 +71,7 @@
             <div class="profile-pic" id="profileInitial">O</div>
             <div class="user-details">
                 <p>नमस्ते,</p>
-                <h2 id="agentName">लोड हो रहा है... (v13)</h2>
+                <h2 id="agentName">लोड हो रहा है... (v14)</h2>
                 <span id="agentId">ID: OJKF-AG-....</span>
             </div>
         </div>
@@ -135,6 +135,14 @@
             <p style="font-size: 14px; color: #555;">आपकी प्रोफाइल वेरीफाई हो चुकी है। अब आप संस्था में नए सदस्य जोड़ सकते हैं।</p>
         </div>
 
+        <!-- MESSAGE 3: REJECTED / CORRECTION (लाल अलर्ट) -->
+        <div id="kyc-rejected-msg" class="status-box" style="display: none; border-top: 5px solid #f44336;">
+            <i class="fas fa-times-circle" style="color: #f44336;"></i>
+            <h3 style="color: #f44336; margin: 0 0 10px 0;">KYC रिजेक्ट / सुधार की ज़रूरत</h3>
+            <p style="font-size: 14px; color: #555;">एडमिन ने आपकी KYC में कुछ कमी बताई है। कृपया अपनी जानकारी सुधार कर दोबारा सबमिट करें।</p>
+            <button class="btn-submit btn-edit" onclick="enableKycEdit()"><i class="fas fa-edit"></i> फिर से फॉर्म भरें (Edit)</button>
+        </div>
+
         <!-- THE ACTUAL KYC FORM -->
         <div id="kyc-form-container" style="display: none;">
             <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
@@ -195,7 +203,7 @@
     <script>
         let supabaseClient;
         window.currentUserEmail = null;
-        window.agentGlobalInfo = null; // डाटा को याद रखने के लिए
+        window.agentGlobalInfo = null; 
 
         function switchTab(tabId, element) {
             try {
@@ -228,12 +236,17 @@
             }
         }
 
-        // ✍️ जानकारी एडिट करने का फंक्शन
+        // ✍️ फॉर्म को एडिट मोड में लाने का फंक्शन
         function enableKycEdit() {
+            // सारे मैसेज छुपा दो
             document.getElementById('kyc-processing-msg').style.display = 'none';
+            document.getElementById('kyc-approved-msg').style.display = 'none';
+            document.getElementById('kyc-rejected-msg').style.display = 'none';
+            
+            // असली फॉर्म दिखाओ
             document.getElementById('kyc-form-container').style.display = 'block';
 
-            // पुरानी जानकारी डिब्बों में भरें
+            // पुराना डेटा डिब्बों में भर दो
             if(window.agentGlobalInfo) {
                 document.getElementById('kycAadhaarNo').value = window.agentGlobalInfo.aadhaar_no || '';
                 document.getElementById('kycPanNo').value = window.agentGlobalInfo.pan_no || '';
@@ -241,7 +254,7 @@
                 document.getElementById('kycAccountNo').value = window.agentGlobalInfo.account_no || '';
                 document.getElementById('kycIfsc').value = window.agentGlobalInfo.ifsc_code || '';
             }
-            alert("✏️ एडिट मोड चालू: कृपया अपनी जानकारी सुधारें और सुरक्षा के लिए सभी 'डॉक्यूमेंट्स' दोबारा चुनें!");
+            alert("✏️ एडिट मोड चालू: कृपया अपनी जानकारी सुधारें और सभी 'डॉक्यूमेंट्स' दोबारा अपलोड करें!");
         }
 
         // --- SUBMIT KYC LOGIC ---
@@ -265,8 +278,6 @@
 
                 const cleanEmail = window.currentUserEmail.replace(/[^a-zA-Z0-9]/g, '_');
                 const timeStamp = Date.now();
-                
-                // 🛑 जादुई रैंडम कोड: इससे पुरानी फाइल कभी आपस में नहीं टकराएगी!
                 const randomCode = Math.random().toString(36).substring(2, 8); 
 
                 async function uploadFile(fileObj, folderName) {
@@ -299,7 +310,7 @@
                         aadhaar_file_front: uploadedUrls.aadhaarFront,
                         aadhaar_file_back: uploadedUrls.aadhaarBack,
                         bank_proof_file: uploadedUrls.bankProof,
-                        status: 'Under Review' // 🛑 स्टेटस बदल दिया गया है!
+                        status: 'Under Review' // 🛑 स्टेटस हमेशा प्रोसेसिंग में जाएगा!
                     })
                     .eq('email', window.currentUserEmail);
 
@@ -318,7 +329,6 @@
 
         // --- SUBMIT NEW LEAD LOGIC ---
         async function submitLead(event) {
-            // (Same as before)
             event.preventDefault();
             const btn = document.getElementById('btnSubmitLead');
             const originalText = btn.innerHTML;
@@ -374,21 +384,26 @@
                     document.getElementById('agentId').innerText = "ID: " + (agentData.agent_code || "पेंडिंग");
                     document.getElementById('profileInitial').innerText = (agentData.name ? agentData.name.charAt(0).toUpperCase() : "O");
 
-                    // 🛑 स्टेटस के हिसाब से स्क्रीन कंट्रोल 🛑
+                    // 🛑 स्टेटस के हिसाब से स्क्रीन कंट्रोल (स्मार्ट मशीन) 🛑
                     if (agentData.status === 'Active') {
-                        document.getElementById('nav-add').style.display = 'block'; // नया सदस्य बटन दिखाएँ
-                        document.getElementById('kyc-approved-msg').style.display = 'block'; // हरा मैसेज दिखाएँ
+                        document.getElementById('nav-add').style.display = 'block'; 
+                        document.getElementById('kyc-approved-msg').style.display = 'block'; 
                         switchTab('home', document.getElementById('nav-home'));
                     } 
                     else if (agentData.status === 'Under Review') {
-                        document.getElementById('nav-add').style.display = 'none'; // नया सदस्य बटन छुपाएं
-                        document.getElementById('kyc-processing-msg').style.display = 'block'; // प्रोसेसिंग मैसेज
+                        document.getElementById('nav-add').style.display = 'none'; 
+                        document.getElementById('kyc-processing-msg').style.display = 'block'; 
                         switchTab('kyc', document.getElementById('nav-profile'));
                     } 
+                    else if (agentData.status === 'Rejected') {
+                        document.getElementById('nav-add').style.display = 'none'; 
+                        document.getElementById('kyc-rejected-msg').style.display = 'block'; 
+                        switchTab('kyc', document.getElementById('nav-profile'));
+                    }
                     else {
                         // Pending KYC
-                        document.getElementById('nav-add').style.display = 'none'; // नया सदस्य बटन छुपाएं
-                        document.getElementById('kyc-form-container').style.display = 'block'; // फॉर्म दिखाएँ
+                        document.getElementById('nav-add').style.display = 'none'; 
+                        document.getElementById('kyc-form-container').style.display = 'block'; 
                         switchTab('kyc', document.getElementById('nav-profile'));
                     }
                 }
