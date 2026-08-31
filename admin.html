@@ -22,7 +22,6 @@
         .form-group input:focus { border-color: var(--accent); outline: none; }
         .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; box-shadow: 0 4px 10px rgba(225, 78, 202, 0.3); }
         
-        /* एरर बॉक्स का नया डिज़ाइन */
         #loginError { color: white; font-size: 13px; font-weight: bold; margin-top: 15px; display: none; background: var(--danger); padding: 10px; border-radius: 6px; text-align: center; }
 
         #admin-dashboard { display: none; padding-bottom: 30px; }
@@ -74,14 +73,14 @@
 </head>
 <body>
 
-    <!-- 🔒 LOGIN SCREEN -->
+    <!-- 🔒 LOGIN SCREEN (FORM TAG REMOVED COMPLETELY) -->
     <div id="login-screen">
         <div class="login-box">
             <h2><i class="fas fa-user-shield"></i> एडमिन लॉगिन</h2>
             <p>केवल अधिकृत ब्रांच मैनेजर और एडमिन के लिए</p>
             
-            <!-- 🚨 फॉर्म सबमिट पर event.preventDefault() लगाया गया है -->
-            <form onsubmit="doAdminLogin(event)">
+            <!-- 🚨 बिना फॉर्म का स्मार्ट डिब्बा 🚨 -->
+            <div id="loginFormContainer">
                 <div class="form-group">
                     <label>एडमिन ईमेल</label>
                     <input type="email" id="adminEmail" required placeholder="email@example.com">
@@ -90,11 +89,12 @@
                     <label>पासवर्ड</label>
                     <input type="password" id="adminPassword" required placeholder="••••••••">
                 </div>
-                <button type="submit" id="loginBtn" class="btn-login">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
+                
+                <button id="loginBtn" class="btn-login" onclick="doAdminLogin()">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
                 
                 <!-- एरर बॉक्स -->
                 <div id="loginError"></div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -182,11 +182,8 @@
 
         let allAgents = [];
 
-        // 🚨 V4 MASTER LOGIN LOGIC 🚨
-        async function doAdminLogin(event) {
-            // यह लाइन पेज को रिफ्रेश होने से 100% रोकेगी
-            event.preventDefault(); 
-            
+        // 🚨 V5 FINAL LOGIN LOGIC (No Event needed) 🚨
+        async function doAdminLogin() {
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
@@ -204,7 +201,7 @@
             btn.disabled = true;
 
             try {
-                // 1. Supabase Auth
+                // 1. Supabase Auth Check
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                 
                 if (error) {
@@ -217,7 +214,7 @@
                     throw error;
                 }
 
-                // 2. Admin Check
+                // 2. Database Role Check
                 const { data: adminData, error: adminErr } = await supabase
                     .from('admin_users')
                     .select('*')
@@ -229,7 +226,7 @@
                     throw new Error("❌ SQL डेटाबेस में इस ईमेल को एडमिन पावर नहीं दी गई है!");
                 }
 
-                // 3. Success
+                // 3. SUCCESS! Show Dashboard
                 showDashboard(adminData);
 
             } catch (error) {
@@ -349,7 +346,7 @@
                     <div><small style="color:#888;">अकाउंट नंबर</small><br>${agent.account_no || '-'}</div>
                     <div><small style="color:#888;">IFSC कोड</small><br>${agent.ifsc_code || '-'}</div>
                     <div><small style="color:#888;">पैन नंबर</small><br>${agent.pan_no || '-'}</div>
-                    <div style="grid-column: span 2;"><small style="color:#888;">आधार नंबर</small><br>${agent.aadhaar_no || '-'}</div>
+                    <div style="grid-column: span 2;"><small style="color:#888;">डॉक्यूमेंट नंबर</small><br>✔️ सबमिट किया गया है</div>
                 </div>
                 <h4 style="color:var(--accent);">अपलोड किए गए डाक्यूमेंट्स</h4>
             `;
@@ -357,8 +354,8 @@
             const docs = [
                 { title: 'पासपोर्ट फोटो', url: agent.profile_photo },
                 { title: 'पैन कार्ड', url: agent.pan_photo },
-                { title: 'आधार फ्रंट', url: agent.aadhaar_file_front },
-                { title: 'आधार बैक', url: agent.aadhaar_file_back },
+                { title: 'आईडी फ्रंट', url: agent.aadhaar_file_front },
+                { title: 'आईडी बैक', url: agent.aadhaar_file_back },
                 { title: 'बैंकिंग प्रूफ', url: agent.bank_proof_file }
             ];
 
