@@ -11,54 +11,77 @@
     <style>
         :root { --purple-main: #6a1b9a; --purple-light: #f3e5f5; --purple-dark: #4a148c; --bg-color: #f5f6fa; --text-dark: #333; --text-gray: #666; }
         
-        /* 📱 Desktop Mobile Emulator UI Fix */
-        html { background-color: #cbd5e1; } /* Desktop Background */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0 auto; max-width: 480px; background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 70px; min-height: 100vh; box-shadow: 0 0 30px rgba(0,0,0,0.15); position: relative; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-dark); position: relative; overflow-x: hidden; }
         
-        .header-section { background: linear-gradient(135deg, var(--purple-main), var(--purple-dark)); color: white; padding: 25px 20px 40px 20px; border-radius: 0 0 25px 25px; display: flex; justify-content: space-between; align-items: flex-start; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.3); }
+        /* HEADER SECTION */
+        .header-section { background: linear-gradient(135deg, var(--purple-main), var(--purple-dark)); color: white; padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.3); position: sticky; top: 0; z-index: 1000; }
         .user-info { display: flex; align-items: center; gap: 15px; }
         .profile-pic { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--purple-main); font-weight: bold; border: 2px solid var(--purple-light); }
         .user-details p { margin: 0; font-size: 14px; opacity: 0.9; }
         .user-details h2 { margin: 5px 0 0 0; font-size: 18px; letter-spacing: 0.5px; }
         .user-details span { font-size: 12px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 12px; margin-top: 5px; display: inline-block; }
         
-        .btn-logout { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.3s; }
-        
-        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-top: -25px; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: left; position: relative; overflow: hidden; border-bottom: 3px solid var(--purple-main); }
-        .stat-card h3 { margin: 0; font-size: 24px; color: var(--purple-main); }
-        .stat-card p { margin: 5px 0 0 0; font-size: 13px; color: var(--text-gray); font-weight: 600; }
-        .stat-card i { position: absolute; right: -10px; bottom: -10px; font-size: 50px; color: var(--purple-light); opacity: 0.5; }
+        /* DESKTOP NAVIGATION */
+        .desktop-nav { display: flex; gap: 20px; align-items: center; }
+        .desktop-nav .nav-item { color: rgba(255,255,255,0.7); cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.3s; padding: 8px 15px; border-radius: 8px; }
+        .desktop-nav .nav-item:hover, .desktop-nav .nav-item.active { background: rgba(255,255,255,0.2); color: white; }
+        .btn-logout { background: #d32f2f; border: none; color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.3s; margin-left: 10px; }
+        .btn-logout:hover { background: #b71c1c; }
 
-        .view-section { display: none; padding: 20px; animation: fadeIn 0.3s; }
+        /* MAIN CONTENT AREA */
+        .main-content { max-width: 1200px; margin: 30px auto; padding: 0 5%; min-height: 70vh; }
+        
+        /* STATS GRID */
+        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: left; position: relative; overflow: hidden; border-left: 5px solid var(--purple-main); }
+        .stat-card h3 { margin: 0; font-size: 32px; color: var(--text-dark); }
+        .stat-card p { margin: 5px 0 0 0; font-size: 14px; color: var(--text-gray); font-weight: 600; }
+        .stat-card i { position: absolute; right: 15px; bottom: 15px; font-size: 60px; color: var(--purple-light); opacity: 0.6; }
+
+        /* VIEWS */
+        .view-section { display: none; animation: fadeIn 0.3s; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #555; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        .form-group input:focus, .form-group select:focus { border-color: var(--purple-main); outline: none; }
-        
-        .file-hint { display: block; color: #d32f2f; font-size: 11px; margin-top: 4px; font-weight: bold; }
-        .section-title { margin: 20px 0 10px 0; color: var(--purple-main); font-size: 15px; border-bottom: 2px solid var(--purple-light); padding-bottom: 5px; }
-        
-        .btn-submit { width: 100%; background: var(--purple-main); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(106, 27, 154, 0.3); }
+        /* FORMS */
+        .form-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto; border-top: 4px solid var(--purple-main); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #444; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: 0.3s; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--purple-main); outline: none; box-shadow: 0 0 5px rgba(106, 27, 154, 0.2); }
+        .section-title { margin: 30px 0 15px 0; color: var(--purple-main); font-size: 18px; border-bottom: 2px solid var(--purple-light); padding-bottom: 8px; }
+        .btn-submit { width: 100%; background: var(--purple-main); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(106, 27, 154, 0.3); transition: 0.3s; }
+        .btn-submit:hover { background: var(--purple-dark); }
 
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; left: 50%; transform: translateX(-50%); background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid #eee; }
-        .nav-item { text-align: center; color: #999; cursor: pointer; flex: 1; transition: 0.3s; }
-        .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
-        .nav-item span { font-size: 11px; font-weight: 600; }
-        .nav-item.active { color: var(--purple-main); }
-        .nav-item.fab { position: relative; top: -20px; }
-        .nav-item.fab .fab-circle { background: var(--purple-main); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.4); border: 4px solid white; }
-        
-        .status-box { background: white; padding: 30px 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 20px; }
-        .status-box i { font-size: 50px; margin-bottom: 15px; }
-        .btn-edit { background: #ff9800; margin-top: 20px; font-size: 14px; padding: 10px; width: auto; display: inline-block; padding-left: 20px; padding-right: 20px; }
+        /* STATUS BOXES */
+        .status-box { background: white; padding: 40px 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin: 20px auto; }
+        .status-box i { font-size: 60px; margin-bottom: 15px; }
+        .btn-edit { background: #ff9800; margin-top: 20px; width: auto; display: inline-block; padding: 12px 30px; }
+
+        /* BOTTOM NAVIGATION (HIDDEN ON DESKTOP) */
+        .bottom-nav { display: none; position: fixed; bottom: 0; width: 100%; background: white; justify-content: space-around; padding: 10px 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid #eee; }
+        .bottom-nav .nav-item { text-align: center; color: #999; cursor: pointer; flex: 1; transition: 0.3s; }
+        .bottom-nav .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+        .bottom-nav .nav-item span { font-size: 11px; font-weight: 600; }
+        .bottom-nav .nav-item.active { color: var(--purple-main); }
+        .bottom-nav .nav-item.fab { position: relative; top: -20px; }
+        .bottom-nav .nav-item.fab .fab-circle { background: var(--purple-main); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.4); border: 4px solid white; }
+
+        /* RESPONSIVE DESIGN (MOBILE) */
+        @media (max-width: 768px) {
+            .header-section { flex-direction: column; align-items: center; text-align: center; padding: 25px 20px 40px 20px; border-radius: 0 0 25px 25px; gap: 15px; }
+            .user-info { flex-direction: column; }
+            .desktop-nav { display: none; /* Hide Desktop Menu on Mobile */ }
+            .btn-logout { position: absolute; top: 20px; right: 20px; margin: 0; padding: 5px 10px; font-size: 12px; }
+            .bottom-nav { display: flex; /* Show Bottom Nav on Mobile */ }
+            .main-content { padding-bottom: 80px; margin: -25px auto 0 auto; }
+            .form-card { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- 🌟 DYNAMIC HEADER -->
     <div class="header-section">
         <div class="user-info">
             <div class="profile-pic" id="profileInitial">O</div>
@@ -68,119 +91,147 @@
                 <span id="agentId">ID: Loading...</span>
             </div>
         </div>
-        <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
-    </div>
-
-    <!-- HOME VIEW -->
-    <div id="view-home" class="view-section active" style="padding: 0;">
-        <div class="stats-container">
-            <div class="stat-card">
-                <h3 id="totalMembers">0</h3>
-                <p>कुल लाभार्थी</p>
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-card">
-                <h3 style="color: #2e7d32;">Active</h3>
-                <p>अकाउंट स्टेटस</p>
-                <i class="fas fa-shield-alt"></i>
-            </div>
+        
+        <!-- Desktop Navigation -->
+        <div class="desktop-nav">
+            <div class="nav-item active" data-tab="home" onclick="switchTab('home')"><i class="fas fa-home"></i> होम (डैशबोर्ड)</div>
+            <div class="nav-item" data-tab="add" id="desktop-nav-add" style="display:none;" onclick="switchTab('add')"><i class="fas fa-user-plus"></i> नया लाभार्थी</div>
+            <div class="nav-item" data-tab="kyc" onclick="switchTab('kyc')"><i class="fas fa-id-card"></i> आपकी प्रोफाइल</div>
+            <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> लॉगआउट</button>
         </div>
         
-        <div style="padding: 20px; text-align: center; margin-top: 20px;">
-            <img src="assets/ojasvi-logo.png" style="width: 100px; opacity: 0.2; margin-bottom: 15px;">
-            <p style="color: #888; font-size: 14px;">ओजस्वी जनकल्याण फाउंडेशन में आपका स्वागत है। नीचे दिए गए <b>(+) बटन</b> से आप नए लाभार्थी जोड़ सकते हैं।</p>
-        </div>
+        <!-- Mobile Logout -->
+        <button class="btn-logout desktop-hide-logout" style="display: none;" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
     </div>
 
-    <!-- ADD MEMBER VIEW -->
-    <div id="view-add" class="view-section">
-        <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-user-plus"></i> नया लाभार्थी जोड़ें</h3>
-        <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 20px;">संस्था की सेवाओं के लिए लाभार्थी का विवरण दर्ज करें।</p>
+    <!-- 🌟 MAIN CONTENT WRAPPER -->
+    <div class="main-content">
         
-        <form id="addLeadForm" onsubmit="submitLead(event)">
-            <div class="form-group"><label>पूरा नाम *</label><input type="text" id="leadName" required></div>
-            <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="leadMobile" pattern="[0-9]{10}" required></div>
-            <div class="form-group">
-                <label>सेवा / योजना चुनें *</label>
-                <select id="leadService" required>
-                    <option value="">-- योजना चुनें --</option>
-                    <option value="विवाह योजना">पुत्र/पुत्री विवाह योजना</option>
-                    <option value="मायरा योजना">मायरा योगदान योजना</option>
-                    <option value="सहायता योजना">सहायता योगदान योजना</option>
-                    <option value="बुजुर्ग योजना">बुजुर्ग सहायता योजना</option>
-                </select>
+        <!-- HOME VIEW -->
+        <div id="view-home" class="view-section active">
+            <div class="stats-container">
+                <div class="stat-card" style="border-left-color: #2196F3;">
+                    <h3 id="totalMembers">0</h3>
+                    <p>आपके द्वारा जोड़े गए कुल लाभार्थी</p>
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-card" style="border-left-color: #4CAF50;">
+                    <h3 style="color: #2e7d32;" id="accountStatusText">Active</h3>
+                    <p>आपका अकाउंट स्टेटस</p>
+                    <i class="fas fa-shield-alt"></i>
+                </div>
             </div>
-            <div class="form-group"><label>पिनकोड *</label><input type="text" id="leadPincode" required></div>
-            <button type="submit" id="btnSubmitLead" class="btn-submit">सबमिट करें <i class="fas fa-paper-plane"></i></button>
-        </form>
-    </div>
-
-    <!-- KYC / PROFILE VIEW -->
-    <div id="view-kyc" class="view-section">
-        <div id="kyc-processing-msg" class="status-box" style="display: none; border-top: 5px solid #2196F3;">
-            <i class="fas fa-clock" style="color: #2196F3;"></i>
-            <h3 style="color: #2196F3; margin: 0 0 10px 0;">KYC प्रोसेसिंग में है</h3>
-            <p style="font-size: 14px; color: #555;">आपकी जानकारी संस्था को भेज दी गई है। अप्रूवल मिलने के बाद ही आप नए सदस्य जोड़ पाएंगे।</p>
-            <button class="btn-submit btn-edit" onclick="enableKycEdit()"><i class="fas fa-edit"></i> जानकारी सुधारें (Edit)</button>
+            
+            <div style="padding: 40px 20px; text-align: center; margin-top: 20px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                <img src="assets/ojasvi-logo.png" style="width: 120px; opacity: 0.15; margin-bottom: 20px;">
+                <h3 style="color: var(--navy); margin-top:0;">ओजस्वी जनकल्याण फाउंडेशन में आपका स्वागत है।</h3>
+                <p style="color: #666; max-width: 600px; margin: 0 auto;">यदि आपका अकाउंट अप्रूव हो चुका है, तो आप 'नया लाभार्थी' सेक्शन में जाकर संस्था की योजनाओं के लिए सदस्यों को जोड़ सकते हैं।</p>
+            </div>
         </div>
 
-        <div id="kyc-approved-msg" class="status-box" style="display: none; border-top: 5px solid #4CAF50;">
-            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
-            <h3 style="color: #4CAF50; margin: 0 0 10px 0;">KYC अप्रूव्ड (एक्टिव)</h3>
-            <p style="font-size: 14px; color: #555;">आपकी प्रोफाइल वेरीफाई हो चुकी है। अब आप संस्था में नए सदस्य जोड़ सकते हैं।</p>
-        </div>
-
-        <div id="kyc-rejected-msg" class="status-box" style="display: none; border-top: 5px solid #f44336;">
-            <i class="fas fa-times-circle" style="color: #f44336;"></i>
-            <h3 style="color: #f44336; margin: 0 0 10px 0;">KYC रिजेक्ट / सुधार की ज़रूरत</h3>
-            <p style="font-size: 14px; color: #555;">एडमिन ने आपकी KYC में कुछ कमी बताई है। कृपया अपनी जानकारी सुधार कर दोबारा सबमिट करें।</p>
-            <button class="btn-submit btn-edit" onclick="enableKycEdit()"><i class="fas fa-edit"></i> फिर से फॉर्म भरें</button>
-        </div>
-
-        <div id="kyc-form-container" style="display: none;">
-            <h3 style="color: var(--purple-main); margin-top: 0;"><i class="fas fa-id-card"></i> कार्यकर्ता प्रोफाइल (KYC)</h3>
-            <form id="kycForm" onsubmit="submitKYC(event)">
-                <h4 class="section-title"><i class="fas fa-user"></i> व्यक्तिगत जानकारी</h4>
-                <div class="form-group"><label>आधार कार्ड नंबर *</label><input type="text" id="kycAadhaarNo" pattern="[0-9]{12}" required></div>
-                <div class="form-group"><label>पैन कार्ड नंबर *</label><input type="text" id="kycPanNo" style="text-transform: uppercase;" required></div>
-
-                <h4 class="section-title"><i class="fas fa-university"></i> बैंक डिटेल्स</h4>
-                <div class="form-group"><label>बैंक का नाम *</label><input type="text" id="kycBankName" required></div>
-                <div class="form-group"><label>खाता संख्या (Account No) *</label><input type="text" id="kycAccountNo" required></div>
-                <div class="form-group"><label>IFSC कोड *</label><input type="text" id="kycIfsc" required></div>
+        <!-- ADD MEMBER VIEW -->
+        <div id="view-add" class="view-section">
+            <div class="form-card">
+                <h3 style="color: var(--purple-main); margin-top: 0; text-align: center; font-size: 22px;"><i class="fas fa-user-plus"></i> नया लाभार्थी जोड़ें</h3>
+                <p style="text-align: center; color: var(--text-gray); margin-bottom: 30px;">संस्था की किसी भी योजना के लिए लाभार्थी का विवरण सावधानीपूर्वक दर्ज करें।</p>
                 
-                <h4 class="section-title"><i class="fas fa-file-upload"></i> डॉक्यूमेंट अपलोड</h4>
-                <div class="form-group"><label>पासपोर्ट साइज फोटो *</label><input type="file" id="kycProfilePic" accept=".jpg, .jpeg" required style="background: white;"></div>
-                <div class="form-group"><label>पैन कार्ड की फोटो *</label><input type="file" id="kycPanPic" accept=".jpg, .jpeg, .pdf" required style="background: white;"></div>
-                <div class="form-group"><label>आधार कार्ड (फ्रंट या PDF) *</label><input type="file" id="kycAadhaarFront" accept=".jpg, .jpeg, .pdf" required style="background: white;"></div>
-                <div class="form-group"><label>बैंकिंग प्रूफ (पासबुक / कैंसिल चेक) *</label><input type="file" id="kycBankProof" accept=".jpg, .jpeg, .pdf" required style="background: white;"></div>
-
-                <button type="submit" id="kycSubmitBtn" class="btn-submit" style="margin-top: 20px;">KYC सबमिट करें <i class="fas fa-upload"></i></button>
-            </form>
+                <form id="addLeadForm" onsubmit="submitLead(event)">
+                    <div class="form-group"><label>लाभार्थी का पूरा नाम *</label><input type="text" id="leadName" required placeholder="जैसे: रमेश कुमार"></div>
+                    <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="leadMobile" pattern="[0-9]{10}" required placeholder="10 अंकों का नंबर"></div>
+                    <div class="form-group">
+                        <label>संस्था की सेवा / योजना चुनें *</label>
+                        <select id="leadService" required>
+                            <option value="">-- कृपया एक योजना चुनें --</option>
+                            <option value="विवाह योजना">पुत्र/पुत्री विवाह योजना</option>
+                            <option value="मायरा योजना">मायरा योगदान योजना</option>
+                            <option value="सहायता योजना">सहायता योगदान योजना</option>
+                            <option value="बुजुर्ग योजना">बुजुर्ग सहायता योजना</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>पिनकोड (Pincode) *</label><input type="text" id="leadPincode" required placeholder="जैसे: 344022"></div>
+                    <button type="submit" id="btnSubmitLead" class="btn-submit" style="margin-top: 10px;">डेटा सबमिट करें <i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- BOTTOM NAVIGATION -->
+        <!-- KYC / PROFILE VIEW -->
+        <div id="view-kyc" class="view-section">
+            
+            <!-- Messages -->
+            <div id="kyc-processing-msg" class="status-box" style="display: none; border-top: 5px solid #2196F3;">
+                <i class="fas fa-clock" style="color: #2196F3;"></i>
+                <h3 style="color: #2196F3; margin: 0 0 10px 0;">KYC प्रोसेसिंग में है</h3>
+                <p style="font-size: 15px; color: #555;">आपकी जानकारी संस्था के एडमिन को भेज दी गई है। अप्रूवल मिलने के बाद ही आप नए सदस्य जोड़ पाएंगे।</p>
+                <button class="btn-submit btn-edit" onclick="enableKycEdit()"><i class="fas fa-edit"></i> जानकारी सुधारें (Edit Data)</button>
+            </div>
+
+            <div id="kyc-approved-msg" class="status-box" style="display: none; border-top: 5px solid #4CAF50;">
+                <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                <h3 style="color: #4CAF50; margin: 0 0 10px 0;">आपकी KYC अप्रूव्ड है</h3>
+                <p style="font-size: 15px; color: #555;">आपकी प्रोफाइल वेरीफाई हो चुकी है। अब आप संस्था में आधिकारिक रूप से काम कर सकते हैं।</p>
+            </div>
+
+            <div id="kyc-rejected-msg" class="status-box" style="display: none; border-top: 5px solid #f44336;">
+                <i class="fas fa-times-circle" style="color: #f44336;"></i>
+                <h3 style="color: #f44336; margin: 0 0 10px 0;">KYC रिजेक्ट कर दी गई है</h3>
+                <p style="font-size: 15px; color: #555;">एडमिन ने आपकी KYC में कुछ कमी बताई है। कृपया अपनी जानकारी सुधार कर दोबारा सबमिट करें।</p>
+                <button class="btn-submit btn-edit" style="background: #d32f2f;" onclick="enableKycEdit()"><i class="fas fa-redo"></i> फिर से फॉर्म भरें</button>
+            </div>
+
+            <!-- KYC Form -->
+            <div id="kyc-form-container" style="display: none;" class="form-card">
+                <h3 style="color: var(--purple-main); margin-top: 0; text-align: center; font-size: 22px;"><i class="fas fa-id-card"></i> कार्यकर्ता प्रोफाइल (KYC फॉर्म)</h3>
+                <p style="text-align: center; color: #888; margin-bottom: 25px;">काम शुरू करने के लिए अपनी पहचान और बैंक डिटेल्स सुरक्षित रूप से सबमिट करें।</p>
+                
+                <form id="kycForm" onsubmit="submitKYC(event)">
+                    <h4 class="section-title"><i class="fas fa-user"></i> व्यक्तिगत जानकारी</h4>
+                    <div class="form-group"><label>आधार कार्ड नंबर *</label><input type="text" id="kycAadhaarNo" pattern="[0-9]{12}" placeholder="12 अंकों का नंबर" required></div>
+                    <div class="form-group"><label>पैन कार्ड नंबर *</label><input type="text" id="kycPanNo" style="text-transform: uppercase;" placeholder="पैन नंबर" required></div>
+
+                    <h4 class="section-title"><i class="fas fa-university"></i> बैंक डिटेल्स (कमीशन के लिए)</h4>
+                    <div class="form-group"><label>बैंक का नाम *</label><input type="text" id="kycBankName" placeholder="उदा. SBI, PNB" required></div>
+                    <div class="form-group"><label>खाता संख्या (Account No) *</label><input type="text" id="kycAccountNo" placeholder="अकाउंट नंबर" required></div>
+                    <div class="form-group"><label>IFSC कोड *</label><input type="text" id="kycIfsc" placeholder="IFSC Code" required></div>
+                    
+                    <h4 class="section-title"><i class="fas fa-file-upload"></i> डाक्यूमेंट्स अपलोड करें</h4>
+                    <div class="form-group"><label>पासपोर्ट साइज फोटो * (JPG)</label><input type="file" id="kycProfilePic" accept=".jpg, .jpeg" required style="background: #f9f9f9; padding: 10px;"></div>
+                    <div class="form-group"><label>पैन कार्ड की फोटो * (JPG/PDF)</label><input type="file" id="kycPanPic" accept=".jpg, .jpeg, .pdf" required style="background: #f9f9f9; padding: 10px;"></div>
+                    <div class="form-group"><label>आधार कार्ड (फ्रंट या पूरी PDF) *</label><input type="file" id="kycAadhaarFront" accept=".jpg, .jpeg, .pdf" required style="background: #f9f9f9; padding: 10px;"></div>
+                    <div class="form-group"><label>बैंकिंग प्रूफ (पासबुक / कैंसिल चेक) *</label><input type="file" id="kycBankProof" accept=".jpg, .jpeg, .pdf" required style="background: #f9f9f9; padding: 10px;"></div>
+
+                    <button type="submit" id="kycSubmitBtn" class="btn-submit" style="margin-top: 30px;">फाइनल KYC सबमिट करें <i class="fas fa-upload"></i></button>
+                </form>
+            </div>
+        </div>
+
+    </div> <!-- End Main Content -->
+
+    <!-- 🌟 MOBILE BOTTOM NAVIGATION (Visible only on phones) -->
     <div class="bottom-nav">
-        <div class="nav-item active" id="nav-home" onclick="switchTab('home', this)"><i class="fas fa-home"></i><span>होम</span></div>
-        <div class="nav-item fab" id="nav-add" onclick="switchTab('add', this)" style="display:none;"><div class="fab-circle"><i class="fas fa-plus"></i></div><span>नया सदस्य</span></div>
-        <div class="nav-item" id="nav-profile" onclick="switchTab('kyc', this)"><i class="fas fa-user-circle"></i><span>प्रोफाइल</span></div>
+        <div class="nav-item active" data-tab="home" onclick="switchTab('home')"><i class="fas fa-home"></i><span>होम</span></div>
+        <div class="nav-item fab" data-tab="add" id="mobile-nav-add" style="display:none;" onclick="switchTab('add')"><div class="fab-circle"><i class="fas fa-plus"></i></div><span>नया सदस्य</span></div>
+        <div class="nav-item" data-tab="kyc" onclick="switchTab('kyc')"><i class="fas fa-user-circle"></i><span>प्रोफाइल</span></div>
     </div>
 
+    <!-- 🌟 LOGIC / JAVASCRIPT -->
     <script>
         let supabaseClient;
         window.currentUserEmail = null;
         window.agentGlobalInfo = null; 
 
-        function switchTab(tabId, element) {
+        // Smart Tab Switcher (Handles both Desktop and Mobile Navs)
+        function switchTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
             document.getElementById('view-' + tabId).classList.add('active');
-            if(element) element.classList.add('active');
+            
+            // Highlight active tab on both menus
+            document.querySelectorAll(`.nav-item[data-tab="${tabId}"]`).forEach(el => el.classList.add('active'));
         }
 
         async function logout() {
-            if(confirm("लॉगआउट करना चाहते हैं?")) {
+            if(confirm("क्या आप लॉगआउट करना चाहते हैं?")) {
                 if(supabaseClient) await supabaseClient.auth.signOut();
                 window.location.href = 'login.html';
             }
@@ -191,6 +242,7 @@
             document.getElementById('kyc-approved-msg').style.display = 'none';
             document.getElementById('kyc-rejected-msg').style.display = 'none';
             document.getElementById('kyc-form-container').style.display = 'block';
+            
             if(window.agentGlobalInfo) {
                 document.getElementById('kycAadhaarNo').value = window.agentGlobalInfo.aadhaar_no || '';
                 document.getElementById('kycPanNo').value = window.agentGlobalInfo.pan_no || '';
@@ -198,6 +250,7 @@
                 document.getElementById('kycAccountNo').value = window.agentGlobalInfo.account_no || '';
                 document.getElementById('kycIfsc').value = window.agentGlobalInfo.ifsc_code || '';
             }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function submitKYC(event) {
@@ -210,7 +263,7 @@
             };
 
             const btn = document.getElementById('kycSubmitBtn');
-            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> अपलोड हो रहा है... कृपया रुकें";
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> डेटा अपलोड हो रहा है... कृपया प्रतीक्षा करें";
             btn.disabled = true;
 
             try {
@@ -219,9 +272,9 @@
 
                 async function uploadFile(fileObj, folderName) {
                     if(!fileObj) return null;
-                    const path = `${folderName}/${cleanEmail}_${timeStamp}_file`;
-                    const { error } = await supabaseClient.storage.from('kyc_documents').upload(path, fileObj);
-                    if (error) throw new Error(`अपलोड फेल: ` + error.message);
+                    const path = `${folderName}/${cleanEmail}_${timeStamp}`;
+                    const { error } = await supabaseClient.storage.from('kyc_documents').upload(path, fileObj, { upsert: true });
+                    if (error) throw new Error(`अपलोड फेल (${folderName}): ` + error.message);
                     return supabaseClient.storage.from('kyc_documents').getPublicUrl(path).data.publicUrl;
                 }
 
@@ -246,12 +299,12 @@
 
                 if (dbUpdateError) throw dbUpdateError;
 
-                alert("🎉 KYC सफलतापूर्वक सबमिट हो गई है!");
+                alert("🎉 KYC सफलतापूर्वक सबमिट हो गई है! अब यह एडमिन के पास चेकिंग के लिए है।");
                 window.location.reload(); 
 
             } catch (error) {
                 alert(error.message); 
-                btn.innerHTML = "KYC सबमिट करें <i class='fas fa-upload'></i>";
+                btn.innerHTML = "फाइनल KYC सबमिट करें <i class='fas fa-upload'></i>";
                 btn.disabled = false;
             }
         }
@@ -260,7 +313,7 @@
             event.preventDefault();
             const btn = document.getElementById('btnSubmitLead');
             try {
-                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> सेव कर रहे हैं...";
+                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> सर्वर पर सेव कर रहे हैं...";
                 btn.disabled = true;
 
                 const { error } = await supabaseClient.from('leads').insert([{
@@ -275,16 +328,21 @@
 
                 alert("✅ नया लाभार्थी सफलतापूर्वक जोड़ा गया!");
                 document.getElementById('addLeadForm').reset();
-                switchTab('home', document.getElementById('nav-home'));
+                switchTab('home');
             } catch (error) {
                 alert("एरर: " + error.message);
             } finally {
-                btn.innerHTML = "सबमिट करें <i class='fas fa-paper-plane'></i>";
+                btn.innerHTML = "डेटा सबमिट करें <i class='fas fa-paper-plane'></i>";
                 btn.disabled = false;
             }
         }
 
         async function initApp() {
+            // Mobile Specific Tweaks
+            if(window.innerWidth <= 768) {
+                document.querySelector('.desktop-hide-logout').style.display = 'block';
+            }
+
             try {
                 const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
                 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
@@ -302,26 +360,28 @@
                     document.getElementById('agentName').innerText = agentData.name || "नाम नहीं मिला";
                     document.getElementById('agentId').innerText = "ID: " + (agentData.agent_code || "पेंडिंग");
                     document.getElementById('profileInitial').innerText = (agentData.name ? agentData.name.charAt(0).toUpperCase() : "O");
+                    document.getElementById('accountStatusText').innerText = agentData.status;
 
                     if (agentData.status === 'Active') {
-                        document.getElementById('nav-add').style.display = 'block'; 
+                        document.getElementById('desktop-nav-add').style.display = 'block'; 
+                        document.getElementById('mobile-nav-add').style.display = 'block'; 
                         document.getElementById('kyc-approved-msg').style.display = 'block'; 
-                        switchTab('home', document.getElementById('nav-home'));
+                        switchTab('home');
                     } 
                     else if (agentData.status === 'Under Review') {
                         document.getElementById('kyc-processing-msg').style.display = 'block'; 
-                        switchTab('kyc', document.getElementById('nav-profile'));
+                        switchTab('kyc');
                     } 
                     else if (agentData.status === 'Rejected') {
                         document.getElementById('kyc-rejected-msg').style.display = 'block'; 
-                        switchTab('kyc', document.getElementById('nav-profile'));
+                        switchTab('kyc');
                     }
                     else {
                         document.getElementById('kyc-form-container').style.display = 'block'; 
-                        switchTab('kyc', document.getElementById('nav-profile'));
+                        switchTab('kyc');
                     }
                 }
-            } catch (err) { alert("सिस्टम एरर: " + err.message); }
+            } catch (err) { console.error("System Error", err); }
         }
 
         window.onload = initApp;
