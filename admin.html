@@ -13,8 +13,8 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--admin-dark); color: var(--admin-text); }
         
         /* ⏳ LOADING SCREEN */
-        #loading-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; background: var(--admin-dark); color: white; }
-        #loading-screen i { font-size: 40px; color: var(--accent); margin-bottom: 15px; }
+        #loading-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; background: var(--admin-dark); color: white; position: fixed; width: 100%; top: 0; left: 0; z-index: 9999; }
+        #loading-screen i { font-size: 45px; color: var(--accent); margin-bottom: 15px; }
 
         /* 🔒 LOGIN SCREEN */
         #login-screen { display: none; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1e1e2f, #11111a); padding: 20px; }
@@ -205,9 +205,23 @@
         let supabase;
         let allAgents = [];
 
-        // 🟢 सुरक्षित इनिशियलाइज़ेशन और लोडिंग स्क्रीन कण्ट्रोल
-        window.onload = async function() {
+        // 🟢 सुरक्षित इनिशियलाइज़ेशन और ऑटो-बाईपास
+        document.addEventListener("DOMContentLoaded", async function() {
+            
+            // 🔥 FAILSAFE: अगर 3 सेकंड तक लोडिंग स्क्रीन नहीं हटी, तो जबरदस्ती हटा कर लॉगिन फॉर्म दिखाओ
+            setTimeout(() => {
+                const loader = document.getElementById('loading-screen');
+                if (loader && loader.style.display !== 'none') {
+                    console.warn("Failsafe triggered: Server taking too long.");
+                    showLoginScreen();
+                }
+            }, 3000);
+
             try {
+                if (typeof window.supabase === 'undefined') {
+                    throw new Error("Supabase script is not loaded properly.");
+                }
+
                 const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
                 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -220,7 +234,6 @@
                     return; 
                 }
 
-                // maybeSingle() का उपयोग ताकि कोई एरर होने पर सिस्टम क्रैश न हो
                 const { data: adminData, error } = await supabase
                     .from('admin_users')
                     .select('*')
@@ -236,9 +249,9 @@
                 }
             } catch (err) {
                 console.error("Supabase Error:", err);
-                showLoginScreen(); // कोई भी एरर आने पर ब्लैक स्क्रीन के बजाय सीधा लॉगिन फॉर्म दिखाएगा
+                showLoginScreen(); 
             }
-        };
+        });
 
         function showLoginScreen() {
             document.getElementById('loading-screen').style.display = 'none';
