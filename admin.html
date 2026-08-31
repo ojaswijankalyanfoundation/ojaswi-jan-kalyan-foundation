@@ -212,17 +212,26 @@
         async function checkSession() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    const { data: adminData } = await supabase.from('admin_users').select('*').eq('email', session.user.email).single();
-                    if (adminData) {
-                        showDashboard(adminData);
-                    } else {
-                        // अगर यूजर एडमिन नहीं है तो उसे लॉगआउट करके बाहर निकालें
-                        await supabase.auth.signOut();
-                        alert("❌ आपके पास एडमिन एक्सेस नहीं है!");
-                        window.location.href = 'login.html';
-                    }
+                
+                // अगर सेशन नहीं है, तो लॉगिन स्क्रीन दिखाएँ
+                if (!session) {
+                    document.getElementById('login-screen').style.display = 'flex';
+                    return; 
+                }
+
+                // अगर सेशन है, तो चेक करें कि क्या यूजर एडमिन है
+                const { data: adminData, error } = await supabase
+                    .from('admin_users')
+                    .select('*')
+                    .eq('email', session.user.email)
+                    .single();
+
+                if (adminData) {
+                    showDashboard(adminData);
                 } else {
+                    // अगर यूजर एडमिन नहीं है, तो उसे लॉगआउट करके बाहर निकालें
+                    await supabase.auth.signOut();
+                    alert("❌ आपके पास एडमिन एक्सेस नहीं है!");
                     document.getElementById('login-screen').style.display = 'flex';
                 }
             } catch (e) { 
@@ -281,7 +290,8 @@
         async function logoutAdmin() {
             if(confirm("क्या आप एडमिन पैनल से लॉगआउट करना चाहते हैं?")){
                 await supabase.auth.signOut();
-                window.location.href = 'login.html';
+                // पेज रीलोड करने से checkSession दोबारा चलेगा और लॉगिन स्क्रीन दिखाएगा
+                window.location.reload(); 
             }
         }
 
