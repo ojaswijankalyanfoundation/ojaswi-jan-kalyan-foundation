@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>एजेंट पोर्टल | ओजस्वी जनकल्याण फाउंडेशन</title>
+    <title>पोर्टल लॉगिन | ओजस्वी जनकल्याण फाउंडेशन</title>
 
-    <!-- Supabase & Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
@@ -47,10 +46,10 @@
         <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> होम</a>
         <img src="assets/ojasvi-logo.png" alt="Logo">
 
-        <!-- ================= LOGIN SECTION ================= -->
+        <!-- LOGIN SECTION -->
         <div id="loginSection" class="auth-section active">
-            <h2>एजेंट लॉगिन</h2>
-            <p class="subtitle">पोर्टल में जाने के लिए अपनी डिटेल्स भरें</p>
+            <h2>पोर्टल लॉगिन</h2>
+            <p class="subtitle">एडमिन और एजेंट यहाँ से लॉगिन करें</p>
 
             <form id="loginForm">
                 <div class="form-group">
@@ -65,7 +64,6 @@
                     <a href="#" onclick="switchTab('forgotSection')">पासवर्ड भूल गए?</a>
                 </div>
 
-                <!-- ⚠️ सबसे बड़ा बदलाव: type="button" और onclick="doLogin()" -->
                 <button type="button" id="loginBtn" class="btn-main btn-login-color" onclick="doLogin()">
                     <i class="fas fa-sign-in-alt"></i> सुरक्षित लॉगिन करें
                 </button>
@@ -76,7 +74,7 @@
             </div>
         </div>
 
-        <!-- ================= FORGOT PASSWORD SECTION ================= -->
+        <!-- FORGOT PASSWORD SECTION -->
         <div id="forgotSection" class="auth-section">
             <h2>पासवर्ड रीसेट</h2>
             <p class="subtitle">अपनी ईमेल डालें, हम पासवर्ड बदलने का लिंक भेजेंगे</p>
@@ -86,7 +84,6 @@
                     <label>रजिस्टर्ड ईमेल आईडी</label>
                     <input type="email" id="resetEmail" name="resetEmail" autocomplete="email" placeholder="अपनी ईमेल आईडी डालें" required>
                 </div>
-                <!-- यहाँ भी type="button" कर दिया है -->
                 <button type="button" id="resetBtn" class="btn-main btn-forgot-color" onclick="doReset()">
                     <i class="fas fa-envelope"></i> रीसेट लिंक भेजें
                 </button>
@@ -99,15 +96,13 @@
     </div>
 
     <script>
-        // टैब बदलने का फंक्शन
         function switchTab(tabId) {
             document.querySelectorAll('.auth-section').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
         }
 
-        // असली लॉगिन फंक्शन
         async function doLogin() {
-            const emailInput = document.getElementById('email').value;
+            const emailInput = document.getElementById('email').value.trim().toLowerCase();
             const passwordInput = document.getElementById('password').value;
             const loginBtn = document.getElementById('loginBtn');
 
@@ -121,15 +116,11 @@
             loginBtn.disabled = true;
 
             try {
-                // चेक करें कि Supabase लोड हुआ है या नहीं
-                if (typeof window.supabase === 'undefined') {
-                    throw new Error("Supabase सर्वर से कनेक्ट नहीं हो पा रहा है। अपना इंटरनेट चेक करें।");
-                }
-
                 const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
                 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
                 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+                // 1. Authenticate User
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: emailInput,
                     password: passwordInput,
@@ -137,11 +128,22 @@
 
                 if (error) throw error;
 
-                loginBtn.innerHTML = "<i class='fas fa-check-circle'></i> सफल! डैशबोर्ड खुल रहा है...";
+                loginBtn.innerHTML = "<i class='fas fa-check-circle'></i> सफल! रीडायरेक्ट हो रहा है...";
 
-                // लॉगिन पक्का होने के बाद ही पेज बदलेगा
+                // 2. Check if user is an Admin
+                const { data: adminData } = await supabase
+                    .from('admin_users')
+                    .select('email')
+                    .eq('email', emailInput)
+                    .maybeSingle();
+
+                // 3. Smart Redirect
                 setTimeout(() => {
-                    window.location.href = 'agent.html';
+                    if (adminData) {
+                        window.location.href = 'admin.html'; // एडमिन को एडमिन पेज पर
+                    } else {
+                        window.location.href = 'agent.html'; // बाकी सबको एजेंट पेज पर
+                    }
                 }, 800);
 
             } catch (error) {
@@ -151,23 +153,16 @@
             }
         }
 
-        // पासवर्ड रीसेट फंक्शन
         async function doReset() {
             const email = document.getElementById('resetEmail').value;
             const resetBtn = document.getElementById('resetBtn');
 
-            if(!email) {
-                alert("कृपया ईमेल भरें!");
-                return;
-            }
+            if(!email) { alert("कृपया ईमेल भरें!"); return; }
 
             resetBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> भेज रहे हैं...";
             resetBtn.disabled = true;
 
             try {
-                if (typeof window.supabase === 'undefined') {
-                    throw new Error("Supabase कनेक्ट नहीं हुआ!");
-                }
                 const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
                 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
                 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
