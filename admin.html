@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>एडमिन पैनल | ओजस्वी फाउंडेशन</title>
+
+    <!-- 🚨 स्मार्ट एरर चेकर: अगर कोड में कोई खराबी होगी तो यह स्क्रीन पर बता देगा -->
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            alert("कोडिंग में गलती है (Line: " + lineno + ")\nकृपया GitHub में कोड दोबारा सही से कॉपी-पेस्ट करें!");
+        };
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -73,13 +80,12 @@
 </head>
 <body>
 
-    <!-- 🔒 LOGIN SCREEN (FORM TAG REMOVED COMPLETELY) -->
+    <!-- 🔒 LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-box">
             <h2><i class="fas fa-user-shield"></i> एडमिन लॉगिन</h2>
             <p>केवल अधिकृत ब्रांच मैनेजर और एडमिन के लिए</p>
             
-            <!-- 🚨 बिना फॉर्म का स्मार्ट डिब्बा 🚨 -->
             <div id="loginFormContainer">
                 <div class="form-group">
                     <label>एडमिन ईमेल</label>
@@ -92,7 +98,6 @@
                 
                 <button id="loginBtn" class="btn-login" onclick="doAdminLogin()">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
                 
-                <!-- एरर बॉक्स -->
                 <div id="loginError"></div>
             </div>
         </div>
@@ -182,7 +187,6 @@
 
         let allAgents = [];
 
-        // 🚨 V5 FINAL LOGIN LOGIC (No Event needed) 🚨
         async function doAdminLogin() {
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
@@ -192,7 +196,7 @@
             errorBox.style.display = 'none';
 
             if(!email || !password) {
-                errorBox.innerHTML = "❌ कृपया ईमेल और पासवर्ड भरें!";
+                errorBox.innerHTML = "❌ कृपया ईमेल और पासवर्ड दोनों भरें!";
                 errorBox.style.display = 'block';
                 return;
             }
@@ -206,7 +210,7 @@
                 
                 if (error) {
                     if (error.message.includes("Email not confirmed")) {
-                        throw new Error("❌ आपका ईमेल वेरीफाई नहीं है! Supabase में 'Confirm email' सेटिंग बंद करें।");
+                        throw new Error("❌ आपका ईमेल वेरीफाई नहीं है! Supabase में 'Confirm email' बंद करें।");
                     }
                     if (error.message.includes("Invalid login credentials")) {
                         throw new Error("❌ पासवर्ड गलत है! (ध्यान दें: Ojaswi का 'O' बड़ा होना चाहिए)");
@@ -226,7 +230,7 @@
                     throw new Error("❌ SQL डेटाबेस में इस ईमेल को एडमिन पावर नहीं दी गई है!");
                 }
 
-                // 3. SUCCESS! Show Dashboard
+                // 3. SUCCESS
                 showDashboard(adminData);
 
             } catch (error) {
