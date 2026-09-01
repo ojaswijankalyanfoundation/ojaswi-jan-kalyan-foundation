@@ -2,7 +2,8 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- मोबाइल स्क्रीन के लिए सबसे ज़रूरी टैग -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>एडमिन पैनल | ओजस्वी फाउंडेशन</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,83 +12,89 @@
     <style>
         :root { --admin-dark: #1e1e2f; --admin-card: #27293d; --admin-text: #e1e1e6; --accent: #e14eca; --success: #00f2c3; --danger: #fd5d93; --warning: #ff8d72; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--admin-dark); color: var(--admin-text); }
+        
+        /* ⏳ LOADING SCREEN */
+        #loading-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; background: var(--admin-dark); color: white; position: fixed; width: 100%; top: 0; left: 0; z-index: 9999; }
+        #loading-screen i { font-size: 45px; color: var(--accent); margin-bottom: 15px; }
 
-        /* 🔒 LOGIN SCREEN */
-        #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1e1e2f, #11111a); padding: 20px; }
-        .login-box { background: var(--admin-card); padding: 40px 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--accent); box-sizing: border-box; }
-        .login-box h2 { margin: 0 0 5px 0; color: white; }
+        /* 🔒 LOGIN SCREEN (मोबाइल फिक्स) */
+        #login-screen { display: none; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1e1e2f, #11111a); padding: 15px; }
+        .login-box { background: var(--admin-card); padding: 30px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--accent); box-sizing: border-box; }
+        .login-box h2 { margin: 0 0 5px 0; color: white; font-size: 22px; }
         .login-box p { color: #888; font-size: 13px; margin-bottom: 25px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; font-size: 13px; color: #aaa; margin-bottom: 5px; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; font-size: 15px; }
         .form-group input:focus { border-color: var(--accent); outline: none; }
-        .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; box-shadow: 0 4px 10px rgba(225, 78, 202, 0.3); transition: 0.3s; }
+        .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.3s; }
         .btn-login:hover { background: #c039a9; }
         
         #loginError { color: white; font-size: 13px; font-weight: bold; margin-top: 15px; display: none; background: var(--danger); padding: 10px; border-radius: 6px; text-align: center; }
 
         /* 📊 DASHBOARD */
         #admin-dashboard { display: none; padding-bottom: 30px; }
-        .header { background: var(--admin-card); padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px; }
-        .header-title h2 { margin: 0; color: white; font-size: 20px; }
-        .header-title span { font-size: 12px; color: var(--warning); background: rgba(255,141,114,0.1); padding: 3px 8px; border-radius: 10px; display: inline-block; margin-top: 5px; }
+        .header { background: var(--admin-card); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; }
+        .header-title h2 { margin: 0; color: white; font-size: 18px; }
+        .header-title span { font-size: 11px; color: var(--warning); background: rgba(255,141,114,0.1); padding: 3px 8px; border-radius: 10px; display: inline-block; margin-top: 5px; }
         .header-profile { text-align: right; }
-        .header-profile strong { color: var(--success); font-size: 15px; display: block; }
-        .header-profile small { color: #888; font-size: 12px; }
-        .btn-logout { background: transparent; border: 1px solid #555; color: white; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-top: 8px; transition: 0.3s; }
+        .header-profile strong { color: var(--success); font-size: 14px; display: block; }
+        .header-profile small { color: #888; font-size: 11px; }
+        .btn-logout { background: transparent; border: 1px solid #555; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-top: 5px; transition: 0.3s; }
         .btn-logout:hover { background: #d32f2f; border-color: #d32f2f; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px 5%; max-width: 1200px; margin: auto; }
-        .stat-card { background: var(--admin-card); padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-left: 5px solid var(--accent); }
-        .stat-card h3 { margin: 0 0 10px 0; font-size: 35px; color: white; }
-        .stat-card p { margin: 0; font-size: 14px; color: #9a9a9a; font-weight: bold; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; padding: 15px; max-width: 1200px; margin: auto; }
+        .stat-card { background: var(--admin-card); padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-left: 4px solid var(--accent); }
+        .stat-card h3 { margin: 0 0 5px 0; font-size: 28px; color: white; }
+        .stat-card p { margin: 0; font-size: 12px; color: #9a9a9a; font-weight: bold; }
 
-        .tab-nav { display: flex; justify-content: center; background: var(--admin-card); margin: 10px 5%; border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
-        .tab-btn { flex: 1; min-width: 150px; padding: 15px; text-align: center; color: #9a9a9a; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; border-bottom: 3px solid transparent; }
+        .tab-nav { display: flex; justify-content: center; background: var(--admin-card); margin: 10px 15px; border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+        .tab-btn { flex: 1; min-width: 120px; padding: 12px; text-align: center; color: #9a9a9a; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; border-bottom: 3px solid transparent; }
         .tab-btn.active { background: rgba(225, 78, 202, 0.1); color: white; border-bottom: 3px solid var(--accent); }
 
-        .tab-view { display: none; padding: 20px 5%; max-width: 1200px; margin: auto; animation: fadeIn 0.3s; }
+        .tab-view { display: none; padding: 15px; max-width: 1200px; margin: auto; animation: fadeIn 0.3s; }
         .tab-view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .table-container { background: var(--admin-card); border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 100%; }
-        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 600px; }
-        th { background: rgba(255,255,255,0.05); padding: 15px; font-size: 14px; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
-        td { padding: 15px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #c1c1c1; }
+        .table-container { background: var(--admin-card); border-radius: 12px; overflow-x: auto; width: 100%; }
+        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 500px; }
+        th { background: rgba(255,255,255,0.05); padding: 12px; font-size: 13px; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+        td { padding: 12px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #c1c1c1; }
         
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; display: inline-block; text-align: center; }
+        .badge { padding: 4px 8px; border-radius: 15px; font-size: 10px; font-weight: bold; color: white; display: inline-block; }
         .badge.review { background: var(--warning); color: black; }
         .badge.active { background: var(--success); color: black; }
         .badge.rejected { background: var(--danger); }
         .badge.pending { background: #888; }
 
-        .btn-action { border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; color: white; margin-right: 5px; margin-bottom: 5px; transition: 0.3s; }
+        .btn-action { border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; color: white; margin-right: 5px; margin-bottom: 5px; }
         .btn-approve { background: var(--success); color: black; }
         .btn-reject { background: var(--danger); }
         .btn-view { background: #344675; }
 
-        /* MODAL (Responsive) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        .modal-content { background: var(--admin-card); padding: 25px; border-radius: 12px; max-width: 600px; margin: 20px auto; position: relative; }
-        .close-modal { position: absolute; top: 10px; right: 15px; color: white; font-size: 30px; cursor: pointer; transition: 0.3s; }
-        .close-modal:hover { color: var(--danger); }
-        .doc-item { margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 15px; }
-        .doc-item h4 { margin: 0 0 10px 0; color: var(--accent); }
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; padding: 15px; box-sizing: border-box; overflow-y: auto; }
+        .modal-content { background: var(--admin-card); padding: 20px; border-radius: 12px; max-width: 600px; margin: 10px auto; position: relative; }
+        .close-modal { position: absolute; top: 5px; right: 15px; color: white; font-size: 30px; cursor: pointer; }
+        .doc-item { margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .doc-item h4 { margin: 0 0 5px 0; color: var(--accent); font-size: 14px; }
         .doc-item img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #555; }
-        .doc-item a { display: inline-block; background: var(--success); color: black; padding: 10px 15px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 13px; }
+        .doc-item a { display: inline-block; background: var(--success); color: black; padding: 8px 12px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 12px; }
 
-        /* 📱 Mobile Adjustments */
         @media (max-width: 768px) {
-            .header { justify-content: center; text-align: center; }
-            .header-profile { text-align: center; }
-            .stats-grid { padding: 15px; }
+            .header { flex-direction: column; text-align: center; justify-content: center; }
+            .header-profile { text-align: center; margin-top: 5px; }
             .tab-nav { flex-direction: column; }
             .tab-btn { border-bottom: 1px solid rgba(255,255,255,0.05); }
-            .modal-content { padding: 15px; margin: 10px auto; }
         }
     </style>
 </head>
 <body>
+
+    <!-- ⏳ LOADING SCREEN -->
+    <div id="loading-screen">
+        <i class="fas fa-spinner fa-spin"></i>
+        <h3>पोर्टल कनेक्ट हो रहा है...</h3>
+    </div>
 
     <!-- 🔒 LOGIN SCREEN -->
     <div id="login-screen">
@@ -95,15 +102,15 @@
             <h2><i class="fas fa-user-shield"></i> एडमिन लॉगिन</h2>
             <p>केवल अधिकृत ब्रांच मैनेजर और एडमिन के लिए</p>
             
-            <!-- FORM TAG REMOVED TO PREVENT PAGE RELOAD -->
+            <!-- FORM TAG REMOVED - NO MORE MOBILE REFRESH BUGS -->
             <div id="loginFormContainer">
                 <div class="form-group">
                     <label>एडमिन ईमेल</label>
-                    <input type="email" id="adminEmail" required placeholder="email@example.com">
+                    <input type="email" id="adminEmail" placeholder="email@example.com">
                 </div>
                 <div class="form-group">
                     <label>पासवर्ड</label>
-                    <input type="password" id="adminPassword" required placeholder="••••••••">
+                    <input type="password" id="adminPassword" placeholder="••••••••">
                 </div>
                 
                 <button type="button" id="loginBtn" class="btn-login" onclick="doAdminLogin()">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
@@ -121,7 +128,7 @@
             </div>
             <div class="header-profile">
                 <strong id="adminNameDisplay">Admin Name</strong>
-                <small id="adminRoleDisplay">Role</small>
+                <small id="adminRoleDisplay">Role</small><br>
                 <button class="btn-logout" onclick="logoutAdmin()">लॉगआउट <i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
@@ -129,21 +136,21 @@
         <div class="stats-grid">
             <div class="stat-card" style="border-left-color: var(--success);">
                 <h3 id="statAgents">0</h3>
-                <p>कुल कार्यकर्ता (एजेंट)</p>
+                <p>कुल एजेंट</p>
             </div>
             <div class="stat-card" style="border-left-color: var(--warning);">
                 <h3 id="statKyc">0</h3>
-                <p>KYC पेंडिंग (चेकिंग)</p>
+                <p>KYC पेंडिंग</p>
             </div>
         </div>
 
         <div class="tab-nav">
-            <div class="tab-btn active" onclick="switchTab('kycList', this)"><i class="fas fa-id-card"></i> KYC अप्रूवल रिक्वेस्ट</div>
-            <div class="tab-btn" onclick="switchTab('leadList', this)"><i class="fas fa-users"></i> संस्था के लाभार्थी (Leads)</div>
+            <div class="tab-btn active" onclick="switchTab('kycList', this)"><i class="fas fa-id-card"></i> KYC रिक्वेस्ट</div>
+            <div class="tab-btn" onclick="switchTab('leadList', this)"><i class="fas fa-users"></i> लाभार्थी (Leads)</div>
         </div>
 
         <div id="kycList" class="tab-view active">
-            <h3 style="color: white; margin-top: 0;">KYC रिक्वेस्ट लिस्ट</h3>
+            <h3 style="color: white; margin-top: 0; font-size: 16px;">KYC रिक्वेस्ट लिस्ट</h3>
             <div class="table-container">
                 <table>
                     <thead>
@@ -151,7 +158,7 @@
                             <th>एजेंट का नाम / ईमेल</th>
                             <th>स्टेटस</th>
                             <th>डॉक्यूमेंट्स</th>
-                            <th>एक्शन (Approve/Reject)</th>
+                            <th>एक्शन</th>
                         </tr>
                     </thead>
                     <tbody id="kycTableBody">
@@ -162,15 +169,15 @@
         </div>
 
         <div id="leadList" class="tab-view">
-            <h3 style="color: white; margin-top: 0;">लाभार्थी (Leads) लिस्ट</h3>
+            <h3 style="color: white; margin-top: 0; font-size: 16px;">लाभार्थी (Leads) लिस्ट</h3>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
                             <th>लाभार्थी का नाम</th>
                             <th>योजना</th>
-                            <th>किस एजेंट ने जोड़ा?</th>
-                            <th>वर्तमान स्टेटस</th>
+                            <th>एजेंट ईमेल</th>
+                            <th>स्टेटस</th>
                         </tr>
                     </thead>
                     <tbody id="leadsTableBody">
@@ -185,41 +192,61 @@
     <div id="docModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">×</span>
-            <h3 style="color: white; margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 10px;">एजेंट की जानकारी व डाक्यूमेंट्स</h3>
+            <h3 style="color: white; margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 10px; font-size: 16px;">एजेंट की जानकारी</h3>
             <div id="modalDataContent"></div>
         </div>
     </div>
 
     <script>
-        // Supabase Initialization Global Setup
-        const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let supabase;
         let allAgents = [];
 
-        window.onload = async function() {
+        document.addEventListener("DOMContentLoaded", async function() {
+            // Failsafe for Mobile Slow Network
+            setTimeout(() => {
+                const loader = document.getElementById('loading-screen');
+                if (loader && loader.style.display !== 'none') {
+                    showLoginScreen();
+                }
+            }, 2500);
+
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
+                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                
+                const { data: { session }, error: sessionErr } = await supabase.auth.getSession();
+                
+                if (!session) {
+                    showLoginScreen();
+                    return; 
+                }
 
-                if (session) {
-                    const { data: adminData } = await supabase
-                        .from('admin_users')
-                        .select('*')
-                        .eq('email', session.user.email)
-                        .maybeSingle();
+                const { data: adminData } = await supabase
+                    .from('admin_users')
+                    .select('*')
+                    .eq('email', session.user.email)
+                    .maybeSingle();
 
-                    if (adminData) {
-                        showDashboard(adminData);
-                    } else {
-                        await supabase.auth.signOut();
-                    }
+                if (adminData) {
+                    showDashboard(adminData);
+                } else {
+                    await supabase.auth.signOut();
+                    showLoginScreen();
                 }
             } catch (err) {
-                console.error("Session Check Error:", err);
+                showLoginScreen(); 
             }
-        };
+        });
+
+        function showLoginScreen() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+        }
 
         function showDashboard(adminData) {
+            document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-dashboard').style.display = 'block';
             
@@ -230,6 +257,13 @@
             fetchAdminData();
         }
 
+        // 🟢 FORM HATA DIYA HAI - Ab "Enter" dabane par bhi kaam karega bina refresh ke
+        document.getElementById("adminPassword").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                doAdminLogin();
+            }
+        });
+
         async function doAdminLogin() {
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
@@ -237,7 +271,7 @@
             const errorBox = document.getElementById('loginError');
 
             if(!email || !password) {
-                errorBox.innerHTML = "❌ कृपया ईमेल और पासवर्ड दोनों भरें!";
+                errorBox.innerHTML = "❌ ईमेल और पासवर्ड भरें!";
                 errorBox.style.display = 'block';
                 return;
             }
@@ -248,14 +282,7 @@
 
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                
-                // ⚠️ Email verification check
-                if (error) {
-                    if (error.message.includes("Email not confirmed")) {
-                        throw new Error("❌ आपका ईमेल वेरीफाई नहीं है! Supabase में 'Confirm email' सेटिंग बंद करें।");
-                    }
-                    throw new Error("❌ ईमेल या पासवर्ड गलत है!");
-                }
+                if (error) throw new Error("❌ ईमेल या पासवर्ड गलत है!");
 
                 const { data: adminData, error: adminErr } = await supabase
                     .from('admin_users')
@@ -265,7 +292,7 @@
 
                 if (adminErr || !adminData) {
                     await supabase.auth.signOut();
-                    throw new Error("❌ SQL डेटाबेस में आपको एडमिन पावर नहीं दी गई है!");
+                    throw new Error("❌ आपको एडमिन पावर नहीं दी गई है!");
                 }
 
                 showDashboard(adminData);
@@ -279,7 +306,7 @@
         }
 
         async function logoutAdmin() {
-            if(confirm("क्या आप एडमिन पैनल से लॉगआउट करना चाहते हैं?")){
+            if(confirm("लॉगआउट करना चाहते हैं?")){
                 await supabase.auth.signOut();
                 window.location.reload(); 
             }
@@ -326,11 +353,11 @@
                 tr.innerHTML = `
                     <td><strong>${agent.name || 'N/A'}</strong><br><small style="color:#888;">${agent.email}</small></td>
                     <td><span class="badge ${badgeClass}">${statusText}</span></td>
-                    <td><button class="btn-action btn-view" onclick="viewDocs('${agent.email}')"><i class="fas fa-eye"></i> देखें</button></td>
+                    <td><button class="btn-action btn-view" onclick="viewDocs('${agent.email}')">देखें</button></td>
                     <td>
                         ${agent.status === 'Under Review' ? `
-                            <button class="btn-action btn-approve" onclick="updateAgentStatus('${agent.email}', 'Active')"><i class="fas fa-check"></i> Approve</button>
-                            <button class="btn-action btn-reject" onclick="updateAgentStatus('${agent.email}', 'Rejected')"><i class="fas fa-times"></i> Reject</button>
+                            <button class="btn-action btn-approve" onclick="updateAgentStatus('${agent.email}', 'Active')"><i class="fas fa-check"></i></button>
+                            <button class="btn-action btn-reject" onclick="updateAgentStatus('${agent.email}', 'Rejected')"><i class="fas fa-times"></i></button>
                         ` : '-'}
                     </td>
                 `;
@@ -359,20 +386,19 @@
             if(!agent) return;
 
             let html = `
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom: 20px; background:#1e1e2f; padding:15px; border-radius:8px;">
-                    <div><small style="color:#888;">बैंक का नाम</small><br>${agent.bank_name || '-'}</div>
-                    <div><small style="color:#888;">अकाउंट नंबर</small><br>${agent.account_no || '-'}</div>
-                    <div><small style="color:#888;">IFSC कोड</small><br>${agent.ifsc_code || '-'}</div>
-                    <div><small style="color:#888;">पैन नंबर</small><br>${agent.pan_no || '-'}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 20px; background:#1e1e2f; padding:15px; border-radius:8px; font-size:12px;">
+                    <div><small style="color:#888;">बैंक</small><br>${agent.bank_name || '-'}</div>
+                    <div><small style="color:#888;">अकाउंट</small><br>${agent.account_no || '-'}</div>
+                    <div><small style="color:#888;">IFSC</small><br>${agent.ifsc_code || '-'}</div>
+                    <div><small style="color:#888;">पैन</small><br>${agent.pan_no || '-'}</div>
                 </div>
-                <h4 style="color:var(--accent);">अपलोड किए गए डाक्यूमेंट्स</h4>
             `;
 
             const docs = [
-                { title: 'पासपोर्ट फोटो', url: agent.profile_photo },
+                { title: 'फोटो', url: agent.profile_photo },
                 { title: 'पैन कार्ड', url: agent.pan_photo },
-                { title: 'आईडी फ्रंट', url: agent.aadhaar_file_front },
-                { title: 'बैंकिंग प्रूफ', url: agent.bank_proof_file }
+                { title: 'आधार', url: agent.aadhaar_file_front },
+                { title: 'बैंक प्रूफ', url: agent.bank_proof_file }
             ];
 
             docs.forEach(doc => {
@@ -381,7 +407,7 @@
                     html += `
                         <div class="doc-item">
                             <h4>${doc.title}</h4>
-                            ${isPdf ? `<a href="${doc.url}" target="_blank"><i class="fas fa-file-pdf"></i> PDF ओपन करें</a>` : `<a href="${doc.url}" target="_blank"><img src="${doc.url}"></a>`}
+                            ${isPdf ? `<a href="${doc.url}" target="_blank"><i class="fas fa-file-pdf"></i> PDF देखें</a>` : `<a href="${doc.url}" target="_blank"><img src="${doc.url}"></a>`}
                         </div>
                     `;
                 }
@@ -392,13 +418,12 @@
         }
 
         async function updateAgentStatus(email, newStatus) {
-            let msg = newStatus === 'Active' ? 'क्या आप इस एजेंट को अप्रूव करना चाहते हैं?' : 'क्या आप इस एजेंट को रिजेक्ट करना चाहते हैं?';
-            if(!confirm(msg)) return;
+            if(!confirm('क्या आप श्योर हैं?')) return;
 
             try {
                 const { error } = await supabase.from('agents').update({ status: newStatus }).eq('email', email);
                 if (error) throw error;
-                alert(`सफलता! स्टेटस "${newStatus}" कर दिया गया है।`);
+                alert(`सफलता!`);
                 fetchAdminData(); 
             } catch(e) { alert("एरर: " + e.message); }
         }
