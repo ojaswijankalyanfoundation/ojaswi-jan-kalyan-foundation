@@ -12,7 +12,7 @@
         :root { --admin-dark: #1e1e2f; --admin-card: #27293d; --admin-text: #e1e1e6; --accent: #e14eca; --success: #00f2c3; --danger: #fd5d93; --warning: #ff8d72; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--admin-dark); color: var(--admin-text); }
 
-        /* 🔒 LOGIN SCREEN (अब यह डिफ़ॉल्ट रूप से दिखेगा) */
+        /* 🔒 LOGIN SCREEN */
         #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1e1e2f, #11111a); padding: 20px; }
         .login-box { background: var(--admin-card); padding: 40px 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--accent); box-sizing: border-box; }
         .login-box h2 { margin: 0 0 5px 0; color: white; }
@@ -89,13 +89,14 @@
 </head>
 <body>
 
-    <!-- 🔒 LOGIN SCREEN (बिना किसी लोडिंग के डायरेक्ट खुलेगा) -->
+    <!-- 🔒 LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-box">
             <h2><i class="fas fa-user-shield"></i> एडमिन लॉगिन</h2>
             <p>केवल अधिकृत ब्रांच मैनेजर और एडमिन के लिए</p>
             
-            <form onsubmit="doAdminLogin(event)">
+            <!-- FORM TAG REMOVED TO PREVENT PAGE RELOAD -->
+            <div id="loginFormContainer">
                 <div class="form-group">
                     <label>एडमिन ईमेल</label>
                     <input type="email" id="adminEmail" required placeholder="email@example.com">
@@ -105,9 +106,9 @@
                     <input type="password" id="adminPassword" required placeholder="••••••••">
                 </div>
                 
-                <button type="submit" id="loginBtn" class="btn-login">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
+                <button type="button" id="loginBtn" class="btn-login" onclick="doAdminLogin()">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
                 <div id="loginError"></div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -141,7 +142,6 @@
             <div class="tab-btn" onclick="switchTab('leadList', this)"><i class="fas fa-users"></i> संस्था के लाभार्थी (Leads)</div>
         </div>
 
-        <!-- TAB 1: KYC -->
         <div id="kycList" class="tab-view active">
             <h3 style="color: white; margin-top: 0;">KYC रिक्वेस्ट लिस्ट</h3>
             <div class="table-container">
@@ -161,7 +161,6 @@
             </div>
         </div>
 
-        <!-- TAB 2: LEADS -->
         <div id="leadList" class="tab-view">
             <h3 style="color: white; margin-top: 0;">लाभार्थी (Leads) लिस्ट</h3>
             <div class="table-container">
@@ -192,18 +191,16 @@
     </div>
 
     <script>
-        let supabase;
+        // Supabase Initialization Global Setup
+        const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let allAgents = [];
 
         window.onload = async function() {
             try {
-                const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
-                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                
                 const { data: { session } } = await supabase.auth.getSession();
 
-                // अगर यूजर पहले से लॉगिन है तो बैकग्राउंड में चेक करके डैशबोर्ड दिखा दो
                 if (session) {
                     const { data: adminData } = await supabase
                         .from('admin_users')
@@ -215,12 +212,10 @@
                         showDashboard(adminData);
                     } else {
                         await supabase.auth.signOut();
-                        // अगर एडमिन नहीं है, तो कुछ मत करो, लॉगिन फॉर्म ही दिखने दो
                     }
                 }
             } catch (err) {
-                console.error("Supabase Error:", err);
-                // अगर कोई भी एरर आये तो लॉगिन फॉर्म ही दिखने दो, स्क्रीन ब्लैंक नहीं होगी
+                console.error("Session Check Error:", err);
             }
         };
 
@@ -235,12 +230,17 @@
             fetchAdminData();
         }
 
-        async function doAdminLogin(event) {
-            event.preventDefault();
+        async function doAdminLogin() {
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
             const errorBox = document.getElementById('loginError');
+
+            if(!email || !password) {
+                errorBox.innerHTML = "❌ कृपया ईमेल और पासवर्ड दोनों भरें!";
+                errorBox.style.display = 'block';
+                return;
+            }
 
             errorBox.style.display = 'none';
             btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> चेक कर रहे हैं...";
@@ -248,7 +248,14 @@
 
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw new Error("❌ ईमेल या पासवर्ड गलत है!");
+                
+                // ⚠️ Email verification check
+                if (error) {
+                    if (error.message.includes("Email not confirmed")) {
+                        throw new Error("❌ आपका ईमेल वेरीफाई नहीं है! Supabase में 'Confirm email' सेटिंग बंद करें।");
+                    }
+                    throw new Error("❌ ईमेल या पासवर्ड गलत है!");
+                }
 
                 const { data: adminData, error: adminErr } = await supabase
                     .from('admin_users')
