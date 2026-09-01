@@ -17,13 +17,13 @@
         .login-box { background: var(--admin-card); padding: 30px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--accent); box-sizing: border-box; }
         .login-box h2 { margin: 0 0 5px 0; color: white; font-size: 22px; }
         .login-box p { color: #888; font-size: 13px; margin-bottom: 25px; }
-        .form-group { margin-bottom: 15px; text-align: left; position: relative; } /* Added relative for eye icon */
+        .form-group { margin-bottom: 15px; text-align: left; position: relative; } 
         .form-group label { display: block; font-size: 13px; color: #aaa; margin-bottom: 5px; }
         .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; font-size: 15px; }
         .form-group input:focus { border-color: var(--accent); outline: none; }
         
-        /* Eye Icon CSS */
-        .eye-icon { position: absolute; right: 15px; top: 35px; color: #aaa; font-size: 16px; cursor: pointer; padding: 5px; }
+        /* 👁️ EYE ICON */
+        .eye-icon { position: absolute; right: 15px; top: 35px; color: #aaa; font-size: 16px; cursor: pointer; padding: 5px; z-index: 10; }
 
         .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.3s; }
         .btn-login:hover { background: #c039a9; }
@@ -97,7 +97,6 @@
                 </div>
                 <div class="form-group">
                     <label>पासवर्ड</label>
-                    <!-- Eye icon aur password field -->
                     <input type="password" id="adminPassword" placeholder="••••••••" style="padding-right: 40px;">
                     <i class="fas fa-eye eye-icon" id="togglePassword" onclick="togglePass()"></i>
                 </div>
@@ -184,6 +183,7 @@
         </div>
     </div>
 
+    <!-- SCRIPTS -->
     <script>
         const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
@@ -192,55 +192,29 @@
 
         // 👁️ पासवर्ड Show/Hide फंक्शन
         function togglePass() {
-            const passInput = document.getElementById('adminPassword');
-            const eyeIcon = document.getElementById('togglePassword');
-            if (passInput.type === "password") {
-                passInput.type = "text";
-                eyeIcon.classList.remove("fa-eye");
-                eyeIcon.classList.add("fa-eye-slash");
-            } else {
-                passInput.type = "password";
-                eyeIcon.classList.remove("fa-eye-slash");
-                eyeIcon.classList.add("fa-eye");
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", async function() {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
-                
-                if (session) {
-                    const { data: adminData } = await supabase
-                        .from('admin_users')
-                        .select('*')
-                        .eq('email', session.user.email)
-                        .maybeSingle();
-
-                    if (adminData) {
-                        showDashboard(adminData);
-                    } else {
-                        await supabase.auth.signOut();
-                    }
+                const passInput = document.getElementById('adminPassword');
+                const eyeIcon = document.getElementById('togglePassword');
+                if (passInput.type === "password") {
+                    passInput.type = "text";
+                    eyeIcon.classList.remove("fa-eye");
+                    eyeIcon.classList.add("fa-eye-slash");
+                } else {
+                    passInput.type = "password";
+                    eyeIcon.classList.remove("fa-eye-slash");
+                    eyeIcon.classList.add("fa-eye");
                 }
-            } catch (err) {
-                console.error(err);
-            }
-        });
-
-        function showDashboard(adminData) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-dashboard').style.display = 'block';
-            document.getElementById('adminNameDisplay').innerText = adminData.name || adminData.email;
-            fetchAdminData();
+            } catch(e) { console.error("Eye Icon Error:", e); }
         }
 
-        // 🟢 Enter Button Fix
+        // 🟢 Enter Button Login Fix
         document.getElementById("adminPassword").addEventListener("keyup", function(event) {
             if (event.key === "Enter") {
                 doAdminLogin();
             }
         });
 
+        // 🟢 सुरक्षित लॉगिन फंक्शन
         async function doAdminLogin() {
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
@@ -264,7 +238,7 @@
                     throw new Error("❌ ईमेल या पासवर्ड गलत है!");
                 }
 
-                // ⚠️ YAHI SABSE MAIN CHECK HAI
+                // एडमिन टेबल चेक
                 const { data: adminData, error: adminErr } = await supabase
                     .from('admin_users')
                     .select('*')
@@ -273,18 +247,49 @@
 
                 if (!adminData) {
                     await supabase.auth.signOut();
-                    throw new Error("❌ आपको एडमिन पावर नहीं दी गई है! (टेबल चेक करें)");
+                    throw new Error("❌ आपको एडमिन पावर नहीं दी गई है!");
                 }
 
-                showDashboard(adminData);
+                // अगर सब सही है, तो डैशबोर्ड दिखाओ
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                document.getElementById('adminNameDisplay').innerText = adminData.name || email;
+                fetchAdminData();
 
             } catch (error) {
                 errorBox.innerHTML = error.message; 
                 errorBox.style.display = 'block';
+            } finally {
+                // बटन वापस नार्मल करना
                 btn.innerHTML = "लॉगिन करें <i class='fas fa-sign-in-alt'></i>";
                 btn.disabled = false;
             }
         }
+
+        // 🟢 बैकग्राउंड सेशन चेक (अगर पहले से लॉगिन है तो डायरेक्ट डैशबोर्ड)
+        document.addEventListener("DOMContentLoaded", async function() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const { data: adminData } = await supabase
+                        .from('admin_users')
+                        .select('*')
+                        .eq('email', session.user.email)
+                        .maybeSingle();
+
+                    if (adminData) {
+                        document.getElementById('login-screen').style.display = 'none';
+                        document.getElementById('admin-dashboard').style.display = 'block';
+                        document.getElementById('adminNameDisplay').innerText = adminData.name || session.user.email;
+                        fetchAdminData();
+                    } else {
+                        await supabase.auth.signOut();
+                    }
+                }
+            } catch (err) {
+                console.error("Session Error:", err);
+            }
+        });
 
         async function logoutAdmin() {
             if(confirm("लॉगआउट करना चाहते हैं?")){
