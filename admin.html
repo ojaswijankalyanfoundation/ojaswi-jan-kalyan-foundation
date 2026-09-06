@@ -177,7 +177,7 @@
     </div>
 
     <script>
-        // 🚀 आपकी FIREBASE CONFIG (API Keys) 🚀
+        // 🚀 FIREBASE CONFIG (API Keys) 🚀
         const firebaseConfig = {
             apiKey: "AIzaSyAJ5Vwr6vhJexo7Q4qQket0NsYJ5ynzm04",
             authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
@@ -192,10 +192,11 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        const MASTER_EMAIL = "ojaswijankalyanfoundation@gmail.com";
+        // 🚨 मास्टर ईमेल अपडेट कर दी गई है 🚨
+        const MASTER_EMAIL = "ojaswijankalyanfoundation@zohomail.in";
         let allAgents = [];
 
-        // 🚨 नया FIREBASE LOGIN LOGIC 🚨
+        // 🚨 FIREBASE LOGIN LOGIC 🚨
         async function doAdminLogin() {
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
