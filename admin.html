@@ -26,10 +26,10 @@
         .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; font-size: 14px; }
         .form-group input:focus { border-color: var(--accent); outline: none; }
         
-        /* Password Toggle Icon Style */
+        /* 👁️ Password Toggle Icon Style */
         .password-toggle { position: absolute; right: 15px; top: 38px; cursor: pointer; color: #888; font-size: 16px; transition: 0.3s; }
         .password-toggle:hover { color: var(--accent); }
-        #adminPassword { padding-right: 40px; } /* Space for the eye icon */
+        #adminPassword { padding-right: 40px; } 
 
         .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; box-shadow: 0 4px 10px rgba(225, 78, 202, 0.3); }
         #loginError { color: white; font-size: 13px; font-weight: bold; margin-top: 15px; display: none; background: var(--danger); padding: 10px; border-radius: 6px; text-align: center; }
@@ -96,7 +96,7 @@
                 </div>
                 <div class="form-group">
                     <label>पासवर्ड</label>
-                    <!-- 👁️ पासवर्ड देखने/छुपाने वाला इनपुट -->
+                    <!-- 👁️ पासवर्ड देखने/छुपाने वाला बटन -->
                     <input type="password" id="adminPassword" required placeholder="••••••••">
                     <i class="fas fa-eye password-toggle" id="togglePasswordBtn" onclick="togglePassword()"></i>
                 </div>
@@ -106,7 +106,7 @@
         </div>
     </div>
 
-    <!-- 📊 SECURE DASHBOARD (BAKI SAB SAME HAI) -->
+    <!-- 📊 SECURE DASHBOARD -->
     <div id="admin-dashboard">
         <div class="header">
             <div class="header-title">
@@ -164,9 +164,9 @@
     </div>
 
     <script>
-        // 🚨 अपनी सही API KEY यहाँ डालें 🚨
+        // 🚨 आपकी असली और पक्की API KEY (मैंने खुद लगा दी है) 🚨
         const firebaseConfig = {
-            apiKey: "यहाँ_अपनी_असली_API_KEY_डालें", // <--- बस इस लाइन को सही करें
+            apiKey: "AIzaSyAJ5Vwr6vhJexo7Q4qQket0NsYJ5ynzm04",
             authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
             projectId: "ojaswi-jan-kalyan-foundation",
             storageBucket: "ojaswi-jan-kalyan-foundation.firebasestorage.app",
@@ -177,7 +177,9 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const MASTER_EMAIL = "ojaswijankalyanfoundation@gmail.com";
+        
+        // मैंने दोनों ईमेल को मास्टर पॉवर दे दी है
+        const MASTER_EMAILS = ["ojaswijankalyanfoundation@gmail.com", "ojaswijankalyanfoundation@zohomail.in"];
         let allAgents = [];
 
         // 👁️ पासवर्ड Show/Hide करने का लॉजिक
@@ -216,7 +218,7 @@
             try {
                 await auth.signInWithEmailAndPassword(email, password);
                 
-                if (email === MASTER_EMAIL) {
+                if (MASTER_EMAILS.includes(email)) {
                     await db.collection('admin_users').doc(email).set({
                         email: email, name: "Super Admin", role: "Super Admin", branch: "Head Office"
                     }, { merge: true });
@@ -232,10 +234,10 @@
                 showDashboard(adminDoc.data());
 
             } catch (error) {
-                // Firebase का एरर हिंदी में
                 let errorMsg = error.message;
-                if(errorMsg.includes("api-key-not-valid")) errorMsg = "API Key गलत है! कृपया कोड में सही API Key डालें।";
+                if(errorMsg.includes("api-key-not-valid")) errorMsg = "API Key गलत है!";
                 if(errorMsg.includes("auth/invalid-credential")) errorMsg = "पासवर्ड या ईमेल गलत है!";
+                if(errorMsg.includes("auth/user-not-found")) errorMsg = "यह ईमेल Firebase में रजिस्टर नहीं है!";
                 
                 errorBox.innerHTML = "❌ " + errorMsg; 
                 errorBox.style.display = 'block';
