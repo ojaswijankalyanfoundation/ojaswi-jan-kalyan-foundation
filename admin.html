@@ -2,84 +2,77 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>एडमिन पैनल | ओजस्वी फाउंडेशन</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>एडमिन पैनल | ओजस्वी फाउंडेशन (Firebase)</title>
+    
+    <!-- 🚨 FIREBASE ENGINES (V9 COMPAT) 🚨 -->
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore-compat.js"></script>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        :root { --admin-dark: #1e1e2f; --admin-card: #27293d; --accent: #e14eca; --success: #00f2c3; --danger: #fd5d93; --warning: #ff8d72; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--admin-dark); color: #e1e1e6; }
+        :root { --admin-dark: #1e1e2f; --admin-card: #27293d; --admin-text: #e1e1e6; --accent: #e14eca; --success: #00f2c3; --danger: #fd5d93; --warning: #ff8d72; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--admin-dark); color: var(--admin-text); }
         
-        /* 🔒 LOGIN SCREEN */
-        #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1e1e2f, #11111a); padding: 15px; }
-        .login-box { background: var(--admin-card); padding: 30px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--accent); box-sizing: border-box; }
-        .login-box h2 { margin: 0 0 5px 0; color: white; font-size: 22px; }
+        #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1e1e2f, #11111a); }
+        .login-box { background: var(--admin-card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; border-top: 4px solid var(--accent); }
+        .login-box h2 { margin: 0 0 5px 0; color: white; }
         .login-box p { color: #888; font-size: 13px; margin-bottom: 25px; }
-        .form-group { margin-bottom: 15px; text-align: left; position: relative; } 
-        .form-group label { display: block; font-size: 13px; color: #aaa; margin-bottom: 5px; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; font-size: 15px; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; font-size: 14px; }
         .form-group input:focus { border-color: var(--accent); outline: none; }
+        .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; box-shadow: 0 4px 10px rgba(225, 78, 202, 0.3); }
         
-        /* 👁️ EYE ICON */
-        .eye-icon { position: absolute; right: 15px; top: 35px; color: #aaa; font-size: 16px; cursor: pointer; padding: 5px; z-index: 10; }
-
-        .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.3s; }
-        .btn-login:hover { background: #c039a9; }
         #loginError { color: white; font-size: 13px; font-weight: bold; margin-top: 15px; display: none; background: var(--danger); padding: 10px; border-radius: 6px; text-align: center; }
 
-        /* 📊 DASHBOARD */
         #admin-dashboard { display: none; padding-bottom: 30px; }
-        .header { background: var(--admin-card); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; }
-        .header-title h2 { margin: 0; color: white; font-size: 18px; }
+        .header { background: var(--admin-card); padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; }
+        .header-title h2 { margin: 0; color: white; font-size: 20px; }
+        .header-title span { font-size: 12px; color: var(--warning); background: rgba(255,141,114,0.1); padding: 3px 8px; border-radius: 10px; }
         .header-profile { text-align: right; }
         .header-profile strong { color: var(--success); font-size: 14px; display: block; }
-        .btn-logout { background: transparent; border: 1px solid #555; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-top: 5px; transition: 0.3s; }
-        .btn-logout:hover { background: #d32f2f; border-color: #d32f2f; }
+        .header-profile small { color: #888; font-size: 11px; }
+        .btn-logout { background: transparent; border: 1px solid #555; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-top: 5px; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; padding: 15px; max-width: 1200px; margin: auto; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
         .stat-card { background: var(--admin-card); padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-left: 4px solid var(--accent); }
-        .stat-card h3 { margin: 0 0 5px 0; font-size: 28px; color: white; }
-        .stat-card p { margin: 0; font-size: 12px; color: #9a9a9a; font-weight: bold; }
+        .stat-card h3 { margin: 0 0 10px 0; font-size: 30px; color: white; }
+        .stat-card p { margin: 0; font-size: 13px; color: #9a9a9a; font-weight: bold; }
 
-        .tab-nav { display: flex; justify-content: center; background: var(--admin-card); margin: 10px 15px; border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
-        .tab-btn { flex: 1; min-width: 120px; padding: 12px; text-align: center; color: #9a9a9a; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; border-bottom: 3px solid transparent; }
-        .tab-btn.active { background: rgba(225, 78, 202, 0.1); color: white; border-bottom: 3px solid var(--accent); }
+        .tab-nav { display: flex; justify-content: space-around; background: var(--admin-card); margin: 0 20px; border-radius: 8px; overflow: hidden; }
+        .tab-btn { flex: 1; padding: 15px; text-align: center; color: #9a9a9a; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
+        .tab-btn.active { background: var(--accent); color: white; }
 
-        .tab-view { display: none; padding: 15px; max-width: 1200px; margin: auto; animation: fadeIn 0.3s; }
+        .tab-view { display: none; padding: 20px; animation: fadeIn 0.3s; }
         .tab-view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .table-container { background: var(--admin-card); border-radius: 12px; overflow-x: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 500px; }
-        th { background: rgba(255,255,255,0.05); padding: 12px; font-size: 13px; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
-        td { padding: 12px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #c1c1c1; }
-        .badge { padding: 4px 8px; border-radius: 15px; font-size: 10px; font-weight: bold; color: white; display: inline-block; }
-        .badge.review { background: var(--warning); color: black; }
+        .table-container { background: var(--admin-card); border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: rgba(255,255,255,0.05); padding: 15px; font-size: 13px; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 15px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #c1c1c1; }
+        
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; }
+        .badge.review { background: var(--warning); }
         .badge.active { background: var(--success); color: black; }
         .badge.rejected { background: var(--danger); }
         .badge.pending { background: #888; }
-        .btn-action { border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; color: white; margin-right: 5px; margin-bottom: 5px; }
+
+        .btn-action { border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; color: white; margin-right: 5px; margin-bottom: 5px; }
         .btn-approve { background: var(--success); color: black; }
         .btn-reject { background: var(--danger); }
         .btn-view { background: #344675; }
 
-        /* MODAL */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; padding: 15px; box-sizing: border-box; overflow-y: auto; }
-        .modal-content { background: var(--admin-card); padding: 20px; border-radius: 12px; max-width: 600px; margin: 10px auto; position: relative; }
-        .close-modal { position: absolute; top: 5px; right: 15px; color: white; font-size: 30px; cursor: pointer; }
-        .doc-item { margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
-        .doc-item h4 { margin: 0 0 5px 0; color: var(--accent); font-size: 14px; }
-        .doc-item img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #555; }
-        .doc-item a { display: inline-block; background: var(--success); color: black; padding: 8px 12px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 12px; }
-
-        @media (max-width: 768px) {
-            .header { flex-direction: column; text-align: center; justify-content: center; }
-            .header-profile { text-align: center; margin-top: 5px; }
-            .tab-nav { flex-direction: column; }
-            .tab-btn { border-bottom: 1px solid rgba(255,255,255,0.05); }
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        .modal-content { background: var(--admin-card); padding: 20px; border-radius: 12px; max-width: 600px; margin: 20px auto; position: relative; }
+        .close-modal { position: absolute; top: 10px; right: 15px; color: white; font-size: 25px; cursor: pointer; }
+        .doc-item { margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 15px; }
+        .doc-item h4 { margin: 0 0 10px 0; color: var(--accent); }
+        .doc-item img { max-width: 100%; border-radius: 8px; border: 1px solid #555; }
+        .doc-item a { display: inline-block; background: var(--success); color: black; padding: 8px 15px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -87,21 +80,19 @@
     <!-- 🔒 LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-box">
-            <h2><i class="fas fa-user-shield"></i> एडमिन लॉगिन</h2>
-            <p>केवल अधिकृत ब्रांच मैनेजर और एडमिन के लिए</p>
+            <h2><i class="fas fa-fire"></i> एडमिन लॉगिन</h2>
+            <p>ओजस्वी फाउंडेशन (Firebase System)</p>
             
             <div id="loginFormContainer">
                 <div class="form-group">
                     <label>एडमिन ईमेल</label>
-                    <input type="email" id="adminEmail" placeholder="email@example.com">
+                    <input type="email" id="adminEmail" required placeholder="email@example.com">
                 </div>
                 <div class="form-group">
                     <label>पासवर्ड</label>
-                    <input type="password" id="adminPassword" placeholder="••••••••" style="padding-right: 40px;">
-                    <i class="fas fa-eye eye-icon" id="togglePassword" onclick="togglePass()"></i>
+                    <input type="password" id="adminPassword" required placeholder="••••••••">
                 </div>
-                
-                <button type="button" id="loginBtn" class="btn-login" onclick="doAdminLogin()">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
+                <button id="loginBtn" class="btn-login" onclick="doAdminLogin()">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
                 <div id="loginError"></div>
             </div>
         </div>
@@ -112,36 +103,38 @@
         <div class="header">
             <div class="header-title">
                 <h2>ओजस्वी कंट्रोल रूम</h2>
+                <span id="adminBranchBadge">ब्रांच: लोड हो रहा है...</span>
             </div>
             <div class="header-profile">
                 <strong id="adminNameDisplay">Admin Name</strong>
+                <small id="adminRoleDisplay">Role</small><br>
                 <button class="btn-logout" onclick="logoutAdmin()">लॉगआउट <i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card" style="border-left-color: var(--success);">
+            <div class="stat-card" style="border-color: var(--success);">
                 <h3 id="statAgents">0</h3>
-                <p>कुल कार्यकर्ता (एजेंट)</p>
+                <p>कुल कार्यकर्ता</p>
             </div>
-            <div class="stat-card" style="border-left-color: var(--warning);">
+            <div class="stat-card" style="border-color: var(--warning);">
                 <h3 id="statKyc">0</h3>
-                <p>KYC पेंडिंग (चेकिंग)</p>
+                <p>KYC पेंडिंग</p>
             </div>
         </div>
 
         <div class="tab-nav">
-            <div class="tab-btn active" onclick="switchTab('kycList', this)"><i class="fas fa-id-card"></i> KYC रिक्वेस्ट</div>
-            <div class="tab-btn" onclick="switchTab('leadList', this)"><i class="fas fa-users"></i> लाभार्थी (Leads)</div>
+            <div class="tab-btn active" onclick="switchTab('kycList', this)"><i class="fas fa-id-card"></i> KYC अप्रूवल</div>
+            <div class="tab-btn" onclick="switchTab('leadList', this)"><i class="fas fa-users"></i> नए लाभार्थी</div>
         </div>
 
         <div id="kycList" class="tab-view active">
-            <h3 style="color: white; margin-top: 0; font-size: 16px;">KYC रिक्वेस्ट लिस्ट</h3>
+            <h3 style="color: white; margin-top: 0;">KYC रिक्वेस्ट</h3>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>एजेंट का नाम / ईमेल</th>
+                            <th>नाम / ईमेल</th>
                             <th>स्टेटस</th>
                             <th>डॉक्यूमेंट्स</th>
                             <th>एक्शन</th>
@@ -155,148 +148,131 @@
         </div>
 
         <div id="leadList" class="tab-view">
-            <h3 style="color: white; margin-top: 0; font-size: 16px;">लाभार्थी (Leads) लिस्ट</h3>
+            <h3 style="color: white; margin-top: 0;">लाभार्थी (Leads) लिस्ट</h3>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
                             <th>लाभार्थी का नाम</th>
                             <th>योजना</th>
-                            <th>एजेंट ईमेल</th>
+                            <th>किसने जोड़ा?</th>
                             <th>स्टेटस</th>
                         </tr>
                     </thead>
                     <tbody id="leadsTableBody">
-                        <tr><td colspan="4" style="text-align:center;">कोई लाभार्थी नहीं मिला</td></tr>
+                        <tr><td colspan="4" style="text-align:center;">डेटा लोड हो रहा है...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- 📄 DOCUMENT VIEW MODAL -->
+    <!-- MODAL -->
     <div id="docModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">×</span>
-            <h3 style="color: white; margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 10px; font-size: 16px;">एजेंट की जानकारी</h3>
+            <h3 style="color: white; margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 10px;">एजेंट की जानकारी</h3>
             <div id="modalDataContent"></div>
         </div>
     </div>
 
-    <!-- SCRIPTS -->
     <script>
-        const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // 🚀 आपकी FIREBASE CONFIG (API Keys) 🚀
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJ5Vwr6vhJexo7Q4qQket0NsYJ5ynzm04",
+            authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
+            projectId: "ojaswi-jan-kalyan-foundation",
+            storageBucket: "ojaswi-jan-kalyan-foundation.firebasestorage.app",
+            messagingSenderId: "249455861155",
+            appId: "1:249455861155:web:c7a1f8093910e25f748e16"
+        };
+
+        // Firebase शुरू करें
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        const MASTER_EMAIL = "ojaswijankalyanfoundation@gmail.com";
         let allAgents = [];
 
-        // 👁️ पासवर्ड Show/Hide फंक्शन
-        function togglePass() {
-            try {
-                const passInput = document.getElementById('adminPassword');
-                const eyeIcon = document.getElementById('togglePassword');
-                if (passInput.type === "password") {
-                    passInput.type = "text";
-                    eyeIcon.classList.remove("fa-eye");
-                    eyeIcon.classList.add("fa-eye-slash");
-                } else {
-                    passInput.type = "password";
-                    eyeIcon.classList.remove("fa-eye-slash");
-                    eyeIcon.classList.add("fa-eye");
-                }
-            } catch(e) { console.error("Eye Icon Error:", e); }
-        }
-
-        // 🟢 Enter Button Login Fix
-        document.getElementById("adminPassword").addEventListener("keyup", function(event) {
-            if (event.key === "Enter") {
-                doAdminLogin();
-            }
-        });
-
-        // 🟢 सुरक्षित लॉगिन फंक्शन
+        // 🚨 नया FIREBASE LOGIN LOGIC 🚨
         async function doAdminLogin() {
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
             const errorBox = document.getElementById('loginError');
 
+            errorBox.style.display = 'none';
+
             if(!email || !password) {
-                errorBox.innerHTML = "❌ ईमेल और पासवर्ड भरें!";
+                errorBox.innerHTML = "❌ कृपया ईमेल और पासवर्ड दोनों भरें!";
                 errorBox.style.display = 'block';
                 return;
             }
 
-            errorBox.style.display = 'none';
             btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> चेक कर रहे हैं...";
             btn.disabled = true;
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                // 1. Firebase Auth Login
+                await auth.signInWithEmailAndPassword(email, password);
                 
-                if (error) {
-                    throw new Error("❌ ईमेल या पासवर्ड गलत है!");
+                // 2. ऑटोमैटिक 'Super Admin' बनाना (ताकि आपको कुछ न करना पड़े)
+                if (email === MASTER_EMAIL) {
+                    await db.collection('admin_users').doc(email).set({
+                        email: email,
+                        name: "Super Admin",
+                        role: "Super Admin",
+                        branch: "Head Office"
+                    }, { merge: true });
                 }
 
-                // एडमिन टेबल चेक
-                const { data: adminData, error: adminErr } = await supabase
-                    .from('admin_users')
-                    .select('*')
-                    .eq('email', email)
-                    .maybeSingle();
+                // 3. डेटाबेस (Firestore) से चेक करना
+                const adminDoc = await db.collection('admin_users').doc(email).get();
 
-                if (!adminData) {
-                    await supabase.auth.signOut();
-                    throw new Error("❌ आपको एडमिन पावर नहीं दी गई है!");
+                if (!adminDoc.exists) {
+                    await auth.signOut();
+                    throw new Error("❌ इस आईडी के पास एडमिन पैनल का एक्सेस नहीं है!");
                 }
 
-                // अगर सब सही है, तो डैशबोर्ड दिखाओ
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('admin-dashboard').style.display = 'block';
-                document.getElementById('adminNameDisplay').innerText = adminData.name || email;
-                fetchAdminData();
+                // SUCCESS
+                showDashboard(adminDoc.data());
 
             } catch (error) {
-                errorBox.innerHTML = error.message; 
+                errorBox.innerHTML = "❌ " + (error.message || "पासवर्ड या ईमेल गलत है!"); 
                 errorBox.style.display = 'block';
-            } finally {
-                // बटन वापस नार्मल करना
                 btn.innerHTML = "लॉगिन करें <i class='fas fa-sign-in-alt'></i>";
                 btn.disabled = false;
             }
         }
 
-        // 🟢 बैकग्राउंड सेशन चेक (अगर पहले से लॉगिन है तो डायरेक्ट डैशबोर्ड)
-        document.addEventListener("DOMContentLoaded", async function() {
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    const { data: adminData } = await supabase
-                        .from('admin_users')
-                        .select('*')
-                        .eq('email', session.user.email)
-                        .maybeSingle();
+        function showDashboard(adminData) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'block';
+            
+            document.getElementById('adminNameDisplay').innerText = adminData.name || adminData.email;
+            document.getElementById('adminRoleDisplay').innerText = adminData.role || 'Manager';
+            document.getElementById('adminBranchBadge').innerText = `ब्रांच: ${adminData.branch || 'All'}`;
 
-                    if (adminData) {
-                        document.getElementById('login-screen').style.display = 'none';
-                        document.getElementById('admin-dashboard').style.display = 'block';
-                        document.getElementById('adminNameDisplay').innerText = adminData.name || session.user.email;
-                        fetchAdminData();
-                    } else {
-                        await supabase.auth.signOut();
-                    }
-                }
-            } catch (err) {
-                console.error("Session Error:", err);
-            }
-        });
+            fetchAdminData();
+        }
 
         async function logoutAdmin() {
-            if(confirm("लॉगआउट करना चाहते हैं?")){
-                await supabase.auth.signOut();
-                window.location.reload(); 
-            }
+            await auth.signOut();
+            window.location.reload();
         }
+
+        // सेशन चेक (ताकि बार-बार लॉगिन न करना पड़े)
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const adminDoc = await db.collection('admin_users').doc(user.email).get();
+                if (adminDoc.exists) {
+                    showDashboard(adminDoc.data());
+                } else {
+                    await auth.signOut();
+                }
+            }
+        });
 
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
@@ -307,28 +283,35 @@
 
         function closeModal() { document.getElementById('docModal').style.display = 'none'; }
 
+        // 📊 FIREBASE से डेटा लाना
         async function fetchAdminData() {
             try {
-                const { data: agents, error: err1 } = await supabase.from('agents').select('*').order('created_at', { ascending: false });
-                if(!err1) {
-                    allAgents = agents;
-                    document.getElementById('statAgents').innerText = agents.length;
-                    document.getElementById('statKyc').innerText = agents.filter(a => a.status === 'Under Review').length;
-                    renderKYC(agents);
-                }
+                // एजेंट्स (कार्यकर्ता) का डेटा लाएं
+                const agentsSnapshot = await db.collection('agents').get();
+                allAgents = [];
+                agentsSnapshot.forEach(doc => { allAgents.push({ id: doc.id, ...doc.data() }); });
 
-                const { data: leads, error: err2 } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
-                if(!err2) renderLeads(leads);
-            } catch (error) { console.error("Data Error:", error); }
+                // लाभार्थी (Leads) का डेटा लाएं
+                const leadsSnapshot = await db.collection('leads').get();
+                let leads = [];
+                leadsSnapshot.forEach(doc => { leads.push({ id: doc.id, ...doc.data() }); });
+
+                // Stats अपडेट करें
+                document.getElementById('statAgents').innerText = allAgents.length;
+                document.getElementById('statKyc').innerText = allAgents.filter(a => a.status === 'Under Review').length;
+
+                renderKYC(allAgents);
+                renderLeads(leads);
+            } catch (error) { console.error("Error fetching data:", error); }
         }
 
         function renderKYC(agents) {
             const tbody = document.getElementById('kycTableBody');
             tbody.innerHTML = '';
-            if(agents.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">कोई एजेंट नहीं मिला</td></tr>'; return; }
+            if(agents.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">कोई डेटा नहीं मिला (Firebase खाली है)</td></tr>'; return; }
 
             agents.forEach(agent => {
-                let badgeClass = 'pending'; let statusText = 'Pending';
+                let badgeClass = 'pending'; let statusText = agent.status || 'Pending';
                 if(agent.status === 'Under Review') { badgeClass = 'review'; statusText = 'चेकिंग में'; }
                 if(agent.status === 'Active') { badgeClass = 'active'; statusText = 'अप्रूव्ड'; }
                 if(agent.status === 'Rejected') { badgeClass = 'rejected'; statusText = 'रिजेक्टेड'; }
@@ -337,11 +320,11 @@
                 tr.innerHTML = `
                     <td><strong>${agent.name || 'N/A'}</strong><br><small style="color:#888;">${agent.email}</small></td>
                     <td><span class="badge ${badgeClass}">${statusText}</span></td>
-                    <td><button class="btn-action btn-view" onclick="viewDocs('${agent.email}')">देखें</button></td>
+                    <td><button class="btn-action btn-view" onclick="viewDocs('${agent.id}')"><i class="fas fa-eye"></i> देखें</button></td>
                     <td>
                         ${agent.status === 'Under Review' ? `
-                            <button class="btn-action btn-approve" onclick="updateAgentStatus('${agent.email}', 'Active')"><i class="fas fa-check"></i></button>
-                            <button class="btn-action btn-reject" onclick="updateAgentStatus('${agent.email}', 'Rejected')"><i class="fas fa-times"></i></button>
+                            <button class="btn-action btn-approve" onclick="updateAgentStatus('${agent.id}', 'Active')"><i class="fas fa-check"></i></button>
+                            <button class="btn-action btn-reject" onclick="updateAgentStatus('${agent.id}', 'Rejected')"><i class="fas fa-times"></i></button>
                         ` : '-'}
                     </td>
                 `;
@@ -358,40 +341,43 @@
                 tr.innerHTML = `
                     <td><strong>${lead.name}</strong><br><small>${lead.mobile}</small></td>
                     <td>${lead.scheme_name}</td>
-                    <td><small style="color:#888;">${lead.agent_email}</small></td>
+                    <td>${lead.agent_email}</td>
                     <td><span class="badge pending">${lead.status || 'Pending'}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function viewDocs(email) {
-            const agent = allAgents.find(a => a.email === email);
+        function viewDocs(docId) {
+            const agent = allAgents.find(a => a.id === docId);
             if(!agent) return;
 
             let html = `
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 20px; background:#1e1e2f; padding:15px; border-radius:8px; font-size:12px;">
-                    <div><small style="color:#888;">बैंक</small><br>${agent.bank_name || '-'}</div>
-                    <div><small style="color:#888;">अकाउंट</small><br>${agent.account_no || '-'}</div>
-                    <div><small style="color:#888;">IFSC</small><br>${agent.ifsc_code || '-'}</div>
-                    <div><small style="color:#888;">पैन</small><br>${agent.pan_no || '-'}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 20px; background:#1e1e2f; padding:15px; border-radius:8px;">
+                    <div><small style="color:#888;">बैंक का नाम</small><br>${agent.bank_name || '-'}</div>
+                    <div><small style="color:#888;">अकाउंट नंबर</small><br>${agent.account_no || '-'}</div>
+                    <div><small style="color:#888;">IFSC कोड</small><br>${agent.ifsc_code || '-'}</div>
+                    <div><small style="color:#888;">पैन नंबर</small><br>${agent.pan_no || '-'}</div>
+                    <div style="grid-column: span 2;"><small style="color:#888;">आधार नंबर</small><br>${agent.aadhaar_no || '-'}</div>
                 </div>
+                <h4 style="color:var(--accent);">अपलोड किए गए डाक्यूमेंट्स</h4>
             `;
 
             const docs = [
-                { title: 'फोटो', url: agent.profile_photo },
+                { title: 'पासपोर्ट फोटो', url: agent.profile_photo },
                 { title: 'पैन कार्ड', url: agent.pan_photo },
-                { title: 'आधार', url: agent.aadhaar_file_front },
-                { title: 'बैंक प्रूफ', url: agent.bank_proof_file }
+                { title: 'आईडी फ्रंट', url: agent.aadhaar_file_front },
+                { title: 'आईडी बैक', url: agent.aadhaar_file_back },
+                { title: 'बैंकिंग प्रूफ', url: agent.bank_proof_file }
             ];
 
             docs.forEach(doc => {
                 if(doc.url) {
-                    const isPdf = doc.url.toLowerCase().includes('.pdf');
+                    const isPdf = doc.url.toLowerCase().includes('.pdf') || doc.url.includes('alt=media');
                     html += `
                         <div class="doc-item">
                             <h4>${doc.title}</h4>
-                            ${isPdf ? `<a href="${doc.url}" target="_blank"><i class="fas fa-file-pdf"></i> PDF देखें</a>` : `<a href="${doc.url}" target="_blank"><img src="${doc.url}"></a>`}
+                            ${isPdf ? `<a href="${doc.url}" target="_blank"><i class="fas fa-external-link-alt"></i> फाइल देखें</a>` : `<a href="${doc.url}" target="_blank"><img src="${doc.url}"></a>`}
                         </div>
                     `;
                 }
@@ -401,13 +387,14 @@
             document.getElementById('docModal').style.display = 'block';
         }
 
-        async function updateAgentStatus(email, newStatus) {
-            if(!confirm('क्या आप श्योर हैं?')) return;
+        // स्टेटस अपडेट (Approve/Reject)
+        async function updateAgentStatus(docId, newStatus) {
+            let msg = newStatus === 'Active' ? 'क्या आप इस एजेंट को अप्रूव करना चाहते हैं?' : 'क्या आप इसे रिजेक्ट करना चाहते हैं?';
+            if(!confirm(msg)) return;
 
             try {
-                const { error } = await supabase.from('agents').update({ status: newStatus }).eq('email', email);
-                if (error) throw error;
-                alert(`सफलता!`);
+                await db.collection('agents').doc(docId).update({ status: newStatus });
+                alert(`सफलता! स्टेटस "${newStatus}" कर दिया गया है।`);
                 fetchAdminData(); 
             } catch(e) { alert("एरर: " + e.message); }
         }
