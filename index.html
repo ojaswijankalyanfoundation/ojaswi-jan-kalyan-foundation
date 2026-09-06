@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ओजस्वी जनकल्याण फाउंडेशन | Ojasvi Jan-Kalyan Foundation</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 🚨 FIREBASE ENGINES 🚨 -->
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore-compat.js"></script>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
@@ -81,7 +84,7 @@
     <!-- 🌟 NAVBAR -->
     <div class="navbar">
         <div class="logo-section">
-            <img src="assets/ojasvi-logo.png" alt="Ojasvi Logo">
+            <img src="assets/ojasvi-logo.png" alt="Ojasvi Logo" onerror="this.src='https://via.placeholder.com/60?text=Ojaswi'">
             <div class="brand-text">
                 <h1>ओजस्वी जनकल्याण फाउंडेशन</h1>
                 <span>OJASVI JAN-KALYAN FOUNDATION</span>
@@ -89,7 +92,7 @@
         </div>        
         <div class="nav-links">
             <a href="index.html">होम</a>
-            <a href="#about">हमारे बारे में</a>
+            <a href="#schemes">हमारे बारे में</a>
             <a href="login.html" class="btn-login">पोर्टल लॉगिन <i class="fas fa-sign-in-alt"></i></a>
         </div>     
     </div>
@@ -184,8 +187,20 @@
 
     </div>
 
-    <!-- 🌟 SUPABASE LOGIC -->
+    <!-- 🌟 FIREBASE LOGIC -->
     <script>
+        // 🚨 असली FIREBASE CONFIG 🚨
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJSVwr6VhJexbfQ4qQket0NsfJ5yHzm04",
+            authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
+            projectId: "ojaswi-jan-kalyan-foundation",
+            storageBucket: "ojaswi-jan-kalyan-foundation.firebasestorage.app",
+            messagingSenderId: "249455861155",
+            appId: "1:249455861155:web:c7a1f0493910e25f748e16"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         async function submitLead(event) {
             event.preventDefault(); 
             const btn = document.getElementById('submitBtn');
@@ -194,20 +209,19 @@
             try {
                 btn.innerHTML = "कृपया प्रतीक्षा करें... <i class='fas fa-spinner fa-spin'></i>";
                 btn.disabled = true;
-
-                const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
-                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
-                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 
                 const leadData = {
                     name: document.getElementById('name').value,
                     mobile: document.getElementById('mobile').value,
                     pincode: document.getElementById('pincode').value,
-                    scheme_name: document.getElementById('scheme').value
+                    scheme_name: document.getElementById('scheme').value,
+                    source: "Website Direct",
+                    status: "Pending",
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                const { error } = await supabase.from('leads').insert([leadData]);
-                if (error) throw error; 
+                // Firebase Firestore में Save करें
+                await db.collection('leads').add(leadData);
 
                 // Hide Form, Show Success
                 document.getElementById('formContainer').style.display = 'none';
