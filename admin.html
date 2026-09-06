@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>एडमिन पैनल | ओजस्वी फाउंडेशन (Firebase)</title>
     
-    <!-- 🚨 FIREBASE ENGINES (V9 COMPAT) 🚨 -->
+    <!-- 🚨 FIREBASE ENGINES 🚨 -->
     <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore-compat.js"></script>
@@ -20,12 +20,18 @@
         .login-box { background: var(--admin-card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; border-top: 4px solid var(--accent); }
         .login-box h2 { margin: 0 0 5px 0; color: white; }
         .login-box p { color: #888; font-size: 13px; margin-bottom: 25px; }
-        .form-group { margin-bottom: 15px; text-align: left; }
+        
+        .form-group { margin-bottom: 15px; text-align: left; position: relative; }
         .form-group label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; }
         .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; font-size: 14px; }
         .form-group input:focus { border-color: var(--accent); outline: none; }
-        .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; box-shadow: 0 4px 10px rgba(225, 78, 202, 0.3); }
         
+        /* Password Toggle Icon Style */
+        .password-toggle { position: absolute; right: 15px; top: 38px; cursor: pointer; color: #888; font-size: 16px; transition: 0.3s; }
+        .password-toggle:hover { color: var(--accent); }
+        #adminPassword { padding-right: 40px; } /* Space for the eye icon */
+
+        .btn-login { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; box-shadow: 0 4px 10px rgba(225, 78, 202, 0.3); }
         #loginError { color: white; font-size: 13px; font-weight: bold; margin-top: 15px; display: none; background: var(--danger); padding: 10px; border-radius: 6px; text-align: center; }
 
         #admin-dashboard { display: none; padding-bottom: 30px; }
@@ -90,7 +96,9 @@
                 </div>
                 <div class="form-group">
                     <label>पासवर्ड</label>
+                    <!-- 👁️ पासवर्ड देखने/छुपाने वाला इनपुट -->
                     <input type="password" id="adminPassword" required placeholder="••••••••">
+                    <i class="fas fa-eye password-toggle" id="togglePasswordBtn" onclick="togglePassword()"></i>
                 </div>
                 <button id="loginBtn" class="btn-login" onclick="doAdminLogin()">लॉगिन करें <i class="fas fa-sign-in-alt"></i></button>
                 <div id="loginError"></div>
@@ -98,7 +106,7 @@
         </div>
     </div>
 
-    <!-- 📊 SECURE DASHBOARD -->
+    <!-- 📊 SECURE DASHBOARD (BAKI SAB SAME HAI) -->
     <div id="admin-dashboard">
         <div class="header">
             <div class="header-title">
@@ -129,45 +137,24 @@
         </div>
 
         <div id="kycList" class="tab-view active">
-            <h3 style="color: white; margin-top: 0;">KYC रिक्वेस्ट</h3>
             <div class="table-container">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>नाम / ईमेल</th>
-                            <th>स्टेटस</th>
-                            <th>डॉक्यूमेंट्स</th>
-                            <th>एक्शन</th>
-                        </tr>
-                    </thead>
-                    <tbody id="kycTableBody">
-                        <tr><td colspan="4" style="text-align:center;">डेटा लोड हो रहा है...</td></tr>
-                    </tbody>
+                    <thead><tr><th>नाम / ईमेल</th><th>स्टेटस</th><th>डॉक्यूमेंट्स</th><th>एक्शन</th></tr></thead>
+                    <tbody id="kycTableBody"><tr><td colspan="4" style="text-align:center;">डेटा लोड हो रहा है...</td></tr></tbody>
                 </table>
             </div>
         </div>
 
         <div id="leadList" class="tab-view">
-            <h3 style="color: white; margin-top: 0;">लाभार्थी (Leads) लिस्ट</h3>
             <div class="table-container">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>लाभार्थी का नाम</th>
-                            <th>योजना</th>
-                            <th>किसने जोड़ा?</th>
-                            <th>स्टेटस</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leadsTableBody">
-                        <tr><td colspan="4" style="text-align:center;">डेटा लोड हो रहा है...</td></tr>
-                    </tbody>
+                    <thead><tr><th>लाभार्थी का नाम</th><th>योजना</th><th>किसने जोड़ा?</th><th>स्टेटस</th></tr></thead>
+                    <tbody id="leadsTableBody"><tr><td colspan="4" style="text-align:center;">डेटा लोड हो रहा है...</td></tr></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- MODAL -->
     <div id="docModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">×</span>
@@ -177,9 +164,9 @@
     </div>
 
     <script>
-        // 🚀 FIREBASE CONFIG (API Keys) 🚀
+        // 🚨 अपनी सही API KEY यहाँ डालें 🚨
         const firebaseConfig = {
-            apiKey: "AIzaSyAJ5Vwr6vhJexo7Q4qQket0NsYJ5ynzm04",
+            apiKey: "यहाँ_अपनी_असली_API_KEY_डालें", // <--- बस इस लाइन को सही करें
             authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
             projectId: "ojaswi-jan-kalyan-foundation",
             storageBucket: "ojaswi-jan-kalyan-foundation.firebasestorage.app",
@@ -187,16 +174,28 @@
             appId: "1:249455861155:web:c7a1f8093910e25f748e16"
         };
 
-        // Firebase शुरू करें
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-
-        // 🚨 मास्टर ईमेल अपडेट कर दी गई है 🚨
-        const MASTER_EMAIL = "ojaswijankalyanfoundation@zohomail.in";
+        const MASTER_EMAIL = "ojaswijankalyanfoundation@gmail.com";
         let allAgents = [];
 
-        // 🚨 FIREBASE LOGIN LOGIC 🚨
+        // 👁️ पासवर्ड Show/Hide करने का लॉजिक
+        function togglePassword() {
+            const pwdInput = document.getElementById("adminPassword");
+            const toggleIcon = document.getElementById("togglePasswordBtn");
+            if (pwdInput.type === "password") {
+                pwdInput.type = "text";
+                toggleIcon.classList.remove("fa-eye");
+                toggleIcon.classList.add("fa-eye-slash");
+            } else {
+                pwdInput.type = "password";
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            }
+        }
+
+        // 🚨 FIREBASE LOGIN LOGIC
         async function doAdminLogin() {
             const email = document.getElementById('adminEmail').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
@@ -215,20 +214,14 @@
             btn.disabled = true;
 
             try {
-                // 1. Firebase Auth Login
                 await auth.signInWithEmailAndPassword(email, password);
                 
-                // 2. ऑटोमैटिक 'Super Admin' बनाना (ताकि आपको कुछ न करना पड़े)
                 if (email === MASTER_EMAIL) {
                     await db.collection('admin_users').doc(email).set({
-                        email: email,
-                        name: "Super Admin",
-                        role: "Super Admin",
-                        branch: "Head Office"
+                        email: email, name: "Super Admin", role: "Super Admin", branch: "Head Office"
                     }, { merge: true });
                 }
 
-                // 3. डेटाबेस (Firestore) से चेक करना
                 const adminDoc = await db.collection('admin_users').doc(email).get();
 
                 if (!adminDoc.exists) {
@@ -236,11 +229,15 @@
                     throw new Error("❌ इस आईडी के पास एडमिन पैनल का एक्सेस नहीं है!");
                 }
 
-                // SUCCESS
                 showDashboard(adminDoc.data());
 
             } catch (error) {
-                errorBox.innerHTML = "❌ " + (error.message || "पासवर्ड या ईमेल गलत है!"); 
+                // Firebase का एरर हिंदी में
+                let errorMsg = error.message;
+                if(errorMsg.includes("api-key-not-valid")) errorMsg = "API Key गलत है! कृपया कोड में सही API Key डालें।";
+                if(errorMsg.includes("auth/invalid-credential")) errorMsg = "पासवर्ड या ईमेल गलत है!";
+                
+                errorBox.innerHTML = "❌ " + errorMsg; 
                 errorBox.style.display = 'block';
                 btn.innerHTML = "लॉगिन करें <i class='fas fa-sign-in-alt'></i>";
                 btn.disabled = false;
@@ -250,11 +247,9 @@
         function showDashboard(adminData) {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-dashboard').style.display = 'block';
-            
             document.getElementById('adminNameDisplay').innerText = adminData.name || adminData.email;
             document.getElementById('adminRoleDisplay').innerText = adminData.role || 'Manager';
             document.getElementById('adminBranchBadge').innerText = `ब्रांच: ${adminData.branch || 'All'}`;
-
             fetchAdminData();
         }
 
@@ -263,15 +258,11 @@
             window.location.reload();
         }
 
-        // सेशन चेक (ताकि बार-बार लॉगिन न करना पड़े)
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const adminDoc = await db.collection('admin_users').doc(user.email).get();
-                if (adminDoc.exists) {
-                    showDashboard(adminDoc.data());
-                } else {
-                    await auth.signOut();
-                }
+                if (adminDoc.exists) showDashboard(adminDoc.data());
+                else await auth.signOut();
             }
         });
 
@@ -284,32 +275,28 @@
 
         function closeModal() { document.getElementById('docModal').style.display = 'none'; }
 
-        // 📊 FIREBASE से डेटा लाना
         async function fetchAdminData() {
             try {
-                // एजेंट्स (कार्यकर्ता) का डेटा लाएं
                 const agentsSnapshot = await db.collection('agents').get();
                 allAgents = [];
                 agentsSnapshot.forEach(doc => { allAgents.push({ id: doc.id, ...doc.data() }); });
 
-                // लाभार्थी (Leads) का डेटा लाएं
                 const leadsSnapshot = await db.collection('leads').get();
                 let leads = [];
                 leadsSnapshot.forEach(doc => { leads.push({ id: doc.id, ...doc.data() }); });
 
-                // Stats अपडेट करें
                 document.getElementById('statAgents').innerText = allAgents.length;
                 document.getElementById('statKyc').innerText = allAgents.filter(a => a.status === 'Under Review').length;
 
                 renderKYC(allAgents);
                 renderLeads(leads);
-            } catch (error) { console.error("Error fetching data:", error); }
+            } catch (error) { console.error("Error:", error); }
         }
 
         function renderKYC(agents) {
             const tbody = document.getElementById('kycTableBody');
             tbody.innerHTML = '';
-            if(agents.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">कोई डेटा नहीं मिला (Firebase खाली है)</td></tr>'; return; }
+            if(agents.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">कोई डेटा नहीं मिला</td></tr>'; return; }
 
             agents.forEach(agent => {
                 let badgeClass = 'pending'; let statusText = agent.status || 'Pending';
@@ -361,14 +348,13 @@
                     <div><small style="color:#888;">पैन नंबर</small><br>${agent.pan_no || '-'}</div>
                     <div style="grid-column: span 2;"><small style="color:#888;">आधार नंबर</small><br>${agent.aadhaar_no || '-'}</div>
                 </div>
-                <h4 style="color:var(--accent);">अपलोड किए गए डाक्यूमेंट्स</h4>
+                <h4 style="color:var(--accent);">डाक्यूमेंट्स</h4>
             `;
 
             const docs = [
                 { title: 'पासपोर्ट फोटो', url: agent.profile_photo },
                 { title: 'पैन कार्ड', url: agent.pan_photo },
                 { title: 'आईडी फ्रंट', url: agent.aadhaar_file_front },
-                { title: 'आईडी बैक', url: agent.aadhaar_file_back },
                 { title: 'बैंकिंग प्रूफ', url: agent.bank_proof_file }
             ];
 
@@ -388,7 +374,6 @@
             document.getElementById('docModal').style.display = 'block';
         }
 
-        // स्टेटस अपडेट (Approve/Reject)
         async function updateAgentStatus(docId, newStatus) {
             let msg = newStatus === 'Active' ? 'क्या आप इस एजेंट को अप्रूव करना चाहते हैं?' : 'क्या आप इसे रिजेक्ट करना चाहते हैं?';
             if(!confirm(msg)) return;
