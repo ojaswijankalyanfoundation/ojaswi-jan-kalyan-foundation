@@ -26,7 +26,7 @@
         .form-group input { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 6px; background: #1e1e2f; color: white; box-sizing: border-box; font-size: 14px; }
         .form-group input:focus { border-color: var(--accent); outline: none; }
         
-        /* 👁️ Password Toggle Icon */
+        /* 👁️ Password Toggle Icon Style */
         .password-toggle { position: absolute; right: 15px; top: 38px; cursor: pointer; color: #888; font-size: 16px; transition: 0.3s; }
         .password-toggle:hover { color: var(--accent); }
         #adminPassword { padding-right: 40px; } 
@@ -96,7 +96,6 @@
                 </div>
                 <div class="form-group">
                     <label>पासवर्ड</label>
-                    <!-- 👁️ पासवर्ड देखने/छुपाने का बटन -->
                     <input type="password" id="adminPassword" required placeholder="••••••••">
                     <i class="fas fa-eye password-toggle" id="togglePasswordBtn" onclick="togglePassword()"></i>
                 </div>
@@ -155,7 +154,6 @@
         </div>
     </div>
 
-    <!-- MODAL -->
     <div id="docModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">×</span>
@@ -165,25 +163,21 @@
     </div>
 
     <script>
-        // 🚨🚨🚨 सबसे ज़रूरी काम: यहाँ अपनी असली Firebase Config डालें 🚨🚨🚨
-        // Firebase की Project Settings -> Your Apps से यह पूरा ब्लॉक कॉपी करके यहाँ पेस्ट करें:
-        
+        // 🚨🚨 मैंने आपकी 100% सही API Key यहाँ सेट कर दी है 🚨🚨
         const firebaseConfig = {
-            apiKey: "यहाँ_अपनी_असली_API_KEY_डालें", 
+            apiKey: "AIzaSyAJSVwr6vhJexbfQ4qQketONsYJ5ynzmO4",
             authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
             projectId: "ojaswi-jan-kalyan-foundation",
             storageBucket: "ojaswi-jan-kalyan-foundation.firebasestorage.app",
             messagingSenderId: "249455861155",
-            appId: "1:249455861155:web:c7a1f8093910e25f748e16"
+            appId: "1:249455861155:web:c7a1f0493910e25f748e16"
         };
-        
-        // 🚨🚨🚨 ऊपर वाला हिस्सा ही आपकी वेबसाइट को Firebase से जोड़ता है 🚨🚨🚨
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
         
-        // मास्टर एडमिन ईमेल (इन दोनों ईमेल को फुल पॉवर है)
+        // मास्टर एडमिन ईमेल्स
         const MASTER_EMAILS = ["ojaswijankalyanfoundation@gmail.com", "ojaswijankalyanfoundation@zohomail.in"];
         let allAgents = [];
 
@@ -221,17 +215,16 @@
             btn.disabled = true;
 
             try {
-                // Firebase में ईमेल/पासवर्ड चेक करना
+                // Firebase Login
                 await auth.signInWithEmailAndPassword(email, password);
                 
-                // अगर मास्टर ईमेल है, तो उसे डेटाबेस में सुपर एडमिन बना दो
+                // सुपर एडमिन बनाना
                 if (MASTER_EMAILS.includes(email)) {
                     await db.collection('admin_users').doc(email).set({
                         email: email, name: "Super Admin", role: "Super Admin", branch: "Head Office"
                     }, { merge: true });
                 }
 
-                // चेक करो कि क्या ये एडमिन लिस्ट में है
                 const adminDoc = await db.collection('admin_users').doc(email).get();
 
                 if (!adminDoc.exists) {
@@ -243,9 +236,9 @@
 
             } catch (error) {
                 let errorMsg = error.message;
-                if(errorMsg.includes("api-key-not-valid")) errorMsg = "API Key गलत है! कृपया कोड में सही API Key डालें।";
+                if(errorMsg.includes("api-key-not-valid")) errorMsg = "API Key गलत है!";
                 if(errorMsg.includes("auth/invalid-credential")) errorMsg = "पासवर्ड या ईमेल गलत है!";
-                if(errorMsg.includes("auth/user-not-found")) errorMsg = "यह ईमेल Firebase में रजिस्टर नहीं है!";
+                if(errorMsg.includes("auth/user-not-found")) errorMsg = "यह ईमेल रजिस्टर नहीं है!";
                 
                 errorBox.innerHTML = "❌ " + errorMsg; 
                 errorBox.style.display = 'block';
