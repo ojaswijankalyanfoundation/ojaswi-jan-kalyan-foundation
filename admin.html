@@ -164,15 +164,12 @@
     </div>
 
     <script>
+        
         // 🚨 आपकी असली और पक्की API KEY (मैंने खुद लगा दी है) 🚨
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJ5Vwr6vhJexo7Q4qQket0NsYJ5ynzm04",
-            authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
-            projectId: "ojaswi-jan-kalyan-foundation",
-            storageBucket: "ojaswi-jan-kalyan-foundation.firebasestorage.app",
-            messagingSenderId: "249455861155",
-            appId: "1:249455861155:web:c7a1f8093910e25f748e16"
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyAJ5Vwr6vhJexo7Q4qQket0NsYJ5ynzm04", // <--- इस पुरानी लाइन को हटा दें
+    authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
+    //... बाकी सब सेम रहेगा
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
