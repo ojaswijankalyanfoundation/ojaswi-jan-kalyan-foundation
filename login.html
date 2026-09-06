@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>पोर्टल लॉगिन | ओजस्वी जनकल्याण फाउंडेशन</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 🚨 FIREBASE ENGINES 🚨 -->
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore-compat.js"></script>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <style>
@@ -18,10 +22,12 @@
         h2 { margin: 0 0 5px 0; color: var(--navy); font-size: 24px; }
         p.subtitle { color: #666; font-size: 14px; margin-bottom: 25px; }
 
-        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group { margin-bottom: 15px; text-align: left; position: relative; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; color: #444; }
         .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: 0.3s; }
         .form-group input:focus { border-color: var(--saffron); outline: none; box-shadow: 0 0 5px rgba(255,153,51,0.2); }
+        
+        .password-toggle { position: absolute; right: 15px; top: 35px; cursor: pointer; color: #888; font-size: 16px; transition: 0.3s; }
 
         .btn-main { width: 100%; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
         .btn-login-color { background: var(--navy); }
@@ -49,20 +55,19 @@
         <!-- LOGIN SECTION -->
         <div id="loginSection" class="auth-section active">
             <h2>पोर्टल लॉगिन</h2>
-            <p class="subtitle">एडमिन और एजेंट यहाँ से लॉगिन करें</p>
+            <p class="subtitle">एडमिन और कार्यकर्ता यहाँ से लॉगिन करें</p>
 
             <form id="loginForm">
                 <div class="form-group">
                     <label>ईमेल आईडी (Email)</label>
-                    <input type="email" id="email" name="email" autocomplete="username" placeholder="अपनी रजिस्टर्ड ईमेल डालें" required>
+                    <input type="email" id="email" required placeholder="रजिस्टर्ड ईमेल डालें">
                 </div>
                 <div class="form-group">
                     <label>पासवर्ड</label>
-                    <input type="password" id="password" name="password" autocomplete="current-password" placeholder="अपना पासवर्ड डालें" required>
+                    <input type="password" id="password" required placeholder="अपना पासवर्ड डालें" style="padding-right:40px;">
+                    <i class="fas fa-eye password-toggle" id="togglePasswordBtn" onclick="togglePassword()"></i>
                 </div>
-                <div class="forgot-link">
-                    <a href="#" onclick="switchTab('forgotSection')">पासवर्ड भूल गए?</a>
-                </div>
+                <div class="forgot-link"><a href="#" onclick="switchTab('forgotSection')">पासवर्ड भूल गए?</a></div>
 
                 <button type="button" id="loginBtn" class="btn-main btn-login-color" onclick="doLogin()">
                     <i class="fas fa-sign-in-alt"></i> सुरक्षित लॉगिन करें
@@ -82,7 +87,7 @@
             <form id="forgotForm">
                 <div class="form-group">
                     <label>रजिस्टर्ड ईमेल आईडी</label>
-                    <input type="email" id="resetEmail" name="resetEmail" autocomplete="email" placeholder="अपनी ईमेल आईडी डालें" required>
+                    <input type="email" id="resetEmail" required placeholder="अपनी ईमेल आईडी डालें">
                 </div>
                 <button type="button" id="resetBtn" class="btn-main btn-forgot-color" onclick="doReset()">
                     <i class="fas fa-envelope"></i> रीसेट लिंक भेजें
@@ -96,86 +101,80 @@
     </div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJSVwr6VhJexbfQ4qQket0NsfJ5yHzm04",
+            authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
+            projectId: "ojaswi-jan-kalyan-foundation",
+            storageBucket: "ojaswi-jan-kalyan-foundation.firebasestorage.app",
+            messagingSenderId: "249455861155",
+            appId: "1:249455861155:web:c7a1f0493910e25f748e16"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
         function switchTab(tabId) {
             document.querySelectorAll('.auth-section').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
         }
 
+        function togglePassword() {
+            const pwd = document.getElementById("password");
+            const icon = document.getElementById("togglePasswordBtn");
+            if (pwd.type === "password") { pwd.type = "text"; icon.className = "fas fa-eye-slash password-toggle"; } 
+            else { pwd.type = "password"; icon.className = "fas fa-eye password-toggle"; }
+        }
+
         async function doLogin() {
-            const emailInput = document.getElementById('email').value.trim().toLowerCase();
-            const passwordInput = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
 
-            if(!emailInput || !passwordInput) {
-                alert("कृपया ईमेल और पासवर्ड दोनों भरें!");
-                return;
-            }
+            if(!email || !password) { alert("ईमेल और पासवर्ड भरें!"); return; }
 
-            const originalText = loginBtn.innerHTML;
-            loginBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> चेक कर रहे हैं...";
-            loginBtn.disabled = true;
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> चेक कर रहे हैं...";
+            btn.disabled = true;
 
             try {
-                const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
-                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
-                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                // 1. Firebase Login
+                await auth.signInWithEmailAndPassword(email, password);
+                btn.innerHTML = "<i class='fas fa-check-circle'></i> सफल! खुल रहा है...";
 
-                // 1. Authenticate User
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: emailInput,
-                    password: passwordInput,
-                });
-
-                if (error) throw error;
-
-                loginBtn.innerHTML = "<i class='fas fa-check-circle'></i> सफल! रीडायरेक्ट हो रहा है...";
-
-                // 2. Check if user is an Admin
-                const { data: adminData } = await supabase
-                    .from('admin_users')
-                    .select('email')
-                    .eq('email', emailInput)
-                    .maybeSingle();
-
-                // 3. Smart Redirect
+                // 2. स्मार्ट चेकर (Smart Redirect)
+                const adminDoc = await db.collection('admin_users').doc(email).get();
+                
                 setTimeout(() => {
-                    if (adminData) {
+                    if (adminDoc.exists) {
                         window.location.href = 'admin.html'; // एडमिन को एडमिन पेज पर
                     } else {
-                        window.location.href = 'agent.html'; // बाकी सबको एजेंट पेज पर
+                        window.location.href = 'agent.html'; // एजेंट को एजेंट पेज पर
                     }
                 }, 800);
 
             } catch (error) {
-                alert("लॉगिन फेल: " + error.message);
-                loginBtn.innerHTML = originalText;
-                loginBtn.disabled = false;
+                alert("❌ लॉगिन फेल: पासवर्ड या ईमेल गलत है!");
+                btn.innerHTML = "<i class='fas fa-sign-in-alt'></i> सुरक्षित लॉगिन करें";
+                btn.disabled = false;
             }
         }
 
         async function doReset() {
             const email = document.getElementById('resetEmail').value;
-            const resetBtn = document.getElementById('resetBtn');
+            const btn = document.getElementById('resetBtn');
+            if(!email) return;
 
-            if(!email) { alert("कृपया ईमेल भरें!"); return; }
-
-            resetBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> भेज रहे हैं...";
-            resetBtn.disabled = true;
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> भेज रहे हैं...";
+            btn.disabled = true;
 
             try {
-                const SUPABASE_URL = 'https://neybyzqjnqmbbjxruzdv.supabase.co';
-                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5leWJ5enFqbnFtYmJqeHJ1emR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTY0NDcsImV4cCI6MjEwMDk3MjQ0N30.upk2GSCavQEMGp1pzgbsbV-6Pe0I54n2gYlJRmqYXOY';
-                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-                const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-                if (error) throw error;
-                alert("पासवर्ड रीसेट लिंक आपकी ईमेल पर भेज दिया गया है!");
+                await auth.sendPasswordResetEmail(email);
+                alert("✅ पासवर्ड रीसेट लिंक आपकी ईमेल पर भेज दिया गया है!");
                 switchTab('loginSection');
             } catch (error) {
-                alert("एरर: " + error.message);
+                alert("❌ एरर: " + error.message);
             } finally {
-                resetBtn.innerHTML = "<i class='fas fa-envelope'></i> रीसेट लिंक भेजें";
-                resetBtn.disabled = false;
+                btn.innerHTML = "<i class='fas fa-envelope'></i> रीसेट लिंक भेजें";
+                btn.disabled = false;
             }
         }
     </script>
