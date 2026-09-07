@@ -27,10 +27,11 @@
         .auth-container h2 { color: var(--navy); text-align: center; margin-top: 0; }
         .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 25px; }
         
-        .form-group { margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; position: relative; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 13px; color: #444; }
         .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
         .form-group input:focus { border-color: var(--saffron); outline: none; }
+        .password-toggle { position: absolute; right: 15px; top: 38px; cursor: pointer; color: #888; font-size: 16px; }
         
         .btn-main { width: 100%; background: var(--green); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
         .btn-main:hover { background: #0f6c06; }
@@ -38,16 +39,15 @@
         .switch-link { margin-top: 20px; font-size: 14px; text-align: center; color: #555; }
         .switch-link a { color: var(--saffron); text-decoration: none; font-weight: bold; }
         
-        #successSection { display: none; text-align: center; }
-        .id-box { background: #f0fdf4; padding: 20px; border-radius: 8px; border: 2px dashed var(--green); margin: 20px 0; }
-        .id-box h1 { margin: 10px 0; color: var(--navy); letter-spacing: 2px; }
+        #verifySection { display: none; text-align: center; }
+        .verify-box { background: #f0fdf4; padding: 20px; border-radius: 8px; border: 2px dashed var(--green); margin: 20px 0; }
     </style>
 </head>
 <body>
 
     <div class="navbar">
         <div class="logo-section">
-            <img src="assets/ojasvi-logo.png" alt="Logo">
+            <img src="assets/ojasvi-logo.png" alt="Logo" onerror="this.src='https://via.placeholder.com/60'">
             <div class="brand-text">
                 <h1>ओजस्वी जनकल्याण</h1>
                 <span>OJASVI FOUNDATION</span>
@@ -63,38 +63,45 @@
         <!-- REGISTER FORM -->
         <div id="registerSection">
             <h2><i class="fas fa-user-plus"></i> नया कार्यकर्ता जुड़ें</h2>
-            <p class="subtitle">सिर्फ 1 मिनट में अपना अकाउंट बनाएँ।</p>
+            <p class="subtitle">फॉर्म भरें और ईमेल वेरिफिकेशन लिंक प्राप्त करें।</p>
             
             <form id="agentForm">
                 <div class="form-group"><label>पूरा नाम *</label><input type="text" id="r_name" required></div>
                 <div class="form-group"><label>मोबाइल नंबर *</label><input type="tel" id="r_mobile" pattern="[0-9]{10}" required></div>
                 <div class="form-group"><label>ईमेल आईडी *</label><input type="email" id="r_email" required></div>
-                <div class="form-group"><label>नया पासवर्ड बनाएँ *</label><input type="password" id="r_password" minlength="6" required></div>
+                <div class="form-group">
+                    <label>नया पासवर्ड बनाएँ *</label>
+                    <input type="password" id="r_password" minlength="6" required style="padding-right:40px;">
+                    <i class="fas fa-eye password-toggle" id="togglePwd" onclick="togglePassword()"></i>
+                </div>
                 
-                <button type="button" id="btnRegister" class="btn-main" onclick="handleRegistration()"><i class="fas fa-check-circle"></i> रजिस्टर करें</button>
+                <button type="button" id="btnRegister" class="btn-main" onclick="handleRegistration()"><i class="fas fa-envelope"></i> वेरिफिकेशन लिंक भेजें</button>
                 <div id="regMsg" style="text-align: center; margin-top: 10px; color: red; font-size: 13px; font-weight: bold;"></div>
             </form>
             <div class="switch-link">पहले से अकाउंट है? <a href="login.html">यहाँ लॉगिन करें</a></div>
         </div>
 
-        <!-- SUCCESS SCREEN -->
-        <div id="successSection">
-            <i class="fas fa-check-circle" style="font-size: 60px; color: var(--green);"></i>
-            <h2 style="margin-top: 15px; color: var(--green);">रजिस्ट्रेशन सफल!</h2>
-            <p style="color: #666;">आपका अकाउंट बन गया है।</p>
+        <!-- EMAIL VERIFICATION SCREEN -->
+        <div id="verifySection">
+            <i class="fas fa-envelope-open-text" style="font-size: 60px; color: var(--navy);"></i>
+            <h2 style="margin-top: 15px; color: var(--navy);">ईमेल चेक करें!</h2>
+            <p style="color: #666; font-size: 15px;">हमने आपकी ईमेल <strong id="showEmail" style="color:var(--saffron);"></strong> पर एक वेरिफिकेशन लिंक भेजा है।</p>
             
-            <div class="id-box">
-                <p style="margin:0; font-size: 14px; color: #666;">आपकी नई ID (Agent Code)</p>
-                <h1 id="newAgentId"></h1>
+            <div class="verify-box">
+                <p style="margin:0; font-size: 14px; color: #444;">
+                    <strong>स्टेप 1:</strong> अपनी ईमेल (Inbox या Spam फोल्डर) खोलें。<br><br>
+                    <strong>स्टेप 2:</strong> उस ईमेल में दिए गए लिंक पर क्लिक करें।<br><br>
+                    <strong>स्टेप 3:</strong> लिंक वेरीफाई होने के बाद नीचे दिए बटन से लॉगिन करें।
+                </p>
             </div>
             
-            <p style="font-size: 13px; color: #555;">पोर्टल के अंदर जाकर अपनी <strong>KYC (आधार, पैन)</strong> पूरी करें।</p>
-            <button onclick="window.location.href='login.html'" class="btn-main" style="background: var(--navy);"><i class="fas fa-sign-in-alt"></i> अब लॉगिन करें</button>
+            <button onclick="window.location.href='login.html'" class="btn-main" style="background: var(--green);"><i class="fas fa-sign-in-alt"></i> मैंने वेरीफाई कर लिया है (लॉगिन करें)</button>
         </div>
 
     </div>
 
     <script>
+        // 🚨 असली FIREBASE CONFIG 🚨
         const firebaseConfig = {
             apiKey: "AIzaSyAJSVwr6VhJexbfQ4qQket0NsfJ5yHzm04",
             authDomain: "ojaswi-jan-kalyan-foundation.firebaseapp.com",
@@ -106,6 +113,13 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
+
+        function togglePassword() {
+            const pwd = document.getElementById("r_password");
+            const icon = document.getElementById("togglePwd");
+            if (pwd.type === "password") { pwd.type = "text"; icon.className = "fas fa-eye-slash password-toggle"; } 
+            else { pwd.type = "password"; icon.className = "fas fa-eye password-toggle"; }
+        }
 
         async function handleRegistration() {
             const form = document.getElementById('agentForm');
@@ -120,42 +134,45 @@
             const password = document.getElementById('r_password').value;
 
             try {
-                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> अकाउंट बन रहा है...";
+                btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> लिंक भेजा जा रहा है...";
                 btn.disabled = true;
                 msg.innerText = "";
 
                 // 1. Firebase Auth में अकाउंट बनाना
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const uid = userCredential.user.uid;
+                const user = userCredential.user;
 
-                // 2. नया Agent Code बनाना (जैसे: OJKF-AG-4589)
+                // 2. ईमेल पर वेरिफिकेशन लिंक भेजना
+                await user.sendEmailVerification();
+
+                // 3. नया Agent Code बनाना (जैसे: OJKF-AG-4589)
                 const randomNum = Math.floor(1000 + Math.random() * 9000);
                 const agentCode = "OJKF-AG-" + randomNum;
 
-                // 3. डेटाबेस (Firestore) में डिटेल्स सेव करना
-                await db.collection('agents').doc(uid).set({
-                    id: uid,
+                // 4. डेटाबेस (Firestore) में डिटेल्स सेव करना (Status: Email Unverified)
+                await db.collection('agents').doc(user.uid).set({
+                    id: user.uid,
                     name: name,
                     mobile: mobile,
                     email: email,
                     agent_code: agentCode,
-                    status: 'Pending KYC',
+                    status: 'Email Unverified', // एडमिन पैनल में पता चलेगा कि इसने ईमेल वेरीफाई नहीं किया है
                     created_at: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // 4. सक्सेस स्क्रीन दिखाना
-                document.getElementById('registerSection').style.display = 'none';
-                document.getElementById('successSection').style.display = 'block';
-                document.getElementById('newAgentId').innerText = agentCode;
-
-                // (सिक्योरिटी के लिए यूजर को तुरंत लॉगआउट कर दें, ताकि वो लॉगिन पेज से आए)
+                // 5. सिक्योरिटी के लिए तुरंत लॉगआउट करना
                 await auth.signOut();
+
+                // 6. सक्सेस स्क्रीन (चेक ईमेल) दिखाना
+                document.getElementById('showEmail').innerText = email;
+                document.getElementById('registerSection').style.display = 'none';
+                document.getElementById('verifySection').style.display = 'block';
 
             } catch (error) {
                 if(error.message.includes("email-already-in-use")) msg.innerText = "❌ यह ईमेल पहले से रजिस्टर है!";
                 else msg.innerText = "❌ एरर: " + error.message;
                 
-                btn.innerHTML = "<i class='fas fa-check-circle'></i> रजिस्टर करें";
+                btn.innerHTML = "<i class='fas fa-envelope'></i> वेरिफिकेशन लिंक भेजें";
                 btn.disabled = false;
             }
         }
